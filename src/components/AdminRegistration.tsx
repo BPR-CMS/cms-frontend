@@ -4,13 +4,32 @@ import FormFieldGroup from "@/components/custom/FormFieldGroup";
 import FormGrid from "@/components/custom/FormGrid";
 import Logo from "./custom/Logo";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
-
+import { useToast } from "@/hooks/use-toast";
 const AdminRegistration = () => {
   const { values, errors, isValid, handleChange } = useFormWithValidation();
+  const { toast } = useToast();
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (values.password !== values.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match.",
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({
+      title: "Success",
+      description: "You have successfully created an admin account.",
+      variant: "success",
+    });
+  };
 
   return (
     <form
       className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
+      onSubmit={handleSubmit}
       noValidate
     >
       <div className="flex items-center justify-center pb-6 ">
