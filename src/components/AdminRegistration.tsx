@@ -1,9 +1,13 @@
+"use client";
 import { Button } from "@/components/ui/Button";
 import FormFieldGroup from "@/components/custom/FormFieldGroup";
 import FormGrid from "@/components/custom/FormGrid";
 import Logo from "./custom/Logo";
+import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 
 const AdminRegistration = () => {
+  const { values, errors, isValid, handleChange } = useFormWithValidation();
+
   return (
     <form
       className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
@@ -31,6 +35,11 @@ const AdminRegistration = () => {
             id="firstName"
             type="text"
             required
+            value={values.firstName}
+            onChange={handleChange}
+            error={errors.firstName}
+            minLength={2}
+            maxLength={20}
           />
         </div>
 
@@ -41,6 +50,11 @@ const AdminRegistration = () => {
             id="lastName"
             type="text"
             required
+            value={values.lastName}
+            onChange={handleChange}
+            error={errors.lastName}
+            minLength={2}
+            maxLength={20}
           />
         </div>
 
@@ -51,6 +65,9 @@ const AdminRegistration = () => {
             id="email"
             type="email"
             required
+            value={values.email}
+            onChange={handleChange}
+            error={errors.email}
           />
         </div>
 
@@ -61,6 +78,11 @@ const AdminRegistration = () => {
             id="password"
             type="password"
             required
+            minLength={8}
+            maxLength={16}
+            value={values.password}
+            onChange={handleChange}
+            error={errors.password}
           />
         </div>
 
@@ -71,11 +93,21 @@ const AdminRegistration = () => {
             id="confirmPassword"
             type="password"
             required
+            minLength={8}
+            maxLength={16}
+            value={values.confirmPassword}
+            onChange={handleChange}
+            error={errors.confirmPassword}
           />
         </div>
       </FormGrid>
       <div className="border-gray-900/10 pt-12">
-        <Button variant="default" size="lg" className="w-full">
+        <Button
+          variant="default"
+          size="lg"
+          className="w-full"
+          disabled={!isValid}
+        >
           {" "}
           Let&apos;s start
         </Button>
