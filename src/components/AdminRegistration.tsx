@@ -1,16 +1,45 @@
 "use client";
+import React from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import FormFieldGroup from "@/components/custom/FormFieldGroup";
 import FormGrid from "@/components/custom/FormGrid";
-import Logo from "./custom/Logo";
+import Logo from "@/components/custom/Logo";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { useToast } from "@/hooks/use-toast";
+import { checkAdminExists, registerAdmin } from "@/services/AdminService";
+import { Admin } from "@/models/Admin";
 const AdminRegistration = () => {
   const { values, errors, isValid, handleChange } = useFormWithValidation();
   const { toast } = useToast();
+  const router = useRouter();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const register = async (adminData: Admin) => {
+    try {
+      await registerAdmin(adminData);
+      toast({
+        title: "Success",
+        description: "You have successfully created an admin account.",
+        variant: "success",
+      });
+      router.push("/account");
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error registering the admin:", error.message);
+      } else {
+        console.error("An unknown error occurred:", error);
+      }
+      toast({
+        title: "Error",
+        description: "An error occurred while registering the admin account.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
     if (values.password !== values.confirmPassword) {
       toast({
         title: "Error",
@@ -19,11 +48,25 @@ const AdminRegistration = () => {
       });
       return;
     }
-    toast({
-      title: "Success",
-      description: "You have successfully created an admin account.",
-      variant: "success",
-    });
+
+    const adminStatus = await checkAdminExists();
+    if (adminStatus.adminExists) {
+      toast({
+        title: "Error",
+        description: "An admin account already exists.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const adminData: Admin = {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      password: values.password,
+    };
+
+    register(adminData);
   };
 
   return (
@@ -127,11 +170,11 @@ const AdminRegistration = () => {
           className="w-full"
           disabled={!isValid}
         >
-          {" "}
           Let&apos;s start
         </Button>
       </div>
     </form>
   );
 };
+
 export default AdminRegistration;
