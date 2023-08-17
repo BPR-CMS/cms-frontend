@@ -54,12 +54,16 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
         />
         {error && (
           <button
+            id="error-button"
             className="mt-2 text-red-500 cursor-pointer relative p-1 border border-red-500 rounded hover:bg-red-100 focus:outline-none"
             onClick={handleIconClick}
           >
             <FaExclamationCircle />
             {showTooltip && (
-              <div className="absolute left-full top-0 mt-0 ml-2 w-48 p-2 bg-white text-sm text-red-500 border border-red-500 rounded-md shadow-md z-10">
+              <div
+                id="error-tooltip"
+                className=" absolute left-full top-0 mt-0 ml-2 w-48 p-2 bg-white text-sm text-red-500 border border-red-500 rounded-md shadow-md z-10"
+              >
                 {error}
               </div>
             )}

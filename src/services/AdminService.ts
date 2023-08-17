@@ -3,7 +3,7 @@ import { Admin } from "@/models/Admin";
 
 const BASE_URL = "http://localhost:8080/api/v1";
 
-export const checkAdminExists = async (): Promise<{ adminExists: boolean }> => {
+export const checkAdminExists = async (): Promise<boolean> => {
   try {
     const response = await axios.get(`${BASE_URL}/initialize`);
     return response.data;

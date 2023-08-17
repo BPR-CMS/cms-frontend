@@ -9,6 +9,8 @@ import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { useToast } from "@/hooks/use-toast";
 import { checkAdminExists, registerAdmin } from "@/services/AdminService";
 import { Admin } from "@/models/Admin";
+import { getErrors } from "@/lib/utils";
+import { AxiosError } from "axios";
 const AdminRegistration = () => {
   const { values, errors, isValid, handleChange } = useFormWithValidation();
   const { toast } = useToast();
@@ -17,6 +19,7 @@ const AdminRegistration = () => {
   const register = async (adminData: Admin) => {
     try {
       await registerAdmin(adminData);
+      localStorage.setItem("adminExists", "true");
       toast({
         title: "Success",
         description: "You have successfully created an admin account.",
@@ -24,14 +27,12 @@ const AdminRegistration = () => {
       });
       router.push("/account");
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error registering the admin:", error.message);
-      } else {
-        console.error("An unknown error occurred:", error);
-      }
+      const axiosError = error as AxiosError; // Type cast the error to AxiosError
+      const errorMessage = getErrors(axiosError);
+      console.error("Error registering the admin:", errorMessage);
       toast({
         title: "Error",
-        description: "An error occurred while registering the admin account.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -50,7 +51,7 @@ const AdminRegistration = () => {
     }
 
     const adminStatus = await checkAdminExists();
-    if (adminStatus.adminExists) {
+    if (adminStatus) {
       toast({
         title: "Error",
         description: "An admin account already exists.",
@@ -71,6 +72,7 @@ const AdminRegistration = () => {
 
   return (
     <form
+      id="admin-registration"
       className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
       onSubmit={handleSubmit}
       noValidate
