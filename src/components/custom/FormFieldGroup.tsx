@@ -52,6 +52,7 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
           maxLength={maxLength}
           pattern={pattern}
         />
+
         {error && (
           <button
             id="error-button"

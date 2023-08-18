@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import FormFieldGroup from "@/components/custom/FormFieldGroup";
@@ -11,10 +11,24 @@ import { checkAdminExists, registerAdmin } from "@/services/AdminService";
 import { Admin } from "@/models/Admin";
 import { getErrors } from "@/lib/utils";
 import { AxiosError } from "axios";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/Tooltip";
+
 const AdminRegistration = () => {
-  const { values, errors, isValid, handleChange } = useFormWithValidation();
+  const { values, errors, isValid, handleChange } = useFormWithValidation({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const { toast } = useToast();
   const router = useRouter();
+  const [submitted, setSubmitted] = useState(false);
 
   const register = async (adminData: Admin) => {
     try {
@@ -35,6 +49,7 @@ const AdminRegistration = () => {
         description: errorMessage,
         variant: "destructive",
       });
+      setSubmitted(false);
     }
   };
 
@@ -66,7 +81,7 @@ const AdminRegistration = () => {
       email: values.email,
       password: values.password,
     };
-
+    setSubmitted(true);
     register(adminData);
   };
 
@@ -104,6 +119,7 @@ const AdminRegistration = () => {
             error={errors.firstName}
             minLength={2}
             maxLength={20}
+            pattern="^[a-zA-Z\s]+$"
           />
         </div>
 
@@ -119,6 +135,7 @@ const AdminRegistration = () => {
             error={errors.lastName}
             minLength={2}
             maxLength={20}
+            pattern="^[a-zA-Z\s]+$"
           />
         </div>
 
@@ -147,7 +164,31 @@ const AdminRegistration = () => {
             value={values.password}
             onChange={handleChange}
             error={errors.password}
+            pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{8,16}$"
           />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger type="button">&#128274;</TooltipTrigger>
+              <TooltipContent side="right">
+                <div className="mt-2 text-xs text-gray-600">
+                  Password must meet the following criteria:
+                  <ul className="list-disc pl-5 mt-2">
+                    <li className="mt-1">At least one digit.</li>
+                    <li className="mt-1">At least one lowercase letter.</li>
+                    <li className="mt-1">At least one uppercase letter.</li>
+                    <li className="mt-1">
+                      At least one special character from the set @#$%^&-+=().
+                    </li>
+                    <li className="mt-1">No whitespace allowed.</li>
+                    <li className="mt-1">
+                      Total length of the password should be between 8 and 20
+                      characters.
+                    </li>
+                  </ul>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         <div className="col-span-full">
@@ -167,10 +208,11 @@ const AdminRegistration = () => {
       </FormGrid>
       <div className="border-gray-900/10 pt-12">
         <Button
+          id="registerAdminButton"
           variant="default"
           size="lg"
           className="w-full"
-          disabled={!isValid}
+          disabled={submitted || !isValid}
         >
           Let&apos;s start
         </Button>
