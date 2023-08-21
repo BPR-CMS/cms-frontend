@@ -39,7 +39,7 @@ const AdminRegistration = () => {
         description: "You have successfully created an admin account.",
         variant: "success",
       });
-      router.push("/account");
+      router.push("/sign-in");
     } catch (error) {
       const axiosError = error as AxiosError; // Type cast the error to AxiosError
       const errorMessage = getErrors(axiosError);
