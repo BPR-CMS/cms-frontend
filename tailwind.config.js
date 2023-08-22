@@ -18,6 +18,8 @@ module.exports = {
     extend: {
       colors: {
         customBlue: '#0075ff',
+        customWhite: '#F6F6F9',
+        customLightBlue: 'rgba(0, 117, 255, 0.07)',
       },
       keyframes: {
         "accordion-down": {
