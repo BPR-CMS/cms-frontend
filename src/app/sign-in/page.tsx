@@ -6,24 +6,61 @@ import FormGrid from "@/components/custom/FormGrid";
 import Logo from "@/components/custom/Logo";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { useToast } from "@/hooks/use-toast";
+import { User } from "@/models/User";
+import { loginUser } from "@/services/UserService";
+import { AxiosError } from "axios";
+import { getErrors } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 const Login = () => {
   const { values, errors, isValid, handleChange } = useFormWithValidation({
     email: "",
     password: "",
   });
   const { toast } = useToast();
+  const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
+
+  const login = async (userData: User) => {
+    try {
+      const response = await loginUser(userData);
+      const token = response;
+      if (token) {
+        localStorage.setItem("token", token);
+      }
+      console.log(token);
+      toast({
+        title: "Success",
+        description: "You have successfully signed in.",
+        variant: "success",
+      });
+
+      router.push("/account");
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      const errorMessage = getErrors(axiosError);
+      console.error("Error logging in:", errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      setSubmitted(false);
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    const userData: User = {
+      email: values.email,
+      password: values.password,
+      firstName: "",
+      lastName: "",
+    };
     setSubmitted(true);
-    toast({
-      title: "Success",
-      description: "You have successfully logged in.",
-      variant: "success",
-    });
-    console.log("login submit");
+    login(userData);
   };
+
   return (
     <form
       id="login-form"
