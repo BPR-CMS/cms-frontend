@@ -21,7 +21,7 @@ export const getErrors = (err: AxiosError): string => {
       case 403:
         return "You don't have permission to perform this action.";
       case 404:
-        return "The requested admin account was not found.";
+        return "The requested data was not found.";
       case 409:
         return "An admin account with this email already exists.";
       case 429:

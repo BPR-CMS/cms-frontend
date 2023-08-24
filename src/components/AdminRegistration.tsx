@@ -8,7 +8,7 @@ import Logo from "@/components/custom/Logo";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { useToast } from "@/hooks/use-toast";
 import { checkAdminExists, registerAdmin } from "@/services/AdminService";
-import { Admin } from "@/models/Admin";
+import { Admin } from "@/models/User";
 import { getErrors } from "@/lib/utils";
 import { AxiosError } from "axios";
 import {
@@ -39,7 +39,7 @@ const AdminRegistration = () => {
         description: "You have successfully created an admin account.",
         variant: "success",
       });
-      router.push("/account");
+      router.push("/sign-in");
     } catch (error) {
       const axiosError = error as AxiosError; // Type cast the error to AxiosError
       const errorMessage = getErrors(axiosError);

@@ -1,18 +1,21 @@
 describe("Admin registration flow", () => {
+  afterEach(() => {
+    // Call the utility endpoint to reset the database
+    cy.request("POST", "http://localhost:8080/api/v1/utils/resetDatabase");
+  });
   // This test checks if the admin registration form is displayed when there is no admin
   it("should show the registration form if no admin exists", () => {
-    // Intercept the API request and mock a response that indicates no admin exists
+    // Intercept the API request and mock a response that indicates an admin exists
     cy.intercept(
       {
         method: "GET",
-        url: "/api/v1/initialize",
+        url: "/api/v1/admin",
       },
       {
         statusCode: 200,
-        body: false, // Mock response indicating no admin exists
+        body: false, // Mock response indicating an admin exists
       }
     ).as("checkAdminExists");
-
     // Navigate to the registration page
     cy.visit("http://localhost:3000/");
 
@@ -26,7 +29,7 @@ describe("Admin registration flow", () => {
     cy.intercept(
       {
         method: "GET",
-        url: "/api/v1/initialize",
+        url: "/api/v1/admin",
       },
       {
         statusCode: 200,
@@ -43,33 +46,26 @@ describe("Admin registration flow", () => {
 });
 
 describe("Admin registration, no admin exists", () => {
-  beforeEach(() => {
-    cy.intercept(
-      {
-        method: "GET",
-        url: "/api/v1/initialize",
-      },
-      {
-        statusCode: 200,
-        body: false,
-      }
-    ).as("checkAdminExists");
+  // beforeEach(() => {
+  //   cy.intercept(
+  //     {
+  //       method: "GET",
+  //       url: "/api/v1/admin",
+  //     },
+  //     {
+  //       statusCode: 200,
+  //       body: false,
+  //     }
+  //   ).as("checkAdminExists");
+  // });
+
+  afterEach(() => {
+    // Call the utility endpoint to reset the database
+    cy.request("POST", "http://localhost:8080/api/v1/utils/resetDatabase");
   });
 
   // This test covers the successful registration of an admin
   it("should register the admin successfully", () => {
-    // Intercept the POST request and mock a success response for admin registration
-    cy.intercept(
-      {
-        method: "POST",
-        url: "/api/v1/initialize",
-      },
-      {
-        statusCode: 201,
-        body: { message: "Admin registered successfully." },
-      }
-    ).as("registerAdmin");
-
     // Navigate to the registration page
     cy.visit("http://localhost:3000/");
 
@@ -87,23 +83,11 @@ describe("Admin registration, no admin exists", () => {
     cy.get(".success")
       .should("be.visible")
       .contains("You have successfully created an admin account.");
-    cy.location("pathname").should("eq", "/account");
+    cy.location("pathname").should("eq", "/sign-in");
   });
 
   // This test checks that 'adminExists' is set to 'true' in localStorage after successful registration
   it("should set 'adminExists' to 'true' in localStorage after successful registration", () => {
-    // Intercept the API request and mock a success response for admin registration
-    cy.intercept(
-      {
-        method: "POST",
-        url: "/api/v1/initialize",
-      },
-      {
-        statusCode: 201,
-        body: { message: "Admin registered successfully." },
-      }
-    ).as("registerAdmin");
-
     // Navigate to the registration page
     cy.visit("http://localhost:3000/");
 
@@ -126,10 +110,11 @@ describe("Admin registration, no admin exists", () => {
     cy.intercept(
       {
         method: "POST",
-        url: "/api/v1/initialize",
+        url: "/api/v1/admin/initialize",
       },
       { forceNetworkError: true }
     ).as("registrationRequest");
+
     cy.visit("http://localhost:3000/");
     // Fill out the form
     cy.get('input[name="firstName"]').type("John");
@@ -154,7 +139,7 @@ describe("Validation", () => {
     cy.intercept(
       {
         method: "GET",
-        url: "/api/v1/initialize",
+        url: "/api/v1/admin",
       },
       {
         statusCode: 200,
@@ -162,6 +147,11 @@ describe("Validation", () => {
       }
     ).as("checkAdminExists");
     cy.visit("http://localhost:3000/");
+  });
+
+  afterEach(() => {
+    // Call the utility endpoint to reset the database
+    cy.request("POST", "http://localhost:8080/api/v1/utils/resetDatabase");
   });
 
   // Test to ensure that an exclamation mark button appears when invalid input is typed into the form
@@ -251,16 +241,6 @@ describe("Validation", () => {
   });
 
   it("should handle whitespace in fields correctly", () => {
-    cy.intercept(
-      {
-        method: "POST",
-        url: "/api/v1/initialize",
-      },
-      {
-        statusCode: 201,
-        body: { message: "Admin registered successfully." },
-      }
-    ).as("registerAdmin");
     // Navigate to the registration page
     cy.visit("http://localhost:3000/");
 
@@ -277,7 +257,7 @@ describe("Validation", () => {
     cy.get(".success")
       .should("be.visible")
       .contains("You have successfully created an admin account.");
-    cy.location("pathname").should("eq", "/account");
+    cy.location("pathname").should("eq", "/sign-in");
   });
 
   it("should display an error when entering symbols in first name", () => {
@@ -351,7 +331,7 @@ describe("Admin Registration Edge Cases", () => {
     cy.intercept(
       {
         method: "GET",
-        url: "/api/v1/initialize",
+        url: "/api/v1/admin",
       },
       {
         statusCode: 200,
@@ -359,6 +339,12 @@ describe("Admin Registration Edge Cases", () => {
       }
     ).as("checkAdminExists");
   });
+
+  afterEach(() => {
+    // Call the utility endpoint to reset the database
+    cy.request("POST", "http://localhost:8080/api/v1/utils/resetDatabase");
+  });
+
   it("should not allow creation of a new admin if one already exists", () => {
     cy.window().then((win) => {
       win.localStorage.setItem("adminExists", "false");
@@ -386,7 +372,7 @@ describe("Admin Registration Form Tests", () => {
     cy.intercept(
       {
         method: "GET",
-        url: "/api/v1/initialize",
+        url: "/api/v1/admin",
       },
       {
         statusCode: 200,
@@ -395,19 +381,12 @@ describe("Admin Registration Form Tests", () => {
     ).as("checkAdminExists");
   });
 
-  it("should prevent multiple submissions by disabling the 'Submit' button after it has been clicked", () => {
-    // Mock the response for registering an admin
-    cy.intercept(
-      {
-        method: "POST",
-        url: "/api/v1/initialize",
-      },
-      {
-        statusCode: 201,
-        body: { message: "Admin registered successfully." },
-      }
-    ).as("registerAdmin");
+  afterEach(() => {
+    // Call the utility endpoint to reset the database
+    cy.request("POST", "http://localhost:8080/api/v1/utils/resetDatabase");
+  });
 
+  it("should prevent multiple submissions by disabling the 'Submit' button after it has been clicked", () => {
     cy.visit("http://localhost:3000/");
     cy.get('form[id="admin-registration"]').within(() => {
       cy.get('input[name="firstName"]').type("Lia");
@@ -455,7 +434,7 @@ describe("Admin Registration Form Tests", () => {
       cy.get('input[name="confirmPassword"]').type("$US0xxDQ5&Oy2SsO");
     });
     // Navigate away from the page
-    cy.visit("http://localhost:3000/account");
+    cy.visit("http://localhost:3000/sign-in");
     // Navigate back to the registration page
     cy.visit("http://localhost:3000/");
     // Verify that the form fields are empty
@@ -469,29 +448,6 @@ describe("Admin Registration Form Tests", () => {
   });
 
   it("should prevent access to registration form after successful registration by using browser back button", () => {
-    // Mock the responses for checking if an admin exists and registering an admin
-    cy.intercept(
-      {
-        method: "GET",
-        url: "/api/v1/initialize",
-      },
-      {
-        statusCode: 200,
-        body: false,
-      }
-    ).as("checkAdminExists");
-
-    cy.intercept(
-      {
-        method: "POST",
-        url: "/api/v1/initialize",
-      },
-      {
-        statusCode: 201,
-        body: { message: "Admin registered successfully." },
-      }
-    ).as("registerAdmin");
-
     // Navigate to the registration page
     cy.visit("http://localhost:3000/");
 
@@ -509,7 +465,7 @@ describe("Admin Registration Form Tests", () => {
     cy.get(".success")
       .should("be.visible")
       .contains("You have successfully created an admin account.");
-    cy.location("pathname").should("eq", "/account");
+    cy.location("pathname").should("eq", "/sign-in");
 
     // Simulate clicking the browser back button
     cy.go("back");
