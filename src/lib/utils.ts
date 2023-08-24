@@ -17,7 +17,12 @@ export const getErrors = (err: AxiosError): string => {
           return "The data provided is invalid. Please check the information you provided and try again.";
         }
       case 401:
-        return "Incorrect email or password.";
+        if (data.message === "Unauthorized") {
+          return "You are not authorized to perform this action.";
+        } else {
+          return "The data provided is incorrect.";
+        }
+
       case 403:
         return "You don't have permission to perform this action.";
       case 404:

@@ -1,9 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-
 import { Button } from "@/components/ui/Button";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,12 +12,16 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/Dialog";
-
 import { DialogClose } from "@radix-ui/react-dialog";
-
 import FormFieldGroup from "@/components/custom/FormFieldGroup";
 import FormGrid from "@/components/custom/FormGrid";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
+import { Collection } from "@/models/Collection";
+import { addCollection } from "@/services/CollectionService";
+import { AxiosError } from "axios";
+import { getErrors } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+
 type ContentType = {
   id: string;
   title: string;
@@ -42,18 +45,52 @@ export default function HomePage() {
     name: "",
     description: "",
   });
+
+  const { toast } = useToast();
+  const [submitted, setSubmitted] = useState(false);
   const [selectedContentType, setSelectedContentType] =
     useState<ContentType | null>(null);
   const router = useRouter();
+  const closeDialogButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const handleContentTypeClick = (contentType: ContentType) => {
     setSelectedContentType(contentType);
     router.push(`#${contentType.id}`, undefined);
   };
+
+  const createCollection = async (collectionData: Collection) => {
+    try {
+      await addCollection(collectionData);
+
+      toast({
+        title: "Success",
+        description: "You have successfully added a new collection.",
+        variant: "success",
+      });
+
+      closeDialogButtonRef.current?.click();
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      const errorMessage = getErrors(axiosError);
+      console.error("Error adding a new collection:", errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      setSubmitted(false);
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    console.log("subbmited collection");
+    const collectionData: Collection = {
+      name: values.name,
+      description: values.description,
+    };
+    setSubmitted(true);
+    createCollection(collectionData);
   };
   return (
     <div className="md:flex">
@@ -133,7 +170,7 @@ export default function HomePage() {
                   </FormGrid>
 
                   <DialogFooter style={{ paddingTop: "48px" }}>
-                    <DialogClose>
+                    <DialogClose ref={closeDialogButtonRef}>
                       <Button variant="outline" type="button">
                         Cancel
                       </Button>
@@ -141,7 +178,7 @@ export default function HomePage() {
                     <Button
                       id="addCollectionButton"
                       type="submit"
-                      disabled={!isValid}
+                      disabled={submitted || !isValid}
                     >
                       Save
                     </Button>
