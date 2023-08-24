@@ -4,7 +4,21 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/Button";
 import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/Dialog";
 
+import { DialogClose } from "@radix-ui/react-dialog";
+
+import FormFieldGroup from "@/components/custom/FormFieldGroup";
+import FormGrid from "@/components/custom/FormGrid";
+import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 type ContentType = {
   id: string;
   title: string;
@@ -24,6 +38,10 @@ const contentTypes: ContentType[] = [
 ];
 
 export default function HomePage() {
+  const { values, errors, isValid, handleChange } = useFormWithValidation({
+    name: "",
+    description: "",
+  });
   const [selectedContentType, setSelectedContentType] =
     useState<ContentType | null>(null);
   const router = useRouter();
@@ -32,7 +50,11 @@ export default function HomePage() {
     setSelectedContentType(contentType);
     router.push(`#${contentType.id}`, undefined);
   };
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
 
+    console.log("subbmited collection");
+  };
   return (
     <div className="md:flex">
       <div className="h-full md:w-72 md:flex-col md:fixed md:inset-y-0 z-80 border-r border-gray-300">
@@ -61,15 +83,72 @@ export default function HomePage() {
                 ))}
               </ul>
             </div>
-            <Button
-              style={{
-                backgroundColor: "transparent",
-                color: "#0075FF",
-                paddingLeft: "0",
-              }}
-            >
-              &#43; Create new collection
-            </Button>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  style={{
+                    backgroundColor: "transparent",
+                    color: "#0075FF",
+                    paddingLeft: "0",
+                  }}
+                >
+                  &#43; Create new collection
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Add collection</DialogTitle>
+                  <DialogDescription>
+                    Create a new collection type. Click save when you are done.
+                  </DialogDescription>
+                </DialogHeader>
+                <form id="collection-form" onSubmit={handleSubmit} noValidate>
+                  <FormGrid>
+                    <div className="col-span-full">
+                      <FormFieldGroup
+                        label="Name"
+                        name="name"
+                        id="name"
+                        type="text"
+                        required
+                        value={values.name}
+                        onChangeInput={handleChange}
+                        error={errors.name}
+                      />
+                    </div>
+
+                    <div className="col-span-full">
+                      <FormFieldGroup
+                        useTextarea
+                        label="Description"
+                        name="description"
+                        id="description"
+                        required
+                        value={values.description}
+                        onChangeTextArea={handleChange}
+                        error={errors.description}
+                      />
+                    </div>
+                  </FormGrid>
+
+                  <DialogFooter style={{ paddingTop: "48px" }}>
+                    <DialogClose>
+                      <Button variant="outline" type="button">
+                        Cancel
+                      </Button>
+                    </DialogClose>
+                    <Button
+                      id="addCollectionButton"
+                      type="submit"
+                      disabled={!isValid}
+                    >
+                      Save
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>

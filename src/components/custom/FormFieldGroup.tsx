@@ -3,19 +3,24 @@ import { useState } from "react";
 import { Input } from "../ui/Input";
 import { Label } from "../ui/Label";
 import { FaExclamationCircle } from "react-icons/fa";
+import { Textarea } from "@/components/ui/Textarea";
 
 interface FormFieldGroupProps {
   label: string;
   name: string;
   id: string;
-  type: string;
+  type?: string;
   required?: boolean;
   value: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChangeInput?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChangeTextArea?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   error?: string;
   minLength?: number;
   maxLength?: number;
   pattern?: string;
+  useTextarea?: boolean;
+  rows?: number;
+  cols?: number;
 }
 
 const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
@@ -25,11 +30,15 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
   type,
   required,
   value,
-  onChange,
+  onChangeInput,
   error,
   minLength,
   maxLength,
   pattern,
+  useTextarea,
+  onChangeTextArea,
+  rows,
+  cols,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -41,17 +50,32 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
     <>
       <Label htmlFor={id}>{label}</Label>
 
-      <Input
-        type={type}
-        name={name}
-        id={id}
-        required={required}
-        value={value}
-        onChange={onChange}
-        minLength={minLength}
-        maxLength={maxLength}
-        pattern={pattern}
-      />
+      {useTextarea ? (
+        <Textarea
+          name={name}
+          id={id}
+          required={required}
+          value={value}
+          onChange={onChangeTextArea}
+          rows={rows}
+          cols={cols}
+          className="mt-2"
+
+          // ... other props for Textarea
+        />
+      ) : (
+        <Input
+          type={type}
+          name={name}
+          id={id}
+          required={required}
+          value={value}
+          onChange={onChangeInput}
+          minLength={minLength}
+          maxLength={maxLength}
+          pattern={pattern}
+        />
+      )}
 
       {error && (
         <button

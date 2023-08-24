@@ -16,18 +16,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    // <html lang="en" suppressHydrationWarning>
-    //   <body className={inter.className}>
-    //     <main className="h-full  overflow-auto">
-    //       <div className="mx-auto max-w-screen-xl h-full w-full">
-    //         {children}
-    //       </div>
-    //     </main>
-
-    //     <Toaster />
-    //   </body>
-    // </html>
-
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <Toaster />

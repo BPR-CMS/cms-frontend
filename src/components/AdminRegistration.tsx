@@ -8,7 +8,7 @@ import Logo from "@/components/custom/Logo";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { useToast } from "@/hooks/use-toast";
 import { checkAdminExists, registerAdmin } from "@/services/AdminService";
-import { Admin } from "@/models/User";
+import { User } from "@/models/User";
 import { getErrors } from "@/lib/utils";
 import { AxiosError } from "axios";
 import {
@@ -30,7 +30,7 @@ const AdminRegistration = () => {
   const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
 
-  const register = async (adminData: Admin) => {
+  const register = async (adminData: User) => {
     try {
       await registerAdmin(adminData);
       localStorage.setItem("adminExists", "true");
@@ -75,7 +75,7 @@ const AdminRegistration = () => {
       return;
     }
 
-    const adminData: Admin = {
+    const adminData: User = {
       firstName: values.firstName,
       lastName: values.lastName,
       email: values.email,
@@ -116,7 +116,7 @@ const AdminRegistration = () => {
               type="text"
               required
               value={values.firstName}
-              onChange={handleChange}
+              onChangeInput={handleChange}
               error={errors.firstName}
               minLength={2}
               maxLength={20}
@@ -132,7 +132,7 @@ const AdminRegistration = () => {
               type="text"
               required
               value={values.lastName}
-              onChange={handleChange}
+              onChangeInput={handleChange}
               error={errors.lastName}
               minLength={2}
               maxLength={20}
@@ -148,7 +148,7 @@ const AdminRegistration = () => {
               type="email"
               required
               value={values.email}
-              onChange={handleChange}
+              onChangeInput={handleChange}
               error={errors.email}
             />
           </div>
@@ -163,7 +163,7 @@ const AdminRegistration = () => {
               minLength={8}
               maxLength={16}
               value={values.password}
-              onChange={handleChange}
+              onChangeInput={handleChange}
               error={errors.password}
               pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{8,16}$"
             />
@@ -202,7 +202,7 @@ const AdminRegistration = () => {
               minLength={8}
               maxLength={16}
               value={values.confirmPassword}
-              onChange={handleChange}
+              onChangeInput={handleChange}
               error={errors.confirmPassword}
             />
           </div>
