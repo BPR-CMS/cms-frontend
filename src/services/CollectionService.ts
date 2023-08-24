@@ -24,3 +24,16 @@ export const addCollection = async (data: Collection): Promise<any> => {
     throw error;
   }
 };
+
+export const getCollections = async (): Promise<any> => {
+  try {
+    const response = await axios.get(`${BASE_URL}`, {
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

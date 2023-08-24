@@ -1,23 +1,38 @@
+"use client";
 type Params = {
   params: {
     contentType: string;
   };
 };
-const contentTypes = [
-  { id: "user", name: "User", description: "This is the User content type." },
-  {
-    id: "webinar",
-    name: "Webinar",
-    description: "This is the Webinar content type.",
-  },
-];
-export default async function ContentTypePage({
-  params: { contentType },
-}: Params) {
-  const selectedContentType = contentTypes.find(
-    (item) => item.id === contentType
-  );
 
+import { Collection } from "@/models/Collection";
+import React, { useState, useEffect } from "react";
+import { getCollections } from "@/services/CollectionService";
+import { useToast } from "@/hooks/use-toast";
+export default function ContentTypePage({ params: { contentType } }: Params) {
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const { toast } = useToast();
+  const fetchCollections = async () => {
+    try {
+      const allCollections = await getCollections();
+      setCollections(allCollections);
+    } catch (error) {
+      console.error("Error fetching collections:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch collections.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchCollections();
+  }, []);
+
+  const selectedContentType = collections.find(
+    (item) => item.name === contentType
+  );
   if (!selectedContentType) {
     return <div>Content type not found.</div>;
   }
