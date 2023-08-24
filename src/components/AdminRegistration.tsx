@@ -86,138 +86,140 @@ const AdminRegistration = () => {
   };
 
   return (
-    <form
-      id="admin-registration"
-      className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
-      onSubmit={handleSubmit}
-      noValidate
-    >
-      <div className="flex items-center justify-center pb-6 ">
-        <Logo width={60} variant="noText" />
-      </div>
-      <h2 className="text-2xl text-center font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-        Welcome to WebEase
-      </h2>
-      <p className="mt-6 text-lg leading-8 text-gray-600 text-center">
-        Let&apos;s set up your initial admin account to get started.{" "}
-      </p>
-
-      <h2 className="text-base font-semibold leading-7 text-gray-900 mt-4">
-        Personal Information
-      </h2>
-
-      <FormGrid>
-        <div className="sm:col-span-3">
-          <FormFieldGroup
-            label="First name"
-            name="firstName"
-            id="firstName"
-            type="text"
-            required
-            value={values.firstName}
-            onChange={handleChange}
-            error={errors.firstName}
-            minLength={2}
-            maxLength={20}
-            pattern="^[a-zA-Z\s]+$"
-          />
+    <div className="flex min-h-screen flex-col items-center justify-between p-10">
+      <form
+        id="admin-registration"
+        className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg "
+        onSubmit={handleSubmit}
+        noValidate
+      >
+        <div className="flex items-center justify-center pb-6 ">
+          <Logo width={60} variant="noText" />
         </div>
+        <h2 className="text-2xl text-center font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+          Welcome to WebEase
+        </h2>
+        <p className="mt-6 text-lg leading-8 text-gray-600 text-center">
+          Let&apos;s set up your initial admin account to get started.{" "}
+        </p>
 
-        <div className="sm:col-span-3">
-          <FormFieldGroup
-            label="Last name"
-            name="lastName"
-            id="lastName"
-            type="text"
-            required
-            value={values.lastName}
-            onChange={handleChange}
-            error={errors.lastName}
-            minLength={2}
-            maxLength={20}
-            pattern="^[a-zA-Z\s]+$"
-          />
-        </div>
+        <h2 className="text-base font-semibold leading-7 text-gray-900 mt-4">
+          Personal Information
+        </h2>
 
-        <div className="col-span-full">
-          <FormFieldGroup
-            label="Email address"
-            name="email"
-            id="email"
-            type="email"
-            required
-            value={values.email}
-            onChange={handleChange}
-            error={errors.email}
-          />
-        </div>
+        <FormGrid>
+          <div className="sm:col-span-3">
+            <FormFieldGroup
+              label="First name"
+              name="firstName"
+              id="firstName"
+              type="text"
+              required
+              value={values.firstName}
+              onChange={handleChange}
+              error={errors.firstName}
+              minLength={2}
+              maxLength={20}
+              pattern="^[a-zA-Z\s]+$"
+            />
+          </div>
 
-        <div className="col-span-full">
-          <FormFieldGroup
-            label="Password"
-            name="password"
-            id="password"
-            type="password"
-            required
-            minLength={8}
-            maxLength={16}
-            value={values.password}
-            onChange={handleChange}
-            error={errors.password}
-            pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{8,16}$"
-          />
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger type="button">&#128274;</TooltipTrigger>
-              <TooltipContent side="right">
-                <div className="mt-2 text-xs text-gray-600">
-                  Password must meet the following criteria:
-                  <ul className="list-disc pl-5 mt-2">
-                    <li className="mt-1">At least one digit.</li>
-                    <li className="mt-1">At least one lowercase letter.</li>
-                    <li className="mt-1">At least one uppercase letter.</li>
-                    <li className="mt-1">
-                      At least one special character from the set @#$%^&-+=().
-                    </li>
-                    <li className="mt-1">No whitespace allowed.</li>
-                    <li className="mt-1">
-                      Total length of the password should be between 8 and 20
-                      characters.
-                    </li>
-                  </ul>
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+          <div className="sm:col-span-3">
+            <FormFieldGroup
+              label="Last name"
+              name="lastName"
+              id="lastName"
+              type="text"
+              required
+              value={values.lastName}
+              onChange={handleChange}
+              error={errors.lastName}
+              minLength={2}
+              maxLength={20}
+              pattern="^[a-zA-Z\s]+$"
+            />
+          </div>
 
-        <div className="col-span-full">
-          <FormFieldGroup
-            label="Confirm Password"
-            name="confirmPassword"
-            id="confirmPassword"
-            type="password"
-            required
-            minLength={8}
-            maxLength={16}
-            value={values.confirmPassword}
-            onChange={handleChange}
-            error={errors.confirmPassword}
-          />
+          <div className="col-span-full">
+            <FormFieldGroup
+              label="Email address"
+              name="email"
+              id="email"
+              type="email"
+              required
+              value={values.email}
+              onChange={handleChange}
+              error={errors.email}
+            />
+          </div>
+
+          <div className="col-span-full">
+            <FormFieldGroup
+              label="Password"
+              name="password"
+              id="password"
+              type="password"
+              required
+              minLength={8}
+              maxLength={16}
+              value={values.password}
+              onChange={handleChange}
+              error={errors.password}
+              pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{8,16}$"
+            />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger type="button">&#128274;</TooltipTrigger>
+                <TooltipContent side="right">
+                  <div className="mt-2 text-xs text-gray-600">
+                    Password must meet the following criteria:
+                    <ul className="list-disc pl-5 mt-2">
+                      <li className="mt-1">At least one digit.</li>
+                      <li className="mt-1">At least one lowercase letter.</li>
+                      <li className="mt-1">At least one uppercase letter.</li>
+                      <li className="mt-1">
+                        At least one special character from the set @#$%^&-+=().
+                      </li>
+                      <li className="mt-1">No whitespace allowed.</li>
+                      <li className="mt-1">
+                        Total length of the password should be between 8 and 20
+                        characters.
+                      </li>
+                    </ul>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+
+          <div className="col-span-full">
+            <FormFieldGroup
+              label="Confirm Password"
+              name="confirmPassword"
+              id="confirmPassword"
+              type="password"
+              required
+              minLength={8}
+              maxLength={16}
+              value={values.confirmPassword}
+              onChange={handleChange}
+              error={errors.confirmPassword}
+            />
+          </div>
+        </FormGrid>
+        <div className="border-gray-900/10 pt-12">
+          <Button
+            id="registerAdminButton"
+            variant="default"
+            size="lg"
+            className="w-full"
+            disabled={submitted || !isValid}
+          >
+            Let&apos;s start
+          </Button>
         </div>
-      </FormGrid>
-      <div className="border-gray-900/10 pt-12">
-        <Button
-          id="registerAdminButton"
-          variant="default"
-          size="lg"
-          className="w-full"
-          disabled={submitted || !isValid}
-        >
-          Let&apos;s start
-        </Button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 
