@@ -35,6 +35,6 @@ export const getErrors = (err: AxiosError): string => {
         return "Server Error.";
     }
   } else {
-    return `Error registering the admin: ${err.message}`;
+    return `We can't connect to the server right now. Please check your internet connection and try again. ${err.message}`;
   }
 };

@@ -22,7 +22,7 @@ import { AxiosError } from "axios";
 import { getErrors } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
-export default function HomePage() {
+export default function CollectionsPage() {
   const { values, errors, isValid, handleChange } = useFormWithValidation({
     name: "",
     description: "",
@@ -48,14 +48,28 @@ export default function HomePage() {
   const fetchCollections = async () => {
     try {
       const allCollections = await getCollections();
+
+      if (allCollections.length === 0) {
+        setCollections([]);
+
+        return;
+      }
+
       setCollections(allCollections);
     } catch (error) {
-      console.error("Error fetching collections:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch collections.",
-        variant: "destructive",
-      });
+      if (error instanceof Error) {
+        console.error("Error fetching collections:", error.message);
+
+        if (error.message !== "No collections found") {
+          toast({
+            title: "Error",
+            description: "Failed to fetch collections.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        console.error("An unknown error occurred:", error);
+      }
     }
   };
 
@@ -64,6 +78,20 @@ export default function HomePage() {
   }, []);
 
   const createCollection = async (collectionData: Collection) => {
+    // Check if collection name already exists
+    const doesNameExist = collections.some(
+      (collection) => collection.name === collectionData.name
+    );
+    if (doesNameExist) {
+      toast({
+        title: "Error",
+        description: "Collection name already exists!",
+        variant: "destructive",
+      });
+      setSubmitted(false); // Reset the submitted state to allow another attempt
+      return; // Exit the function early, preventing the API call
+    }
+
     try {
       const newCollection = await addCollection(collectionData);
       // Add the new collection to the state
@@ -102,6 +130,20 @@ export default function HomePage() {
     setSubmitted(true);
     createCollection(collectionData);
   };
+
+  const resetForm = () => {
+    values.name = "";
+    values.description = "";
+    errors.name = "";
+    errors.description = "";
+  };
+
+  useEffect(() => {
+    if (!isDialogOpen) {
+      resetForm();
+    }
+  }, [isDialogOpen]);
+
   return (
     <div className="md:flex">
       <div className="h-full md:w-72 md:flex-col md:fixed md:inset-y-0 z-80 border-r border-gray-300">
@@ -115,19 +157,25 @@ export default function HomePage() {
                 Collection types
               </div>
               <ul className="list-disc pl-5 space-y-2">
-                {collections.map((contentType, index) => (
-                  <li
-                    key={index}
-                    className="text-sm font-medium text-customBlue"
-                  >
-                    <button
-                      onClick={() => handleContentTypeClick(contentType)}
-                      className="text-customBlue hover:opacity-70 focus:outline-none"
+                {collections.length > 0 ? (
+                  collections.map((contentType, index) => (
+                    <li
+                      key={index}
+                      className="text-sm font-medium text-customBlue"
                     >
-                      {contentType.name}
-                    </button>
+                      <button
+                        onClick={() => handleContentTypeClick(contentType)}
+                        className="text-customBlue hover:opacity-70 focus:outline-none"
+                      >
+                        {contentType.name}
+                      </button>
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-sm text-gray-500">
+                    No collections available.
                   </li>
-                ))}
+                )}
               </ul>
             </div>
 
@@ -137,6 +185,7 @@ export default function HomePage() {
             >
               <DialogTrigger asChild>
                 <Button
+                  id="createNewCollectionButton"
                   style={{
                     backgroundColor: "transparent",
                     color: "#0075FF",
@@ -162,9 +211,12 @@ export default function HomePage() {
                         id="name"
                         type="text"
                         required
+                        minLength={2}
+                        maxLength={15}
                         value={values.name}
                         onChangeInput={handleChange}
                         error={errors.name}
+                        pattern="^[a-zA-Z\s]+$"
                       />
                     </div>
 
@@ -184,7 +236,7 @@ export default function HomePage() {
 
                   <DialogFooter style={{ paddingTop: "48px" }}>
                     <DialogClose ref={closeDialogButtonRef}>
-                      <Button variant="outline" type="button">
+                      <Button variant="outline" type="button" id="cancelButton">
                         Cancel
                       </Button>
                     </DialogClose>
