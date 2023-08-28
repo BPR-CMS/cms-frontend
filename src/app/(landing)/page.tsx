@@ -1,9 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 import { checkAdminExists } from "@/services/AdminService";
 import AdminRegistration from "@/components/AdminRegistration";
 
-export default function Home() {
+const LandingPage = () => {
+  const router = useRouter();
   const [adminExists, setAdminExists] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -22,11 +25,21 @@ export default function Home() {
 
     fetchData();
   }, []);
-
-  // If adminExists state is null, don't render anything
+  useEffect(() => {
+    if (adminExists) {
+      router.push("/sign-in");
+    }
+  }, [adminExists]);
+  //   If adminExists state is null, don't render anything
   if (adminExists === null) {
     return null;
   }
 
-  return adminExists ? <h1>Hello</h1> : <AdminRegistration />;
-}
+  if (adminExists) {
+    return null;
+  } else {
+    return <AdminRegistration />;
+  }
+};
+
+export default LandingPage;
