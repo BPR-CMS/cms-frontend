@@ -16,6 +16,9 @@ module.exports = {
       },
     },
     extend: {
+      spacing: {
+        '56': '56px',
+      },
       colors: {
         customBlue: '#0075ff',
         customWhite: '#F6F6F9',
