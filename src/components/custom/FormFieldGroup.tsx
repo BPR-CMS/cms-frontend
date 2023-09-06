@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Ref } from "react";
 import { useState } from "react";
 import { Input } from "../ui/Input";
 import { Label } from "../ui/Label";
@@ -21,6 +21,7 @@ interface FormFieldGroupProps {
   useTextarea?: boolean;
   rows?: number;
   cols?: number;
+  ref? : Ref<HTMLInputElement> | undefined;
 }
 
 const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
@@ -39,6 +40,7 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
   onChangeTextArea,
   rows,
   cols,
+  ref
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -74,6 +76,7 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
           minLength={minLength}
           maxLength={maxLength}
           pattern={pattern}
+          ref={ref}
         />
       )}
 

@@ -7,7 +7,7 @@ type Params = {
 
 import { Collection } from "@/models/Collection";
 import { PlusIcon, Files, ArrowLeftIcon } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { getCollections } from "@/services/CollectionService";
 import { useToast } from "@/hooks/use-toast";
 import { DataTable } from "@/components/custom/DataTable";
@@ -16,7 +16,6 @@ import { Field, FieldType } from "@/models/Field";
 import { Button } from "@/components/ui/Button";
 import { fields } from "@/utils/constants";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
-import CustomCard from "@/components/custom/CustomCard"
 
 import {
   Dialog,
@@ -28,7 +27,8 @@ import {
   DialogFooter,
 } from "@/components/ui/Dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
-import SettingsTabs from "@/components/SettingsTabs";
+import DetailedView from "@/components/DetailedView";
+import GridView from "@/components/GridView";
 export const columns: ColumnDef<Field>[] = [
   {
     accessorKey: "name",
@@ -39,13 +39,21 @@ export const columns: ColumnDef<Field>[] = [
     header: "Type",
   },
 ];
-export default function ContentTypePage({ params: { contentType } }: Params) {
-  const [collections, setCollections] = useState<Collection[]>([]);
+export default function ContentTypePage({ params }: Params) {
+  const { contentType } = params;
 
-  const { values, errors, handleChange } = useFormWithValidation({
+  const { values, errors, isValid, handleChange } = useFormWithValidation({
     name: "",
   });
+  const [collections, setCollections] = useState<Collection[]>([]);
+
   const [submitted, setSubmitted] = useState(false);
+  const [selectedFieldType, setSelectedFieldType] = useState<FieldType | null>(
+    null
+  );
+  const [numberFormat, setNumberFormat] = useState<string | undefined>(
+    undefined
+  );
 
   const [fieldsData, setFieldsData] = useState<Field[]>([]);
   const { toast } = useToast();
@@ -67,28 +75,34 @@ export default function ContentTypePage({ params: { contentType } }: Params) {
     fetchCollections();
   }, []);
 
-   function getData(): Field[] {
+  function getData(): Field[] {
     return fieldsData;
   }
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentView, setCurrentView] = useState("grid"); // 'grid' or 'detail'
   const [selectedField, setSelectedField] = useState(null);
 
-  const handleCardClick = (field: any) => {
+  const handleCardClick = useCallback((field: any) => {
     setSelectedField(field);
     setCurrentView("detail");
-    // router.push(field.href);
-  };
+    setSelectedFieldType(field.label);
+  }, []);
 
-  const handleFinishClick = () => {
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (selectedFieldType) {
+      const newField: Field = {
+        name: values.name,
+        type: selectedFieldType,
+      };
 
-    const newField: Field = {
-      name: values.name,
-      type: values.type as FieldType, 
-    };
+      setFieldsData((prevFields) => [...prevFields, newField]);
 
-    setFieldsData([...fieldsData, newField]);
-    setIsDialogOpen(false); 
+      setIsDialogOpen(false);
+    } else {
+      console.log("error");
+      // Handle error, maybe show a toast saying "Please select a field type"
+    }
   };
 
   const selectedContentType = collections.find(
@@ -98,51 +112,6 @@ export default function ContentTypePage({ params: { contentType } }: Params) {
     return <div>Content type not found.</div>;
   }
   const data = getData();
-
-  function GridView({ fields, onCardClick }) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {fields.map((field) => (
-          <CustomCard
-          onClick={() => onCardClick(field)}
-          href={field.href}
-          icon={field.icon}
-          label={field.label}
-          description={field.description}
-        />
-        ))}
-      </div>
-    );
-  }
-
-  function DetailedView() {
-    return (
-      <>
-        <h1 className="text-2xl font-bold text-gray-800 ">
-          Add new {selectedField.label}
-        </h1>
-        <p className="text-gray-600 leading-relaxed">
-          {selectedField.description}
-        </p>
-        <SettingsTabs
-        selectedField={selectedField}
-        values={values}
-        errors={errors}
-        handleChange={handleChange}
-      />
-        <DialogFooter style={{ paddingTop: "48px" }}>
-          <DialogClose>
-            <Button variant="outline" type="button" id="cancelButton">
-              Cancel
-            </Button>
-            <Button type="button" id="finishButton" onClick={handleFinishClick}>
-              Finish
-            </Button>
-          </DialogClose>
-        </DialogFooter>
-      </>
-    );
-  }
 
   return (
     <>
@@ -176,42 +145,71 @@ export default function ContentTypePage({ params: { contentType } }: Params) {
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="w-full max-w-xl sm:max-w-3xl">
-                      <DialogHeader className="flex justify-between">
-                        {currentView === "grid" ? (
-                          <>
-                            <DialogTitle>
-                              {selectedContentType.name}
-                            </DialogTitle>
-                            <DialogDescription>
-                              Select a field for your collection type
-                            </DialogDescription>
-                          </>
-                        ) : (
-                          <div className="flex items-center">
-                            <button
-                              className="text-sm text-blue-600 hover:underline mr-2"
-                              onClick={() => {
-                                setCurrentView("grid");
-                                setSelectedField(null);
-                              }}
-                            >
-                              <ArrowLeftIcon />
-                            </button>
-                            <DialogTitle>
-                              {selectedContentType.name}
-                            </DialogTitle>
-                          </div>
-                        )}
-                      </DialogHeader>
+                      <form onSubmit={handleSubmit} noValidate>
+                        <DialogHeader className="flex justify-between">
+                          {currentView === "grid" ? (
+                            <>
+                              <DialogTitle>
+                                {selectedContentType.name}
+                              </DialogTitle>
+                              <DialogDescription>
+                                Select a field for your collection type
+                              </DialogDescription>
+                            </>
+                          ) : (
+                            <div className="flex items-center">
+                              <button
+                                className="text-sm text-blue-600 hover:underline mr-2"
+                                onClick={() => {
+                                  setCurrentView("grid");
+                                  setSelectedField(null);
+                                }}
+                              >
+                                <ArrowLeftIcon />
+                              </button>
+                              <DialogTitle>
+                                {selectedContentType.name}
+                              </DialogTitle>
+                            </div>
+                          )}
+                        </DialogHeader>
 
-                      {currentView === "grid" ? (
-                        <GridView
-                          fields={fields}
-                          onCardClick={handleCardClick}
-                        />
-                      ) : (
-                        <DetailedView field={selectedField} />
-                      )}
+                        {currentView === "grid" ? (
+                          <GridView
+                            fields={fields}
+                            onCardClick={handleCardClick}
+                          />
+                        ) : (
+                          <>
+                            <DetailedView
+                              selectedField={selectedField}
+                              values={values}
+                              errors={errors}
+                              handleChange={handleChange}
+                              numberFormat={numberFormat}
+                              setNumberFormat={setNumberFormat}
+                            />
+                            <DialogFooter style={{ paddingTop: "48px" }}>
+                              <DialogClose>
+                                <Button
+                                  variant="outline"
+                                  type="button"
+                                  id="cancelButton"
+                                >
+                                  Cancel
+                                </Button>
+                              </DialogClose>
+                              <Button
+                                id="finishButton"
+                                type="submit"
+                                disabled={!isValid}
+                              >
+                                Finish
+                              </Button>
+                            </DialogFooter>
+                          </>
+                        )}
+                      </form>
                     </DialogContent>
                   </Dialog>
                 </div>
