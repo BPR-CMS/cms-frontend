@@ -42,9 +42,10 @@ export const columns: ColumnDef<Field>[] = [
 export default function ContentTypePage({ params }: Params) {
   const { contentType } = params;
 
-  const { values, errors, isValid, handleChange } = useFormWithValidation({
-    name: "",
-  });
+  const { values, errors, isValid, handleChange, setValues } =
+    useFormWithValidation({
+      name: "",
+    });
   const [collections, setCollections] = useState<Collection[]>([]);
 
   const [submitted, setSubmitted] = useState(false);
@@ -112,7 +113,13 @@ export default function ContentTypePage({ params }: Params) {
     return <div>Content type not found.</div>;
   }
   const data = getData();
+  function resetDialog() {
+    setCurrentView("grid");
+    setSelectedField(null);
+    setSelectedFieldType(null);
 
+    setValues({});
+  }
   return (
     <>
       <h2>{selectedContentType.name}</h2>
@@ -132,7 +139,13 @@ export default function ContentTypePage({ params }: Params) {
 
                   <Dialog
                     open={isDialogOpen}
-                    onOpenChange={() => setIsDialogOpen(!isDialogOpen)}
+                    onOpenChange={() => {
+                      // If the dialog was just closed
+                      if (isDialogOpen) {
+                        resetDialog();
+                      }
+                      setIsDialogOpen(!isDialogOpen);
+                    }}
                   >
                     <DialogTrigger asChild>
                       <Button
@@ -163,6 +176,7 @@ export default function ContentTypePage({ params }: Params) {
                                 onClick={() => {
                                   setCurrentView("grid");
                                   setSelectedField(null);
+                                  setValues({});
                                 }}
                               >
                                 <ArrowLeftIcon />
@@ -189,7 +203,7 @@ export default function ContentTypePage({ params }: Params) {
                               numberFormat={numberFormat}
                               setNumberFormat={setNumberFormat}
                             />
-                            <DialogFooter style={{ paddingTop: "48px" }}>
+                            <DialogFooter>
                               <DialogClose>
                                 <Button
                                   variant="outline"

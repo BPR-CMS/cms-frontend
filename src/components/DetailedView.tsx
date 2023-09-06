@@ -18,7 +18,7 @@ function DetailedView({
   setNumberFormat,
 }: DetailedViewProps) {
   return (
-    <>
+ <div className="p-8"> 
       <h1 className="text-2xl font-bold text-gray-800 ">
         Add new {selectedField.label}
       </h1>
@@ -34,7 +34,7 @@ function DetailedView({
         numberFormat={numberFormat}
         setNumberFormat={setNumberFormat}
       />
-    </>
+  </div>
   );
 }
 

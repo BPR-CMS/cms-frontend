@@ -29,13 +29,13 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
   setNumberFormat,
 }) => {
   return (
-    <Tabs defaultValue="basic" className="w-[400px]">
-      <TabsList>
+    <Tabs defaultValue="basic">
+      <TabsList className="flex justify-end">
         <TabsTrigger value="basic">Basic settings</TabsTrigger>
         <TabsTrigger value="advanced">Advanced settings</TabsTrigger>
       </TabsList>
       <TabsContent value="basic">
-        <div className="col-span-full">
+        <div className=" mb-6 w-[400px]">
           <FormFieldGroup
             label="Name"
             name="name"
@@ -53,8 +53,8 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
 
         {selectedField && selectedField.label === "Text" && (
           <div>
-            <Label>Type</Label>
-            <RadioGroup defaultValue="short-text">
+            <Label className="flex mb-4">Type</Label>
+            <RadioGroup defaultValue="short-text" className="flex ">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="short-text" id="short-texte" />
                 <Label htmlFor="short-text">Short text</Label>
@@ -68,7 +68,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
         )}
         {selectedField && selectedField.label === "Number" && (
           <div>
-            <Label>Number format</Label>
+            <Label className="flex mb-4">Number format</Label>
             <Select
               required
               value={numberFormat}
@@ -91,7 +91,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
 
         {selectedField && selectedField.label === "Date" && (
           <div>
-            <Label>Type</Label>
+            <Label className="flex mb-4">Type</Label>
             <Select required>
               <SelectTrigger className="w-[380px]">
                 <SelectValue placeholder="Choose here" />
@@ -109,7 +109,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
 
         {selectedField && selectedField.label === "Media" && (
           <div>
-            <Label>Type</Label>
+            <Label className="flex mb-4">Type</Label>
             <RadioGroup defaultValue="multiple-media">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="multiple-media" id="multiple-media" />
@@ -125,7 +125,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
       </TabsContent>
 
       <TabsContent value="advanced">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 mb-4">
           <Checkbox id="required" />
           <Label
             htmlFor="required"
@@ -137,7 +137,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
 
         {selectedField && selectedField.label === "Text" && (
           <div>
-            <div className="col-span-full">
+            <div className="col-span-full mb-4">
               <FormFieldGroup
                 label="Default value"
                 name="defaultValue"
@@ -148,7 +148,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 error={errors.defaultValue}
               />
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 mb-4">
               <Checkbox id="unique" />
               <Label
                 htmlFor="unique"
@@ -157,7 +157,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 Unique
               </Label>
             </div>
-            <div className="col-span-full">
+            <div className="col-span-full mb-4">
               <FormFieldGroup
                 label="Maximum Length"
                 name="maximumLength"
@@ -183,7 +183,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
         )}
         {selectedField && selectedField.label === "Rich Text" && (
           <div>
-            <div className="col-span-full">
+            <div className="col-span-full mb-4">
               <FormFieldGroup
                 label="Default value"
                 name="defaultValue"
@@ -195,7 +195,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
               />
             </div>
 
-            <div className="col-span-full">
+            <div className="col-span-full mb-4">
               <FormFieldGroup
                 label="Maximum Length"
                 name="maximumLength"
@@ -222,7 +222,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
 
         {selectedField && selectedField.label === "Number" && (
           <div>
-            <div className="col-span-full">
+            <div className="col-span-full mb-4">
               <FormFieldGroup
                 label="Default value"
                 name="defaultValue"
@@ -233,7 +233,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 error={errors.defaultValue}
               />
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 mb-4">
               <Checkbox id="unique" />
               <Label
                 htmlFor="unique"
@@ -242,7 +242,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 Unique
               </Label>
             </div>
-            <div className="col-span-full">
+            <div className="col-span-full mb-4">
               <FormFieldGroup
                 label="Maximum Value"
                 name="maximumValue"
@@ -269,7 +269,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
 
         {selectedField && selectedField.label === "Date" && (
           <div>
-            <div className="col-span-full">
+            <div className="col-span-full mb-4">
               <FormFieldGroup
                 label="Default value"
                 name="defaultValue"
