@@ -2,7 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Label } from "@/components/ui/Label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/Radio-group";
-import React, { useCallback } from "react";
+import React from "react";
 import {
   Select,
   SelectContent,
@@ -54,7 +54,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
         {selectedField && selectedField.label === "Text" && (
           <div>
             <Label className="flex mb-4">Type</Label>
-            <RadioGroup defaultValue="short-text" className="flex ">
+            <RadioGroup defaultValue="short-text" className="flex justify-between w-[400px]">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="short-text" id="short-texte" />
                 <Label htmlFor="short-text">Short text</Label>
@@ -110,7 +110,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
         {selectedField && selectedField.label === "Media" && (
           <div>
             <Label className="flex mb-4">Type</Label>
-            <RadioGroup defaultValue="multiple-media">
+            <RadioGroup defaultValue="multiple-media" className="flex justify-between w-[400px]">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="multiple-media" id="multiple-media" />
                 <Label htmlFor="multiple-media">Multiple Media</Label>

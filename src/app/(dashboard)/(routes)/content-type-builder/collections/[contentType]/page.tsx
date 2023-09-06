@@ -29,6 +29,7 @@ import {
 import { DialogClose } from "@radix-ui/react-dialog";
 import DetailedView from "@/components/DetailedView";
 import GridView from "@/components/GridView";
+import ContentBuilderSideBar from "@/components/custom/ContentBuilderSideBar";
 export const columns: ColumnDef<Field>[] = [
   {
     accessorKey: "name",
@@ -48,7 +49,6 @@ export default function ContentTypePage({ params }: Params) {
     });
   const [collections, setCollections] = useState<Collection[]>([]);
 
-  const [submitted, setSubmitted] = useState(false);
   const [selectedFieldType, setSelectedFieldType] = useState<FieldType | null>(
     null
   );
@@ -122,113 +122,118 @@ export default function ContentTypePage({ params }: Params) {
   }
   return (
     <>
-      <h2>{selectedContentType.name}</h2>
-      <p>{selectedContentType.description}</p>
-      <div className="pl-56 pr-56">
-        <div className="mt-6">
-          <div className="container mx-auto py-10">
-            <DataTable
-              columns={columns}
-              data={data}
-              emptyStateComponent={
-                <div className="flex flex-col items-center space-y-4">
-                  <div aria-hidden="true">
-                    <Files size={60} color="#0075ff" />
-                  </div>
-                  <p>Add your first field to this Collection-Type</p>
+      <div className="md:flex">
+        <ContentBuilderSideBar />
+        <div className="flex-grow md:ml-72 mt-4">
+          <h2>{selectedContentType.name}</h2>
+          <p>{selectedContentType.description}</p>
+          <div className="pl-56 pr-56">
+            <div className="mt-6">
+              <div className="container mx-auto py-10">
+                <DataTable
+                  columns={columns}
+                  data={data}
+                  emptyStateComponent={
+                    <div className="flex flex-col items-center space-y-4">
+                      <div aria-hidden="true">
+                        <Files size={60} color="#0075ff" />
+                      </div>
+                      <p>Add your first field to this Collection-Type</p>
 
-                  <Dialog
-                    open={isDialogOpen}
-                    onOpenChange={() => {
-                      // If the dialog was just closed
-                      if (isDialogOpen) {
-                        resetDialog();
-                      }
-                      setIsDialogOpen(!isDialogOpen);
-                    }}
-                  >
-                    <DialogTrigger asChild>
-                      <Button
-                        className="flex items-center space-x-2"
-                        aria-disabled="false"
-                        type="button"
+                      <Dialog
+                        open={isDialogOpen}
+                        onOpenChange={() => {
+                          // If the dialog was just closed
+                          if (isDialogOpen) {
+                            resetDialog();
+                          }
+                          setIsDialogOpen(!isDialogOpen);
+                        }}
                       >
-                        <PlusIcon />
-                        <span>Add new field</span>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="w-full max-w-xl sm:max-w-3xl">
-                      <form onSubmit={handleSubmit} noValidate>
-                        <DialogHeader className="flex justify-between">
-                          {currentView === "grid" ? (
-                            <>
-                              <DialogTitle>
-                                {selectedContentType.name}
-                              </DialogTitle>
-                              <DialogDescription>
-                                Select a field for your collection type
-                              </DialogDescription>
-                            </>
-                          ) : (
-                            <div className="flex items-center">
-                              <button
-                                className="text-sm text-blue-600 hover:underline mr-2"
-                                onClick={() => {
-                                  setCurrentView("grid");
-                                  setSelectedField(null);
-                                  setValues({});
-                                }}
-                              >
-                                <ArrowLeftIcon />
-                              </button>
-                              <DialogTitle>
-                                {selectedContentType.name}
-                              </DialogTitle>
-                            </div>
-                          )}
-                        </DialogHeader>
+                        <DialogTrigger asChild>
+                          <Button
+                            className="flex items-center space-x-2"
+                            aria-disabled="false"
+                            type="button"
+                          >
+                            <PlusIcon />
+                            <span>Add new field</span>
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="w-full max-w-xl sm:max-w-3xl">
+                          <form onSubmit={handleSubmit} noValidate>
+                            <DialogHeader className="flex justify-between">
+                              {currentView === "grid" ? (
+                                <>
+                                  <DialogTitle>
+                                    {selectedContentType.name}
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    Select a field for your collection type
+                                  </DialogDescription>
+                                </>
+                              ) : (
+                                <div className="flex items-center">
+                                  <button
+                                    className="text-sm text-blue-600 hover:underline mr-2"
+                                    onClick={() => {
+                                      setCurrentView("grid");
+                                      setSelectedField(null);
+                                      setValues({});
+                                    }}
+                                  >
+                                    <ArrowLeftIcon />
+                                  </button>
+                                  <DialogTitle>
+                                    {selectedContentType.name}
+                                  </DialogTitle>
+                                </div>
+                              )}
+                            </DialogHeader>
 
-                        {currentView === "grid" ? (
-                          <GridView
-                            fields={fields}
-                            onCardClick={handleCardClick}
-                          />
-                        ) : (
-                          <>
-                            <DetailedView
-                              selectedField={selectedField}
-                              values={values}
-                              errors={errors}
-                              handleChange={handleChange}
-                              numberFormat={numberFormat}
-                              setNumberFormat={setNumberFormat}
-                            />
-                            <DialogFooter>
-                              <DialogClose>
-                                <Button
-                                  variant="outline"
-                                  type="button"
-                                  id="cancelButton"
-                                >
-                                  Cancel
-                                </Button>
-                              </DialogClose>
-                              <Button
-                                id="finishButton"
-                                type="submit"
-                                disabled={!isValid}
-                              >
-                                Finish
-                              </Button>
-                            </DialogFooter>
-                          </>
-                        )}
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              }
-            />
+                            {currentView === "grid" ? (
+                              <GridView
+                                fields={fields}
+                                onCardClick={handleCardClick}
+                              />
+                            ) : (
+                              <>
+                                <DetailedView
+                                  selectedField={selectedField}
+                                  values={values}
+                                  errors={errors}
+                                  handleChange={handleChange}
+                                  numberFormat={numberFormat}
+                                  setNumberFormat={setNumberFormat}
+                                />
+                                <DialogFooter>
+                                  <DialogClose>
+                                    <Button
+                                      variant="outline"
+                                      type="button"
+                                      id="cancelButton"
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </DialogClose>
+                                  <Button
+                                    id="finishButton"
+                                    type="submit"
+                                    disabled={!isValid}
+                                  >
+                                    Finish
+                                  </Button>
+                                </DialogFooter>
+                              </>
+                            )}
+                          </form>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  }
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
