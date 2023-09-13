@@ -10,16 +10,19 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import FormFieldGroup from "./custom/FormFieldGroup";
-
+import { useState } from "react";
+type CheckboxStateValues = boolean | string;
 type SettingsTabsProps = {
   selectedField: any;
-  values: Record<string, string>;
+  values: Record<string, any>;
   errors: Record<string, string>;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   numberFormat: string | undefined;
   setNumberFormat: React.Dispatch<React.SetStateAction<string | undefined>>;
   textType: string;
   setTextType: React.Dispatch<React.SetStateAction<string>>;
+  checkboxStates: Record<string, CheckboxStateValues>;
+  handleCheckboxChange: (name: string, checked: CheckboxStateValues) => void;
 };
 
 const SettingsTabs: React.FC<SettingsTabsProps> = ({
@@ -31,6 +34,8 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
   setNumberFormat,
   textType,
   setTextType,
+  checkboxStates,
+  handleCheckboxChange,
 }) => {
   return (
     <Tabs defaultValue="basic">
@@ -137,7 +142,13 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
 
       <TabsContent value="advanced">
         <div className="flex items-center space-x-2 mb-4">
-          <Checkbox id="required" />
+          <Checkbox
+            id="required"
+            checked={!!checkboxStates.required}
+            onCheckedChange={(checked) =>
+              handleCheckboxChange("required", checked)
+            }
+          />
           <Label
             htmlFor="required"
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -160,7 +171,13 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
               />
             </div>
             <div className="flex items-center space-x-2 mb-4">
-              <Checkbox id="unique" />
+              <Checkbox
+                id="unique"
+                checked={!!checkboxStates.unique}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange("unique", checked)
+                }
+              />
               <Label
                 htmlFor="unique"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -245,7 +262,13 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
               />
             </div>
             <div className="flex items-center space-x-2 mb-4">
-              <Checkbox id="unique" />
+              <Checkbox
+                id="unique"
+                checked={!!checkboxStates.unique}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange("unique", checked)
+                }
+              />
               <Label
                 htmlFor="unique"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -292,7 +315,13 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
               />
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox id="unique" />
+              <Checkbox
+                id="unique"
+                checked={!!checkboxStates.unique}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange("unique", checked)
+                }
+              />
               <Label
                 htmlFor="unique"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"

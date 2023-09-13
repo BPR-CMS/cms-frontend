@@ -5,6 +5,8 @@ export interface Attribute {
   minimumLength?: number;
   maximumLength?: number;
   required?: boolean;
+  unique?: boolean;
+  format?: string;
 }
 
 export enum AttributeType {

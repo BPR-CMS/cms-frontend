@@ -12,7 +12,7 @@ import { getCollections } from "@/services/CollectionService";
 import { useToast } from "@/hooks/use-toast";
 import { DataTable } from "@/components/custom/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
-import { Attribute, FieldType } from "@/models/Attribute";
+import { Attribute, AttributeType } from "@/models/Attribute";
 import { Button } from "@/components/ui/Button";
 import { fields } from "@/utils/constants";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
@@ -41,14 +41,24 @@ export const columns: ColumnDef<Attribute>[] = [
 ];
 export default function ContentTypePage({ params }: Params) {
   const { contentType } = params;
+  type CheckboxStateValues = boolean | string;
+  const [checkboxStates, setCheckboxStates] = useState<Record<string, CheckboxStateValues>>({});
 
+  function handleCheckboxChange(name: string, checked: CheckboxStateValues) {
+    console.log(name, checked);
+    setCheckboxStates(prevState => ({
+        ...prevState,
+        [name]: checked
+    }));
+  }
   const { values, errors, isValid, handleChange, setValues } =
     useFormWithValidation({
       name: "",
+
     });
   const [collections, setCollections] = useState<Collection[]>([]);
 
-  const [selectedFieldType, setSelectedFieldType] = useState<FieldType | null>(
+  const [selectedFieldType, setSelectedFieldType] = useState<AttributeType | null>(
     null
   );
   const [numberFormat, setNumberFormat] = useState<string | undefined>(
@@ -92,11 +102,15 @@ export default function ContentTypePage({ params }: Params) {
         name: values.name,
         type: textType,
         contentType: selectedFieldType,
+        required: checkboxStates.required || false,
+        unique: checkboxStates.unique || false,
+        format: numberFormat
+
       };
 
       try {
         await addAttributesToCollection(selectedContentType.id, newField);
-
+console.log(newField)
         setFieldsData((prevFields) => [...prevFields, newField]);
         setCollections((prevCollections) => {
           return prevCollections.map((collection) => {
@@ -259,6 +273,8 @@ export default function ContentTypePage({ params }: Params) {
                             handleChange={handleChange}
                             numberFormat={numberFormat}
                             setNumberFormat={setNumberFormat}
+                            checkboxStates={checkboxStates}
+                            handleCheckboxChange={handleCheckboxChange}
                           />
                           <DialogFooter>
                             <DialogClose>
