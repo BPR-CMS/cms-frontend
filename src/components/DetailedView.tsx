@@ -7,6 +7,8 @@ type DetailedViewProps = {
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   numberFormat: string | undefined;
   setNumberFormat: React.Dispatch<React.SetStateAction<string | undefined>>;
+  textType: string;
+  setTextType: React.Dispatch<React.SetStateAction<string>>;
 };
 
 function DetailedView({
@@ -16,9 +18,11 @@ function DetailedView({
   handleChange,
   numberFormat,
   setNumberFormat,
+  textType,
+  setTextType,
 }: DetailedViewProps) {
   return (
- <div className="p-8"> 
+    <div className="p-8">
       <h1 className="text-2xl font-bold text-gray-800 ">
         Add new {selectedField.label}
       </h1>
@@ -33,8 +37,10 @@ function DetailedView({
         handleChange={handleChange}
         numberFormat={numberFormat}
         setNumberFormat={setNumberFormat}
+        textType={textType}
+        setTextType={setTextType}
       />
-  </div>
+    </div>
   );
 }
 

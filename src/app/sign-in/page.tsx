@@ -34,7 +34,7 @@ const Login = () => {
         variant: "success",
       });
 
-      router.push("/account");
+      router.push("/dashboard");
     } catch (error) {
       const axiosError = error as AxiosError;
       const errorMessage = getErrors(axiosError);

@@ -2,7 +2,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Label } from "@/components/ui/Label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/Radio-group";
-import React from "react";
 import {
   Select,
   SelectContent,
@@ -11,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import FormFieldGroup from "./custom/FormFieldGroup";
+
 type SettingsTabsProps = {
   selectedField: any;
   values: Record<string, string>;
@@ -18,6 +18,8 @@ type SettingsTabsProps = {
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   numberFormat: string | undefined;
   setNumberFormat: React.Dispatch<React.SetStateAction<string | undefined>>;
+  textType: string;
+  setTextType: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const SettingsTabs: React.FC<SettingsTabsProps> = ({
@@ -27,6 +29,8 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
   handleChange,
   numberFormat,
   setNumberFormat,
+  textType,
+  setTextType,
 }) => {
   return (
     <Tabs defaultValue="basic">
@@ -54,13 +58,17 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
         {selectedField && selectedField.label === "Text" && (
           <div>
             <Label className="flex mb-4">Type</Label>
-            <RadioGroup defaultValue="short-text" className="flex justify-between w-[400px]">
+            <RadioGroup
+              defaultValue="SHORT"
+              className="flex justify-between w-[400px]"
+              onValueChange={(value: string) => setTextType(value)}
+            >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="short-text" id="short-texte" />
+                <RadioGroupItem value="SHORT" id="short-text" />
                 <Label htmlFor="short-text">Short text</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="long-text" id="long-text" />
+                <RadioGroupItem value="LONG" id="long-text" />
                 <Label htmlFor="long-text">Long text</Label>
               </div>
             </RadioGroup>
@@ -110,7 +118,10 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
         {selectedField && selectedField.label === "Media" && (
           <div>
             <Label className="flex mb-4">Type</Label>
-            <RadioGroup defaultValue="multiple-media" className="flex justify-between w-[400px]">
+            <RadioGroup
+              defaultValue="multiple-media"
+              className="flex justify-between w-[400px]"
+            >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="multiple-media" id="multiple-media" />
                 <Label htmlFor="multiple-media">Multiple Media</Label>

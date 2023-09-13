@@ -12,31 +12,30 @@ import { getCollections } from "@/services/CollectionService";
 import { useToast } from "@/hooks/use-toast";
 import { DataTable } from "@/components/custom/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
-import { Field, FieldType } from "@/models/Field";
+import { Attribute, FieldType } from "@/models/Attribute";
 import { Button } from "@/components/ui/Button";
 import { fields } from "@/utils/constants";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
-
+import { addAttributesToCollection } from "@/services/ContentModelService";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/Dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
 import DetailedView from "@/components/DetailedView";
 import GridView from "@/components/GridView";
 import ContentBuilderSideBar from "@/components/custom/ContentBuilderSideBar";
-export const columns: ColumnDef<Field>[] = [
+export const columns: ColumnDef<Attribute>[] = [
   {
     accessorKey: "name",
     header: "Name",
   },
   {
-    accessorKey: "type",
+    accessorKey: "contentType",
     header: "Type",
   },
 ];
@@ -56,7 +55,7 @@ export default function ContentTypePage({ params }: Params) {
     undefined
   );
 
-  const [fieldsData, setFieldsData] = useState<Field[]>([]);
+  const [fieldsData, setFieldsData] = useState<Attribute[]>([]);
   const { toast } = useToast();
   const fetchCollections = async () => {
     try {
@@ -76,33 +75,64 @@ export default function ContentTypePage({ params }: Params) {
     fetchCollections();
   }, []);
 
-  function getData(): Field[] {
-    return fieldsData;
-  }
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentView, setCurrentView] = useState("grid"); // 'grid' or 'detail'
   const [selectedField, setSelectedField] = useState(null);
-
+  const [textType, setTextType] = useState<string>("SHORT");
   const handleCardClick = useCallback((field: any) => {
     setSelectedField(field);
     setCurrentView("detail");
-    setSelectedFieldType(field.label);
+    setSelectedFieldType(field.label.toUpperCase());
   }, []);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (selectedFieldType) {
-      const newField: Field = {
+      const newField: Attribute = {
         name: values.name,
-        type: selectedFieldType,
+        type: textType,
+        contentType: selectedFieldType,
       };
 
-      setFieldsData((prevFields) => [...prevFields, newField]);
+      try {
+        await addAttributesToCollection(selectedContentType.id, newField);
 
-      setIsDialogOpen(false);
+        setFieldsData((prevFields) => [...prevFields, newField]);
+        setCollections((prevCollections) => {
+          return prevCollections.map((collection) => {
+            if (collection.id === selectedContentType.id) {
+              return {
+                ...collection,
+                attributes: [...collection.attributes, newField],
+              };
+            }
+            return collection;
+          });
+        });
+
+        setIsDialogOpen(false);
+
+        toast({
+          title: "Success",
+          description: "Field added successfully.",
+          variant: "success",
+        });
+      } catch (error) {
+        console.error("Error adding new field:", error);
+
+        toast({
+          title: "Error",
+          description: "Failed to add new field.",
+          variant: "destructive",
+        });
+      }
     } else {
       console.log("error");
-      // Handle error, maybe show a toast saying "Please select a field type"
+      toast({
+        title: "Error",
+        description: "Please select a field type.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -112,7 +142,11 @@ export default function ContentTypePage({ params }: Params) {
   if (!selectedContentType) {
     return <div>Content type not found.</div>;
   }
-  const data = getData();
+
+  const attributes: Attribute[] = selectedContentType
+    ? selectedContentType.attributes
+    : [];
+
   function resetDialog() {
     setCurrentView("grid");
     setSelectedField(null);
@@ -120,6 +154,7 @@ export default function ContentTypePage({ params }: Params) {
 
     setValues({});
   }
+
   return (
     <>
       <div className="md:flex">
@@ -130,108 +165,124 @@ export default function ContentTypePage({ params }: Params) {
           <div className="pl-56 pr-56">
             <div className="mt-6">
               <div className="container mx-auto py-10">
+                {/* Data Table */}
                 <DataTable
                   columns={columns}
-                  data={data}
+                  data={attributes}
                   emptyStateComponent={
                     <div className="flex flex-col items-center space-y-4">
                       <div aria-hidden="true">
                         <Files size={60} color="#0075ff" />
                       </div>
                       <p>Add your first field to this Collection-Type</p>
-
-                      <Dialog
-                        open={isDialogOpen}
-                        onOpenChange={() => {
-                          // If the dialog was just closed
-                          if (isDialogOpen) {
-                            resetDialog();
-                          }
-                          setIsDialogOpen(!isDialogOpen);
-                        }}
-                      >
-                        <DialogTrigger asChild>
-                          <Button
-                            className="flex items-center space-x-2"
-                            aria-disabled="false"
-                            type="button"
-                          >
-                            <PlusIcon />
-                            <span>Add new field</span>
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="w-full max-w-xl sm:max-w-3xl">
-                          <form onSubmit={handleSubmit} noValidate>
-                            <DialogHeader className="flex justify-between">
-                              {currentView === "grid" ? (
-                                <>
-                                  <DialogTitle>
-                                    {selectedContentType.name}
-                                  </DialogTitle>
-                                  <DialogDescription>
-                                    Select a field for your collection type
-                                  </DialogDescription>
-                                </>
-                              ) : (
-                                <div className="flex items-center">
-                                  <button
-                                    className="text-sm text-blue-600 hover:underline mr-2"
-                                    onClick={() => {
-                                      setCurrentView("grid");
-                                      setSelectedField(null);
-                                      setValues({});
-                                    }}
-                                  >
-                                    <ArrowLeftIcon />
-                                  </button>
-                                  <DialogTitle>
-                                    {selectedContentType.name}
-                                  </DialogTitle>
-                                </div>
-                              )}
-                            </DialogHeader>
-
-                            {currentView === "grid" ? (
-                              <GridView
-                                fields={fields}
-                                onCardClick={handleCardClick}
-                              />
-                            ) : (
-                              <>
-                                <DetailedView
-                                  selectedField={selectedField}
-                                  values={values}
-                                  errors={errors}
-                                  handleChange={handleChange}
-                                  numberFormat={numberFormat}
-                                  setNumberFormat={setNumberFormat}
-                                />
-                                <DialogFooter>
-                                  <DialogClose>
-                                    <Button
-                                      variant="outline"
-                                      type="button"
-                                      id="cancelButton"
-                                    >
-                                      Cancel
-                                    </Button>
-                                  </DialogClose>
-                                  <Button
-                                    id="finishButton"
-                                    type="submit"
-                                    disabled={!isValid}
-                                  >
-                                    Finish
-                                  </Button>
-                                </DialogFooter>
-                              </>
-                            )}
-                          </form>
-                        </DialogContent>
-                      </Dialog>
+                      {/* Only display button if attributes are empty */}
+                      {attributes.length === 0 && (
+                        <Button
+                          className="flex items-center space-x-2 mt-4"
+                          aria-disabled="false"
+                          type="button"
+                          onClick={() => setIsDialogOpen(true)}
+                        >
+                          <PlusIcon />
+                          <span>Add new field</span>
+                        </Button>
+                      )}
                     </div>
                   }
                 />
+                {/* Show Add New Field Button if attributes aren't empty */}
+                {attributes.length > 0 && (
+                  <Button
+                    className="flex items-center space-x-2 mt-4"
+                    aria-disabled="false"
+                    type="button"
+                    onClick={() => setIsDialogOpen(true)}
+                  >
+                    <PlusIcon />
+                    <span>Add new field</span>
+                  </Button>
+                )}
+
+                <Dialog
+                  open={isDialogOpen}
+                  onOpenChange={() => {
+                    if (isDialogOpen) {
+                      resetDialog();
+                    }
+                    setIsDialogOpen(!isDialogOpen);
+                  }}
+                >
+                  <DialogContent className="w-full max-w-xl sm:max-w-3xl">
+                    <form onSubmit={handleSubmit} noValidate>
+                      <DialogHeader className="flex justify-between">
+                        {currentView === "grid" ? (
+                          <>
+                            <DialogTitle>
+                              {selectedContentType.name}
+                            </DialogTitle>
+                            <DialogDescription>
+                              Select a field for your collection type
+                            </DialogDescription>
+                          </>
+                        ) : (
+                          <div className="flex items-center">
+                            <button
+                              className="text-sm text-blue-600 hover:underline mr-2"
+                              onClick={() => {
+                                setCurrentView("grid");
+                                setSelectedField(null);
+                                setValues({});
+                              }}
+                            >
+                              <ArrowLeftIcon />
+                            </button>
+                            <DialogTitle>
+                              {selectedContentType.name}
+                            </DialogTitle>
+                          </div>
+                        )}
+                      </DialogHeader>
+
+                      {currentView === "grid" ? (
+                        <GridView
+                          fields={fields}
+                          onCardClick={handleCardClick}
+                        />
+                      ) : (
+                        <>
+                          <DetailedView
+                            textType={textType}
+                            setTextType={setTextType}
+                            selectedField={selectedField}
+                            values={values}
+                            errors={errors}
+                            handleChange={handleChange}
+                            numberFormat={numberFormat}
+                            setNumberFormat={setNumberFormat}
+                          />
+                          <DialogFooter>
+                            <DialogClose>
+                              <Button
+                                variant="outline"
+                                type="button"
+                                id="cancelButton"
+                              >
+                                Cancel
+                              </Button>
+                            </DialogClose>
+                            <Button
+                              id="finishButton"
+                              type="submit"
+                              disabled={!isValid}
+                            >
+                              Finish
+                            </Button>
+                          </DialogFooter>
+                        </>
+                      )}
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>
