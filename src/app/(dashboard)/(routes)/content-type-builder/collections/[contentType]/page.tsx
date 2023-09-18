@@ -6,12 +6,10 @@ type Params = {
 };
 
 import { Collection } from "@/models/Collection";
-import { PlusIcon, Files, ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 import React, { useState, useEffect, useCallback } from "react";
 import { getCollections } from "@/services/CollectionService";
 import { useToast } from "@/hooks/use-toast";
-import { DataTable } from "@/components/custom/DataTable";
-import { ColumnDef } from "@tanstack/react-table";
 import { Attribute, AttributeType } from "@/models/Attribute";
 import { Button } from "@/components/ui/Button";
 import { fields } from "@/utils/constants";
@@ -29,22 +27,15 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import DetailedView from "@/components/DetailedView";
 import GridView from "@/components/GridView";
 import ContentBuilderSideBar from "@/components/custom/ContentBuilderSideBar";
-export const columns: ColumnDef<Attribute>[] = [
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "contentType",
-    header: "Type",
-  },
-];
+import { CollectionFieldsTable } from "@/components/CollectionFieldsTable";
+
 export default function ContentTypePage({ params }: Params) {
   const { contentType } = params;
   type CheckboxStateValues = boolean | string;
   const [checkboxStates, setCheckboxStates] = useState<
     Record<string, CheckboxStateValues>
   >({});
+  
 
   function handleCheckboxChange(name: string, checked: CheckboxStateValues) {
     console.log(name, checked);
@@ -199,43 +190,10 @@ export default function ContentTypePage({ params }: Params) {
           <div className="pl-56 pr-56">
             <div className="mt-6">
               <div className="container mx-auto py-10">
-                {/* Data Table */}
-                <DataTable
-                  columns={columns}
-                  data={attributes}
-                  emptyStateComponent={
-                    <div className="flex flex-col items-center space-y-4">
-                      <div aria-hidden="true">
-                        <Files size={60} color="#0075ff" />
-                      </div>
-                      <p>Add your first field to this Collection-Type</p>
-                      {/* Only display button if attributes are empty */}
-                      {attributes.length === 0 && (
-                        <Button
-                          className="flex items-center space-x-2 mt-4"
-                          aria-disabled="false"
-                          type="button"
-                          onClick={() => setIsDialogOpen(true)}
-                        >
-                          <PlusIcon />
-                          <span>Add new field</span>
-                        </Button>
-                      )}
-                    </div>
-                  }
+              <CollectionFieldsTable
+                  attributes={attributes}
+                  onAddFieldClick={() => setIsDialogOpen(true)}
                 />
-                {/* Show Add New Field Button if attributes aren't empty */}
-                {attributes.length > 0 && (
-                  <Button
-                    className="flex items-center space-x-2 mt-4"
-                    aria-disabled="false"
-                    type="button"
-                    onClick={() => setIsDialogOpen(true)}
-                  >
-                    <PlusIcon />
-                    <span>Add new field</span>
-                  </Button>
-                )}
 
                 <Dialog
                   open={isDialogOpen}
