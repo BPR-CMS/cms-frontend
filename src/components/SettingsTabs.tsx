@@ -10,7 +10,6 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import FormFieldGroup from "./custom/FormFieldGroup";
-import { useState } from "react";
 type CheckboxStateValues = boolean | string;
 type SettingsTabsProps = {
   selectedField: any;
@@ -21,6 +20,10 @@ type SettingsTabsProps = {
   setNumberFormat: React.Dispatch<React.SetStateAction<string | undefined>>;
   textType: string;
   setTextType: React.Dispatch<React.SetStateAction<string>>;
+  dateType: string | undefined;
+  setDateType: React.Dispatch<React.SetStateAction<string | undefined>>;
+  mediaType: string;
+  setMediaType: React.Dispatch<React.SetStateAction<string>>;
   checkboxStates: Record<string, CheckboxStateValues>;
   handleCheckboxChange: (name: string, checked: CheckboxStateValues) => void;
 };
@@ -34,6 +37,10 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
   setNumberFormat,
   textType,
   setTextType,
+  dateType,
+  setDateType,
+  mediaType,
+  setMediaType,
   checkboxStates,
   handleCheckboxChange,
 }) => {
@@ -91,12 +98,12 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 <SelectValue placeholder="Choose here" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="integer">integer (ex: 10)</SelectItem>
-                <SelectItem value="bigInteger">
+                <SelectItem value="INTEGER">integer (ex: 10)</SelectItem>
+                <SelectItem value="BIGINTEGER">
                   big integer (ex: 123456789)
                 </SelectItem>
-                <SelectItem value="decimal">decimal (ex: 2.22)</SelectItem>
-                <SelectItem value="float">float (ex: 3.33333333)</SelectItem>
+                <SelectItem value="DECIMAL">decimal (ex: 2.22)</SelectItem>
+                <SelectItem value="FLOAT">float (ex: 3.33333333)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -105,16 +112,20 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
         {selectedField && selectedField.label === "Date" && (
           <div>
             <Label className="flex mb-4">Type</Label>
-            <Select required>
+            <Select
+              required
+              value={dateType}
+              onValueChange={(value: string) => setDateType(value)}
+            >
               <SelectTrigger className="w-[380px]">
                 <SelectValue placeholder="Choose here" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="date">date (ex: 01/01/2023)</SelectItem>
-                <SelectItem value="dateTime">
+                <SelectItem value="DATE">date (ex: 01/01/2023)</SelectItem>
+                <SelectItem value="DATETIME">
                   datetime (ex: 01/01/2023 00:00 AM)
                 </SelectItem>
-                <SelectItem value="time">time (ex: 00:00 AM)</SelectItem>
+                <SelectItem value="TIME">time (ex: 00:00 AM)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -124,15 +135,16 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
           <div>
             <Label className="flex mb-4">Type</Label>
             <RadioGroup
-              defaultValue="multiple-media"
+              defaultValue="SINGLE"
               className="flex justify-between w-[400px]"
+              onValueChange={(value: string) => setMediaType(value)}
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="multiple-media" id="multiple-media" />
+                <RadioGroupItem value="MULTIPLE" id="multiple-media" />
                 <Label htmlFor="multiple-media">Multiple Media</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="single-media" id="single-media" />
+                <RadioGroupItem value="SINGLE" id="single-media" />
                 <Label htmlFor="single-media">Single Media</Label>
               </div>
             </RadioGroup>

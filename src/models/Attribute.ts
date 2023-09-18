@@ -1,6 +1,9 @@
 export interface Attribute {
   name: string;
-  type: string;
+  textType: string;
+  mediaType: string;
+  dateType: string;
+  formatType: string;
   contentType: AttributeType;
   minimumLength?: number;
   maximumLength?: number;
@@ -11,7 +14,7 @@ export interface Attribute {
 
 export enum AttributeType {
   Text = "TEXT",
-  RichText = "RICH TEXT",
+  RichText = "RICHTEXT",
   Date = "DATE",
   Number = "NUMBER",
   Media = "MEDIA",

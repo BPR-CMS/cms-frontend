@@ -42,28 +42,32 @@ export const columns: ColumnDef<Attribute>[] = [
 export default function ContentTypePage({ params }: Params) {
   const { contentType } = params;
   type CheckboxStateValues = boolean | string;
-  const [checkboxStates, setCheckboxStates] = useState<Record<string, CheckboxStateValues>>({});
+  const [checkboxStates, setCheckboxStates] = useState<
+    Record<string, CheckboxStateValues>
+  >({});
 
   function handleCheckboxChange(name: string, checked: CheckboxStateValues) {
     console.log(name, checked);
-    setCheckboxStates(prevState => ({
-        ...prevState,
-        [name]: checked
+    setCheckboxStates((prevState) => ({
+      ...prevState,
+      [name]: checked,
     }));
   }
   const { values, errors, isValid, handleChange, setValues } =
     useFormWithValidation({
       name: "",
-
+      minimumLength: "",
+      maximumLength: "",
+      minimumValue: "",
+      maximumValue: "",
+      defaultValue: "",
     });
   const [collections, setCollections] = useState<Collection[]>([]);
 
-  const [selectedFieldType, setSelectedFieldType] = useState<AttributeType | null>(
-    null
-  );
-  const [numberFormat, setNumberFormat] = useState<string | undefined>(
-    undefined
-  );
+  const [selectedFieldType, setSelectedFieldType] =
+    useState<AttributeType | null>(null);
+  const [numberFormat, setNumberFormat] = useState<string>("INTEGER");
+  const [dateType, setDateType] = useState<string>("DATE");
 
   const [fieldsData, setFieldsData] = useState<Attribute[]>([]);
   const { toast } = useToast();
@@ -89,6 +93,7 @@ export default function ContentTypePage({ params }: Params) {
   const [currentView, setCurrentView] = useState("grid"); // 'grid' or 'detail'
   const [selectedField, setSelectedField] = useState(null);
   const [textType, setTextType] = useState<string>("SHORT");
+  const [mediaType, setMediaType] = useState<string>("SINGLE");
   const handleCardClick = useCallback((field: any) => {
     setSelectedField(field);
     setCurrentView("detail");
@@ -100,17 +105,23 @@ export default function ContentTypePage({ params }: Params) {
     if (selectedFieldType) {
       const newField: Attribute = {
         name: values.name,
-        type: textType,
+        textType: textType,
+        mediaType: mediaType,
+        dateType: dateType,
         contentType: selectedFieldType,
+        formatType: numberFormat,
         required: checkboxStates.required || false,
         unique: checkboxStates.unique || false,
-        format: numberFormat
-
+        minimumLength: values.minimumLength,
+        maximumLength: values.maximumLength,
+        minimumValue: values.minimumValue,
+        maximumValue: values.maximumValue,
+        defaultValue: values.defaultValue,
       };
 
       try {
         await addAttributesToCollection(selectedContentType.id, newField);
-console.log(newField)
+        console.log(newField);
         setFieldsData((prevFields) => [...prevFields, newField]);
         setCollections((prevCollections) => {
           return prevCollections.map((collection) => {
@@ -165,8 +176,17 @@ console.log(newField)
     setCurrentView("grid");
     setSelectedField(null);
     setSelectedFieldType(null);
-
-    setValues({});
+    setValues({
+      name: "",
+      minimumLength: "",
+      maximumLength: "",
+      minimumValue: "",
+      maximumValue: "",
+      defaultValue: "",
+    });
+    setCheckboxStates({});
+    setNumberFormat("INTEGER");
+    setDateType("DATE");
   }
 
   return (
@@ -273,6 +293,10 @@ console.log(newField)
                             handleChange={handleChange}
                             numberFormat={numberFormat}
                             setNumberFormat={setNumberFormat}
+                            dateType={dateType}
+                            setDateType={setDateType}
+                            mediaType={mediaType}
+                            setMediaType={setMediaType}
                             checkboxStates={checkboxStates}
                             handleCheckboxChange={handleCheckboxChange}
                           />

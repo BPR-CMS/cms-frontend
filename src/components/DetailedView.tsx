@@ -9,6 +9,10 @@ type DetailedViewProps = {
   setNumberFormat: React.Dispatch<React.SetStateAction<string | undefined>>;
   textType: string;
   setTextType: React.Dispatch<React.SetStateAction<string>>;
+  dateType: string | undefined;
+  setDateType: React.Dispatch<React.SetStateAction<string | undefined>>;
+  mediaType: string;
+  setMediaType: React.Dispatch<React.SetStateAction<string>>;
   checkboxStates: Record<string, CheckboxStateValues>;
   handleCheckboxChange: (name: string, checked: CheckboxStateValues) => void;
 };
@@ -22,8 +26,12 @@ function DetailedView({
   setNumberFormat,
   textType,
   setTextType,
+  dateType,
+  setDateType,
+  mediaType,
+  setMediaType,
   checkboxStates,
-  handleCheckboxChange
+  handleCheckboxChange,
 }: DetailedViewProps) {
   return (
     <div className="p-8">
@@ -43,6 +51,10 @@ function DetailedView({
         setNumberFormat={setNumberFormat}
         textType={textType}
         setTextType={setTextType}
+        dateType={dateType}
+        setDateType={setDateType}
+        mediaType={mediaType}
+        setMediaType={setMediaType}
         checkboxStates={checkboxStates}
         handleCheckboxChange={handleCheckboxChange}
       />

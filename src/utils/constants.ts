@@ -22,7 +22,7 @@ export const fields = [
     bgColor: "bg-violet-500/10",
   },
   {
-    label: "Rich Text",
+    label: "RichText",
     icon: TextIcon,
     href: "/content-type-builder",
     description: "A rich text editor with formatting options",
