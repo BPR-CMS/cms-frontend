@@ -265,7 +265,7 @@ export default function ContentTypePage({ params }: Params) {
                               onClick={() => {
                                 setCurrentView("grid");
                                 setSelectedField(null);
-                                setValues({});
+                                resetDialog();
                               }}
                             >
                               <ArrowLeftIcon />

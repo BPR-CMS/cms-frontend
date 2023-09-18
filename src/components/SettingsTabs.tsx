@@ -11,17 +11,17 @@ import {
 } from "@/components/ui/Select";
 import FormFieldGroup from "./custom/FormFieldGroup";
 type CheckboxStateValues = boolean | string;
-type SettingsTabsProps = {
+export type SettingsTabsProps = {
   selectedField: any;
   values: Record<string, any>;
   errors: Record<string, string>;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   numberFormat: string | undefined;
-  setNumberFormat: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setNumberFormat: React.Dispatch<React.SetStateAction<string>>;
   textType: string;
   setTextType: React.Dispatch<React.SetStateAction<string>>;
   dateType: string | undefined;
-  setDateType: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setDateType: React.Dispatch<React.SetStateAction<string>>;
   mediaType: string;
   setMediaType: React.Dispatch<React.SetStateAction<string>>;
   checkboxStates: Record<string, CheckboxStateValues>;
@@ -72,6 +72,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
             <Label className="flex mb-4">Type</Label>
             <RadioGroup
               defaultValue="SHORT"
+              value={textType}
               className="flex justify-between w-[400px]"
               onValueChange={(value: string) => setTextType(value)}
             >
@@ -136,6 +137,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
             <Label className="flex mb-4">Type</Label>
             <RadioGroup
               defaultValue="SINGLE"
+              value={mediaType}
               className="flex justify-between w-[400px]"
               onValueChange={(value: string) => setMediaType(value)}
             >
