@@ -37,3 +37,16 @@ export const getCollections = async (): Promise<any> => {
     throw error;
   }
 };
+
+export const getCollectionById = async (id: string): Promise<any> => {
+  try {
+    const response = await axios.get(`${BASE_URL}/${id}`, {
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
