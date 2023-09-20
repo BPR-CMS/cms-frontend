@@ -18,11 +18,13 @@ import {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
     emptyStateComponent?: React.ReactNode // New prop for empty state
+    id: string;
   }
   
   export function DataTable<TData, TValue>({
     columns,
     data,
+    id,
     emptyStateComponent = <span>No results.</span>, // Default to "No results." if not provided
   }: DataTableProps<TData, TValue>) {
     const table = useReactTable({
@@ -33,7 +35,7 @@ import {
   
     return (
       <div className="rounded-md border">
-        <Table>
+        <Table id={id}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

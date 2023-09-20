@@ -7,6 +7,7 @@ export interface Attribute {
   contentType: AttributeType;
   minimumLength?: number;
   maximumLength?: number;
+  maximumRichTextLength?: string;
   required?: boolean;
   unique?: boolean;
   format?: string;

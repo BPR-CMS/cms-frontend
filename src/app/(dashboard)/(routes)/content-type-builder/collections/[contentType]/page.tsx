@@ -35,7 +35,6 @@ export default function ContentTypePage({ params }: Params) {
   const [checkboxStates, setCheckboxStates] = useState<
     Record<string, CheckboxStateValues>
   >({});
-  
 
   function handleCheckboxChange(name: string, checked: CheckboxStateValues) {
     console.log(name, checked);
@@ -49,6 +48,7 @@ export default function ContentTypePage({ params }: Params) {
       name: "",
       minimumLength: "",
       maximumLength: "",
+      maximumRichTextLength: "",
       minimumValue: "",
       maximumValue: "",
       defaultValue: "",
@@ -105,6 +105,7 @@ export default function ContentTypePage({ params }: Params) {
         unique: checkboxStates.unique || false,
         minimumLength: values.minimumLength,
         maximumLength: values.maximumLength,
+        maximumRichTextLength: values.maximumRichTextLength,
         minimumValue: values.minimumValue,
         maximumValue: values.maximumValue,
         defaultValue: values.defaultValue,
@@ -133,6 +134,7 @@ export default function ContentTypePage({ params }: Params) {
           description: "Field added successfully.",
           variant: "success",
         });
+        resetDialog()
       } catch (error) {
         console.error("Error adding new field:", error);
 
@@ -190,7 +192,7 @@ export default function ContentTypePage({ params }: Params) {
           <div className="pl-56 pr-56">
             <div className="mt-6">
               <div className="container mx-auto py-10">
-              <CollectionFieldsTable
+                <CollectionFieldsTable
                   attributes={attributes}
                   onAddFieldClick={() => setIsDialogOpen(true)}
                 />

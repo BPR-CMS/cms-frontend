@@ -10,14 +10,16 @@ type CardProps = {
     icon: React.ElementType;
     label: string;
     description: string;
+    id: string;
   };
   
-const CustomCard: React.FC<CardProps> = ({ onClick, href, icon: Icon, label, description }) => {
+const CustomCard: React.FC<CardProps> = ({id,  onClick, href, icon: Icon, label, description }) => {
     return (
       <Card
+      id={id}
         onClick={onClick}
         key={href}
-        className="p-4 border-black/5 flex items-center justify-between hover:shadow-md transition cursor-pointer"
+        className="card p-4 border-black/5 flex items-center justify-between hover:shadow-md transition cursor-pointer"
       >
         <CardHeader>
           <div className="flex items-center space-x-2">

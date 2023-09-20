@@ -25,6 +25,7 @@ export const CollectionFieldsTable: React.FC<CollectionFieldsTableProps> = ({
   return (
     <>
       <DataTable
+      id="fieldsTable"
         columns={columns}
         data={attributes}
         emptyStateComponent={
@@ -33,6 +34,7 @@ export const CollectionFieldsTable: React.FC<CollectionFieldsTableProps> = ({
             <p>Add your first field to this Collection-Type</p>
             {attributes.length === 0 && (
               <Button
+              id="addNewFieldButton"
                 className="flex items-center space-x-2 mt-4"
                 onClick={onAddFieldClick}
               >
@@ -45,6 +47,7 @@ export const CollectionFieldsTable: React.FC<CollectionFieldsTableProps> = ({
       />
       {attributes.length > 0 && (
         <Button
+        id="addNewFieldButton"
           className="flex items-center space-x-2 mt-4"
           onClick={onAddFieldClick}
         >

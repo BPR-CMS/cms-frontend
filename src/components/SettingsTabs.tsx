@@ -48,7 +48,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
     <Tabs defaultValue="basic">
       <TabsList className="flex justify-end">
         <TabsTrigger value="basic">Basic settings</TabsTrigger>
-        <TabsTrigger value="advanced">Advanced settings</TabsTrigger>
+        <TabsTrigger id="advanced" value="advanced">Advanced settings</TabsTrigger>
       </TabsList>
       <TabsContent value="basic">
         <div className=" mb-6 w-[400px]">
@@ -71,6 +71,8 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
           <div>
             <Label className="flex mb-4">Type</Label>
             <RadioGroup
+              id="type"
+              name="type"
               defaultValue="SHORT"
               value={textType}
               className="flex justify-between w-[400px]"
@@ -99,12 +101,12 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 <SelectValue placeholder="Choose here" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="INTEGER">integer (ex: 10)</SelectItem>
-                <SelectItem value="BIGINTEGER">
+                <SelectItem id="integer" value="INTEGER">integer (ex: 10)</SelectItem>
+                <SelectItem id="bigInteger" value="BIGINTEGER">
                   big integer (ex: 123456789)
                 </SelectItem>
-                <SelectItem value="DECIMAL">decimal (ex: 2.22)</SelectItem>
-                <SelectItem value="FLOAT">float (ex: 3.33333333)</SelectItem>
+                <SelectItem  id="decimal" value="DECIMAL">decimal (ex: 2.22)</SelectItem>
+                <SelectItem id="float" value="FLOAT">float (ex: 3.33333333)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -122,11 +124,11 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 <SelectValue placeholder="Choose here" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="DATE">date (ex: 01/01/2023)</SelectItem>
-                <SelectItem value="DATETIME">
+                <SelectItem id="date" value="DATE">date (ex: 01/01/2023)</SelectItem>
+                <SelectItem id="dateTime" value="DATETIME">
                   datetime (ex: 01/01/2023 00:00 AM)
                 </SelectItem>
-                <SelectItem value="TIME">time (ex: 00:00 AM)</SelectItem>
+                <SelectItem id="time" value="TIME">time (ex: 00:00 AM)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -157,6 +159,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
       <TabsContent value="advanced">
         <div className="flex items-center space-x-2 mb-4">
           <Checkbox
+            name="required"
             id="required"
             checked={!!checkboxStates.required}
             onCheckedChange={(checked) =>
@@ -187,6 +190,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
             <div className="flex items-center space-x-2 mb-4">
               <Checkbox
                 id="unique"
+                name="unique"
                 checked={!!checkboxStates.unique}
                 onCheckedChange={(checked) =>
                   handleCheckboxChange("unique", checked)
@@ -205,7 +209,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 name="maximumLength"
                 id="maximumLength"
                 type="number"
-                value={values.maximumLength || "0"}
+                value={values.maximumLength}
                 onChangeInput={handleChange}
                 error={errors.maximumLength}
               />
@@ -216,14 +220,14 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 name="minimumLength"
                 id="minimumLength"
                 type="number"
-                value={values.minimumLength || "0"}
+                value={values.minimumLength}
                 onChangeInput={handleChange}
                 error={errors.minimumLength}
               />
             </div>
           </div>
         )}
-        {selectedField && selectedField.label === "Rich Text" && (
+        {selectedField && selectedField.label === "RichText" && (
           <div>
             <div className="col-span-full mb-4">
               <FormFieldGroup
@@ -240,10 +244,10 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
             <div className="col-span-full mb-4">
               <FormFieldGroup
                 label="Maximum Length"
-                name="maximumLength"
-                id="maximumLength"
+                name="maximumRichTextLength"
+                id="maximumRichTextLength"
                 type="number"
-                value={values.maximumLength}
+                value={values.maximumRichTextLength}
                 onChangeInput={handleChange}
                 error={errors.maximumLength}
               />
@@ -270,7 +274,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 name="defaultValue"
                 id="defaultValue"
                 type="number"
-                value={values.defaultValue || "0"}
+                value={values.defaultValue}
                 onChangeInput={handleChange}
                 error={errors.defaultValue}
               />
@@ -296,7 +300,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 name="maximumValue"
                 id="maximumValue"
                 type="number"
-                value={values.maximumValue || "0"}
+                value={values.maximumValue}
                 onChangeInput={handleChange}
                 error={errors.maximumValue}
               />
@@ -307,7 +311,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 name="minimumValue"
                 id="minimumValue"
                 type="number"
-                value={values.minimumValue || "0"}
+                value={values.minimumValue}
                 onChangeInput={handleChange}
                 error={errors.minimumValue}
               />
