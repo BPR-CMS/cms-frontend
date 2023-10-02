@@ -14,7 +14,11 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       const allUsers = await getUsers();
-      setUsers(allUsers);
+      const createdUsers = allUsers.filter(
+        (user) => user.accountStatus === "CREATED"
+      );
+
+      setUsers(createdUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast({
