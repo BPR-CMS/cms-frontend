@@ -1,3 +1,4 @@
+"use client";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { Button } from "../ui/Button";
 import {
@@ -12,9 +13,13 @@ import {
 import FormFieldGroup from "./FormFieldGroup";
 import FormGrid from "./FormGrid";
 import { useRef, useState } from "react";
+import { inviteUser } from "@/services/EmailInvitationService";
 
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
-
+import { User } from "@/models/User";
+import { useToast } from "@/hooks/use-toast";
+import { AxiosError } from "axios";
+import { getErrors } from "@/lib/utils";
 function InviteUserDialog() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -24,10 +29,45 @@ function InviteUserDialog() {
     lastName: "",
     email: "",
   });
+  const { toast } = useToast();
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const sendInvitation = async (userData: User) => {
+    try {
+      await inviteUser(userData);
+
+      toast({
+        title: "Success",
+        description: "You have successfully sent an invitation.",
+        variant: "success",
+      });
+      setIsDialogOpen(false);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      const errorMessage = getErrors(axiosError);
+
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
   };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    setSubmitted(true);
+
+    const userData: User = {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+    };
+
+    sendInvitation(userData).finally(() => {
+      setSubmitted(false);
+    });
+  };
+
   return (
     <Dialog
       open={isDialogOpen}
