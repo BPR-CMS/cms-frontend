@@ -20,7 +20,7 @@ export const loginUser = async (data: User): Promise<User> => {
   }
 };
 //revise here: Promise<any>
-export const getUsers = async (): Promise<User> => {
+export const getUsers = async (): Promise<User[]> => {
   try {
     const response = await axios.get(`${BASE_URL}`, {
       headers: {
