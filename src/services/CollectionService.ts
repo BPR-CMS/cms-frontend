@@ -12,7 +12,7 @@ if (typeof window !== "undefined") {
   }
 }
 
-export const addCollection = async (data: Collection): Promise<any> => {
+export const addCollection = async (data: Collection): Promise<Collection> => {
   try {
     const response = await axios.post(`${BASE_URL}`, data, {
       headers: {
@@ -25,7 +25,7 @@ export const addCollection = async (data: Collection): Promise<any> => {
   }
 };
 
-export const getCollections = async (): Promise<any> => {
+export const getCollections = async (): Promise<Collection> => {
   try {
     const response = await axios.get(`${BASE_URL}`, {
       headers: {
@@ -38,7 +38,7 @@ export const getCollections = async (): Promise<any> => {
   }
 };
 
-export const getCollectionById = async (id: string): Promise<any> => {
+export const getCollectionById = async (id: string): Promise<Collection> => {
   try {
     const response = await axios.get(`${BASE_URL}/${id}`, {
       headers: {

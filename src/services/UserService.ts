@@ -11,7 +11,7 @@ if (typeof window !== "undefined") {
   }
 }
 //revise here: Promise<any>
-export const loginUser = async (data: User): Promise<any> => {
+export const loginUser = async (data: User): Promise<User> => {
   try {
     const response = await axios.post(`${BASE_URL}/login`, data);
     return response.data;
@@ -20,7 +20,7 @@ export const loginUser = async (data: User): Promise<any> => {
   }
 };
 //revise here: Promise<any>
-export const getUsers = async (): Promise<any> => {
+export const getUsers = async (): Promise<User> => {
   try {
     const response = await axios.get(`${BASE_URL}`, {
       headers: {
