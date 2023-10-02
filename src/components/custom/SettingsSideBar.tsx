@@ -10,6 +10,10 @@ function SettingsSideBar() {
       label: "Users",
       href: "/settings/users",
     },
+    {
+      label: "Pending Invitations",
+      href: "/settings/pending-invitations",
+    },
   ];
 
   return (
