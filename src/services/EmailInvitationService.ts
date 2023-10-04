@@ -36,3 +36,14 @@ export const resendInvitation = async (userId: string): Promise<string> => {
     throw error;
   }
 };
+
+export const validateToken = async (inviteToken: string) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/validateToken?token=${inviteToken}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
