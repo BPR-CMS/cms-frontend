@@ -74,7 +74,7 @@ function InviteUserDialog() {
       onOpenChange={() => setIsDialogOpen(!isDialogOpen)}
     >
       <DialogTrigger asChild>
-        <Button id="inviteUserButton">&#9993; Invite new user</Button>
+        <Button id="inviteNewUserButton">&#9993; Invite new user</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[640px]">
         <DialogHeader>
