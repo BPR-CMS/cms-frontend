@@ -1,5 +1,6 @@
 describe("Invite new user to create an account", () => {
   beforeEach(() => {
+    // cy.request("POST", "http://localhost:8080/api/v1/utils/resetDatabase");
     cy.visit("http://localhost:3000/");
 
     // Fill out the form with valid data
@@ -148,12 +149,8 @@ describe("Invite new user to create an account", () => {
       cy.visit("http://localhost:3000/settings/pending-invitations");
     });
 
-    it("should not resend an invitation on the same email if the link did not expire yet", () => {
-      cy.contains("button", "Resend Invitation").click();
-
-      cy.get(".default")
-        .should("be.visible")
-        .contains("Invitation is still valid.");
+    it("should display Resend Invitation button as disabled if the invitation did not expire yet", () => {
+      cy.contains('button', 'Resend Invitation').should("be.disabled");
     });
   });
 });
