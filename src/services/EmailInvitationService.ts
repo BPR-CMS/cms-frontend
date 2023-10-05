@@ -36,3 +36,16 @@ export const resendInvitation = async (userId: string): Promise<string> => {
     throw error;
   }
 };
+
+export const isTokenExpired = async (userId: string): Promise<boolean> => {
+  try {
+    const response = await axios.get(`${BASE_URL}/isTokenExpired/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
