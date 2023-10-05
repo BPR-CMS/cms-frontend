@@ -12,7 +12,7 @@ export const checkAdminExists = async (): Promise<boolean> => {
   }
 };
 
-export const registerAdmin = async (data: User): Promise<any> => {
+export const registerAdmin = async (data: User): Promise<User> => {
   try {
     const response = await axios.post(`${BASE_URL}/initialize`, data);
     return response.data;

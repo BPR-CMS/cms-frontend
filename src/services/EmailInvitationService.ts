@@ -1,8 +1,7 @@
 import axios from "axios";
-import { Collection } from "@/models/Collection";
+import { User } from "@/models/User";
 
-const BASE_URL = "http://localhost:8080/api/v1/collections";
-
+const BASE_URL = "http://localhost:8080/api/v1/invitations";
 let TOKEN = "";
 
 if (typeof window !== "undefined") {
@@ -12,9 +11,9 @@ if (typeof window !== "undefined") {
   }
 }
 
-export const addCollection = async (data: Collection): Promise<Collection> => {
+export const inviteUser = async (data: User): Promise<User> => {
   try {
-    const response = await axios.post(`${BASE_URL}`, data, {
+    const response = await axios.post(`${BASE_URL}/send`, data, {
       headers: {
         Authorization: `Bearer ${TOKEN}`,
       },
@@ -25,9 +24,9 @@ export const addCollection = async (data: Collection): Promise<Collection> => {
   }
 };
 
-export const getCollections = async (): Promise<Collection> => {
+export const resendInvitation = async (userId: string): Promise<string> => {
   try {
-    const response = await axios.get(`${BASE_URL}`, {
+    const response = await axios.post(`${BASE_URL}/resend/${userId}`, {
       headers: {
         Authorization: `Bearer ${TOKEN}`,
       },
@@ -38,9 +37,9 @@ export const getCollections = async (): Promise<Collection> => {
   }
 };
 
-export const getCollectionById = async (id: string): Promise<Collection> => {
+export const isTokenExpired = async (userId: string): Promise<boolean> => {
   try {
-    const response = await axios.get(`${BASE_URL}/${id}`, {
+    const response = await axios.get(`${BASE_URL}/isTokenExpired/${userId}`, {
       headers: {
         Authorization: `Bearer ${TOKEN}`,
       },

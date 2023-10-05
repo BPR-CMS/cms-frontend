@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Montserrat } from "next/font/google";
-import { LayoutDashboard, LayoutIcon } from "lucide-react";
+import { LayoutDashboard, LayoutIcon, SettingsIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +21,12 @@ const routes = [
     icon: LayoutIcon,
     href: "/content-type-builder",
     color: "text-violet-500",
+  },
+  {
+    label: "Settings",
+    icon: SettingsIcon,
+    href: "/settings",
+    color: "text-grey-500",
   },
 ];
 
