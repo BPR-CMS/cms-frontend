@@ -22,6 +22,7 @@ interface DataTableProps<TData, TValue> {
   id: string;
   renderButton?: (rowData: TData) => React.ReactNode;
   onButtonClick?: (rowData: TData) => () => void;
+  defaultButtonLabel: string; 
 }
 
 export function DataTable<TData, TValue>({
@@ -30,6 +31,7 @@ export function DataTable<TData, TValue>({
   id,
   renderButton,
   onButtonClick,
+  defaultButtonLabel,
   emptyStateComponent = <span>No results.</span>, // Default to "No results." if not provided
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
@@ -73,15 +75,15 @@ export function DataTable<TData, TValue>({
                   </TableCell>
                 ))}
                 {renderButton && (
-                  <TableCell>
-                    <Button
-                      onClick={
-                        onButtonClick ? onButtonClick(row.original) : undefined
-                      }
-                    >
-                      {renderButton(row.original)}
-                    </Button>
-                  </TableCell>
+           <TableCell>
+           <Button
+             disabled={!renderButton || !renderButton(row.original)}
+             onClick={onButtonClick ? onButtonClick(row.original) : undefined}
+           >
+             {defaultButtonLabel}
+           </Button>
+         </TableCell>
+         
                 )}
               </TableRow>
             ))
