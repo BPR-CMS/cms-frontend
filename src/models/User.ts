@@ -6,4 +6,5 @@ export interface User {
   password?: string;
   userType?: string;
   accountStatus?: string;
+  isTokenExpired?: boolean;
 }
