@@ -1,11 +1,18 @@
 import { DataTable } from "./custom/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { User } from "@/models/User";
-import { Button } from "./ui/Button";
-export const columns: ColumnDef<User>[] = [
+export const columns: ColumnDef<User & { isTokenExpired?: boolean }>[] = [
   {
     accessorKey: "email",
     header: "Email",
+  },
+  {
+    accessorKey: "isTokenExpired",
+    header: "Invitation Status",
+    cell: (context) => {
+      console.log("Cell value:", context.getValue());
+      return context.getValue() ? "Expired" : "Valid";
+    },
   },
 ];
 
@@ -24,7 +31,10 @@ export const PendingInvitationsTable: React.FC<
         id="usersTable"
         columns={columns}
         data={users}
-        renderButton={(rowData) => buttonLabel}
+        renderButton={(rowData) =>
+          rowData.isTokenExpired ? buttonLabel : null
+        }
+        defaultButtonLabel={buttonLabel}
         onButtonClick={(rowData) => onButtonClick(rowData)}
       />
     </>

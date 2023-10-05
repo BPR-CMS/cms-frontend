@@ -6,18 +6,28 @@ import { getUsers } from "@/services/UserService";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PendingInvitationsTable } from "@/components/PendingInvitationsTable";
-import { resendInvitation } from "@/services/EmailInvitationService";
+import { isTokenExpired, resendInvitation } from "@/services/EmailInvitationService";
 export default function PendingInvitationsPage() {
   const { toast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const fetchUsers = async () => {
     try {
       const allUsers = await getUsers();
-
       const pendingUsers = allUsers.filter(
         (user) => user.accountStatus === "PENDING"
       );
-
+  
+      // Fetch expiration status for each user concurrently
+      const expirationStatuses = await Promise.all(
+        pendingUsers.map(user => isTokenExpired(user.userId!))
+      );
+  
+      // Update each user object with the fetched status
+      pendingUsers.forEach((user, index) => {
+        user.isTokenExpired = expirationStatuses[index];
+        console.log(user.isTokenExpired)
+      });
+  
       setUsers(pendingUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -28,6 +38,7 @@ export default function PendingInvitationsPage() {
       });
     }
   };
+  
 
   useEffect(() => {
     fetchUsers();
