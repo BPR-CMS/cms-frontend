@@ -49,3 +49,14 @@ export const isTokenExpired = async (userId: string): Promise<boolean> => {
     throw error;
   }
 };
+
+export const validateToken = async (inviteToken: string) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/validateToken?token=${inviteToken}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
