@@ -15,6 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/Tooltip";
+import { setPassword } from "@/services/UserService";
 const Register = () => {
   const { values, errors, isValid, handleChange } = useFormWithValidation({
     firstName: "",
@@ -61,12 +62,58 @@ const Register = () => {
     return <div>Error: {error}</div>;
   }
 
-  const register = async (userData: User) => {
-    //TODO
+  const register = async (password: string) => {
+    if (!userData || !userData.userId) {
+      toast({
+        title: "Error",
+        description: "User data is missing",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await setPassword(userData.userId, password);
+      toast({
+        title: "Success",
+        description: "Password set successfully",
+        variant: "success",
+      });
+      // Redirect to login page after successful registration
+      router.push("/sign-in");
+    } catch (error) {
+      console.error("Failed to set password:", error);
+      toast({
+        title: "Error",
+        description: "Failed to set password",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setSubmitted(true);
+
+    if (!isValid) {
+      toast({
+        title: "Error",
+        description: "Please correct the errors in the form",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (values.password !== values.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    await register(values.password);
   };
 
   return (
