@@ -10,7 +10,7 @@ if (typeof window !== "undefined") {
     console.log("Token is missing from local storage");
   }
 }
-//revise here: Promise<any>
+
 export const loginUser = async (data: User): Promise<User> => {
   try {
     const response = await axios.post(`${BASE_URL}/login`, data);
@@ -19,7 +19,7 @@ export const loginUser = async (data: User): Promise<User> => {
     throw error;
   }
 };
-//revise here: Promise<any>
+
 export const getUsers = async (): Promise<User[]> => {
   try {
     const response = await axios.get(`${BASE_URL}`, {
@@ -28,6 +28,25 @@ export const getUsers = async (): Promise<User[]> => {
       },
     });
     return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const setPassword = async (
+  userId: string,
+  newPassword: string
+): Promise<void> => {
+  try {
+    await axios.patch(
+      `${BASE_URL}/setPassword/${userId}`,
+      { password: newPassword },
+      {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      }
+    );
   } catch (error) {
     throw error;
   }
