@@ -35,7 +35,6 @@ const Register = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -45,7 +44,7 @@ const Register = () => {
           setUserData(data);
         }
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
         setTokenValid(false);
       } finally {
         setLoading(false);
@@ -59,7 +58,6 @@ const Register = () => {
       setTokenValid(false);
     }
   }, [token]);
-  
 
   if (loading) {
     return <div>Loading...</div>;
@@ -90,9 +88,26 @@ const Register = () => {
       router.push("/sign-in");
     } catch (error) {
       console.error("Failed to set password:", error);
+
+      let errorMessage = "An unexpected error occurred";
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            errorMessage = "Validation error. Please check your input.";
+            break;
+          case 409:
+            errorMessage = "Password is already set for this user.";
+            break;
+          default:
+            break;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
       toast({
         title: "Error",
-        description: "Failed to set password",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -123,7 +138,7 @@ const Register = () => {
     await register(values.password);
   };
   if (!tokenValid) {
-    return <TokenInvalidMessage />
+    return <TokenInvalidMessage />;
   }
 
   return (
