@@ -11,7 +11,9 @@ interface FormFieldGroupProps {
   id: string;
   type?: string;
   required?: boolean;
-  value: string;
+  readonly?: boolean;
+  value?: string;
+  defaultValue?: string;
   onChangeInput?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onChangeTextArea?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   error?: string;
@@ -30,7 +32,9 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
   id,
   type,
   required,
+  readonly,
   value,
+  defaultValue,
   onChangeInput,
   error,
   minLength,
@@ -72,11 +76,13 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
           id={id}
           required={required}
           value={value}
+          defaultValue={defaultValue}
           onChange={onChangeInput}
           minLength={minLength}
           maxLength={maxLength}
           pattern={pattern}
           ref={ref}
+          readOnly={readonly}
         />
       )}
 
