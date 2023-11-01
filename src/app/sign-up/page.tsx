@@ -16,6 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/Tooltip";
 import { setPassword } from "@/services/UserService";
+import TokenInvalidMessage from "@/components/TokenInvalidMessage";
 const Register = () => {
   const { values, errors, isValid, handleChange } = useFormWithValidation({
     firstName: "",
@@ -29,30 +30,36 @@ const Register = () => {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [submitted, setSubmitted] = useState(false);
-
+  const [tokenValid, setTokenValid] = useState(true);
   const [userData, setUserData] = useState<User>();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
 
   useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const data = await validateToken(token!);
+        if (data && data.email && data.firstName && data.lastName) {
+          setUserData(data);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        setTokenValid(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (token) {
-      setLoading(true);
-      validateToken(token)
-        .then((data) => {
-          if (data && data.email && data.firstName && data.lastName) {
-            setUserData(data);
-          }
-        })
-        .catch((err) => {
-          console.error("Error fetching user data:", err);
-          setError(err.message);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      fetchUserData();
+    } else {
+      setLoading(false);
+      setTokenValid(false);
     }
   }, [token]);
+  
 
   if (loading) {
     return <div>Loading...</div>;
@@ -115,6 +122,9 @@ const Register = () => {
 
     await register(values.password);
   };
+  if (!tokenValid) {
+    return <TokenInvalidMessage />
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-between p-10">
@@ -234,7 +244,7 @@ const Register = () => {
         </FormGrid>
         <div className="border-gray-900/10 pt-12">
           <Button
-            id="loginButton"
+            id="registerButton"
             variant="default"
             size="lg"
             className="w-full"
