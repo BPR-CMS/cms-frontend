@@ -53,7 +53,7 @@ export default function CollectionsPage() {
 
   return (
     <div className="md:flex">
-      <ContentBuilderSideBar />
+      <ContentBuilderSideBar title="Content-Type Builder" showContentModelDialog={true} basePath="/content-type-builder/collections" />
       <div className="flex-grow md:ml-72 mt-4">
         {!selectedContentType && collections.length == 0 && (
           <div className=" mt-4">

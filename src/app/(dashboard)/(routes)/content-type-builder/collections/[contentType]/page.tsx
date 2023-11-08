@@ -158,6 +158,7 @@ export default function ContentTypePage({ params }: Params) {
     (item) => item.name === contentType
   );
   if (!selectedContentType) {
+
     return <div>Content type not found.</div>;
   }
 
@@ -185,7 +186,7 @@ export default function ContentTypePage({ params }: Params) {
   return (
     <>
       <div className="md:flex">
-        <ContentBuilderSideBar />
+        <ContentBuilderSideBar title="Content-Type Builder" showContentModelDialog={true}  />
         <div className="flex-grow md:ml-72 mt-4">
           <h2>{selectedContentType.name}</h2>
           <p>{selectedContentType.description}</p>

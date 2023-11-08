@@ -2,10 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-export default function ContentTypeBuilderRedirect() {
+export default function ContentManagerRedirect() {
   const router = useRouter();
   const pathname = usePathname();
-  if (pathname === "/content-type-builder") {
-    router.push("/content-type-builder/collections");
+  if (pathname === "/content-manager") {
+    router.push("/content-manager/collections");
   }
 }
