@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Montserrat } from "next/font/google";
-import { LayoutDashboard, LayoutIcon, SettingsIcon } from "lucide-react";
+import { FeatherIcon, LayoutDashboard, LayoutIcon, SettingsIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +15,13 @@ const routes = [
     icon: LayoutDashboard,
     href: "/dashboard",
     color: "text-sky-500",
+  },
+
+  {
+    label: "Content Manager",
+    icon: FeatherIcon,
+    href: "/content-manager",
+    color: "text-green-500",
   },
   {
     label: "Content-Type Builder",
