@@ -4,7 +4,13 @@ import { useRouter } from "next/navigation";
 import { Collection } from "@/models/Collection";
 import { useToast } from "@/hooks/use-toast";
 import ContentModelDialog from "./ContentModelDialog";
-function ContentBuilderSideBar() {
+
+interface ContentBuilderSideBarProps {
+  title: string;
+  showContentModelDialog?: boolean;
+  basePath?: string;
+}
+function ContentBuilderSideBar({ title, showContentModelDialog,  basePath }: ContentBuilderSideBarProps) {
   const [collections, setCollections] = useState<Collection[]>([]);
 
   const router = useRouter();
@@ -16,7 +22,7 @@ function ContentBuilderSideBar() {
   const handleContentTypeClick = (contentType: Collection) => {
     setSelectedContentType(contentType);
     router.push(
-      `/content-type-builder/collections/${contentType.name}`,
+      `${basePath}/${contentType.name}`,
       undefined
     );
   };
@@ -57,7 +63,7 @@ function ContentBuilderSideBar() {
       <div className="space-y-4 py-4 flex flex-col h-full text-white">
         <div className="px-3 py-2 flex-1">
           <h3 className="text-xxs  font-bold leading-1 text-gray-900 sm:truncate sm:text-xl sm:tracking-tight">
-            Content-Type Builder
+            {title}
           </h3>
           <div className="space-y-1">
             <div className="flex items-center flex-1 text-sm group flex p-3 w-full justify-start font-medium text-gray-400">
@@ -86,7 +92,7 @@ function ContentBuilderSideBar() {
             </ul>
           </div>
 
-          <ContentModelDialog />
+          {showContentModelDialog && <ContentModelDialog />}
         </div>
       </div>
     </div>
