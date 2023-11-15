@@ -10,6 +10,7 @@ import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import { getInputType } from "@/lib/utils";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { Input } from "@/components/ui/Input";
 const CreateEntryPage = ({ params }: Params) => {
   const router = useRouter();
 
@@ -71,33 +72,40 @@ const CreateEntryPage = ({ params }: Params) => {
                 </div>
               )}
               <div className="flex items-center space-x-2">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white text-xs py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                <Button>
                   Publish
-                </button>
-                <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                </Button>
+                <Button variant="secondary">
                   Save
-                </button>
+                </Button>
               </div>
             </div>
 
             {/* Dynamically create form fields based on attributes */}
             {collection &&
               collection.attributes.map((attribute) => {
+                const isRequired = attribute.required;
+                console.log(isRequired)
+                const label = `${attribute.name}${isRequired ? ' *' : ''}`;
                 if (attribute.contentType === "RICHTEXT") {
                   // Use ReactQuill for RICHTEXT attributes
                   return (
                     <div key={attribute.name} className="sm:col-span-3 mt-4">
-                      <label>{attribute.name}</label>
-                      <div className="bg-white p-2">
-                      <ReactQuill
-                        value={richTextFieldValues[attribute.name] || ""}
-                        onChange={(content) =>
-                          handleRichTextChange(attribute.name, content)
-                        }
-                      />
+                      <label>{label}</label>
+                      <div className="p-2 ">
+                        <div className="max-w-4xl bg-white"> {/* Set a max width and center it */}
+                          <ReactQuill
+                            theme="snow"
+                            value={richTextFieldValues[attribute.name] || ""}
+                            onChange={(content) =>
+                              handleRichTextChange(attribute.name, content)
+                            }
+                          />
+                        </div>
                       </div>
                     </div>
                   );
+                  
                 } else {
                   // Use a standard input for other types of attributes
                   return (
@@ -105,7 +113,7 @@ const CreateEntryPage = ({ params }: Params) => {
                       <div key={attribute.name} className="sm:col-span-3">
                         {/* Replace with your actual form field component */}
                         <FormFieldGroup
-                          label={attribute.name}
+                          label={label}
                           name={attribute.name}
                           id={attribute.name}
                           type={getInputType(attribute.contentType)}
@@ -119,7 +127,6 @@ const CreateEntryPage = ({ params }: Params) => {
                 }
               })}
           </div>
-
           {/* Sidebar Section */}
           <div className="  p-8 border-l self-center">
             <div className="flex justify-between items-center mb-6"></div>
