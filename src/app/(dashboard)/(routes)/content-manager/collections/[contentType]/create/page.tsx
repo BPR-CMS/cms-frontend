@@ -1,17 +1,40 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ContentBuilderSideBar from "@/components/custom/ContentBuilderSideBar";
 import FormFieldGroup from "@/components/custom/FormFieldGroup";
 import FormGrid from "@/components/custom/FormGrid";
 import { Button } from "@/components/ui/Button";
-import { values } from "cypress/types/lodash";
-const CreateEntryPage = () => {
+import { getCollectionByApiId } from "@/services/CollectionService";
+import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
+import { getInputType } from "@/lib/utils";
+const CreateEntryPage = ({ params }: Params) => {
   const router = useRouter();
+
+  const [collection, setCollection] = useState(null);
+  const [error, setError] = useState("");
+  const { contentType } = params;
 
   const handleBackClick = () => {
     router.back();
   };
+
+  useEffect(() => {
+    if (contentType) {
+      getCollectionByApiId(contentType)
+        .then((data) => {
+          setCollection(data);
+        })
+        .catch((error) => {
+          setError(error.message || "An error occurred");
+        });
+    }
+  }, [contentType]);
+
+  if (collection) {
+    console.log(collection);
+  }
+
   return (
     <div className="md:flex">
       <ContentBuilderSideBar title="Content" />
@@ -29,10 +52,14 @@ const CreateEntryPage = () => {
               </Button>
             </div>
             <div className="flex justify-between items-start mb-6">
-              <div>
-                <h1 className="text-2xl font-bold">Create an entry</h1>
-                <p className="text-sm text-gray-600">API ID: webinar</p>
-              </div>
+              {collection && (
+                <div>
+                  <h1 className="text-2xl font-bold">Create an entry</h1>
+                  <p className="text-sm text-gray-600">
+                    API ID: {collection.name}
+                  </p>
+                </div>
+              )}
               <div className="flex items-center space-x-2">
                 <button className="bg-blue-600 hover:bg-blue-700 text-white text-xs py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                   Publish
@@ -43,37 +70,24 @@ const CreateEntryPage = () => {
               </div>
             </div>
 
-            <form
-              id="post-form"
-              className="bg-white mt-6 mr-6 mb-6 p-6 sm:mt-8 sm:mr-8 sm:mb-8 sm:p-8 md:mt-10 md:mr-10 md:mb-10 md:p-10 rounded-md shadow-lg"
-              noValidate
-            >
-              <FormGrid>
-                <div className="sm:col-span-3">
-                  <FormFieldGroup
-                    label="Email address"
-                    name="email"
-                    id="email"
-                    type="email"
-                    required
-                  />
-                </div>
-
-                <div className="col-span-full">
-                  <FormFieldGroup
-                    label="Password"
-                    name="password"
-                    id="password"
-                    type="password"
-                    required
-                    minLength={8}
-                    maxLength={16}
-                    pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{8,16}$"
-                  />
-                </div>
-              </FormGrid>
-              <div className="border-gray-900/10 pt-12"></div>
-            </form>
+            {/* Dynamically create form fields based on attributes */}
+            {collection &&
+              collection.attributes.map((attribute) => (
+                <FormGrid>
+                  <div className="sm:col-span-3">
+                    {/* Replace with your actual form field component */}
+                    <FormFieldGroup
+                      label={attribute.name}
+                      name={attribute.name}
+                      id={attribute.name}
+                      type={getInputType(attribute.contentType)}
+                      // value={formData[attribute.name]}
+                      // onChange={handleInputChange}
+                      required={attribute.required}
+                    />
+                  </div>
+                </FormGrid>
+              ))}
           </div>
 
           {/* Sidebar Section */}
