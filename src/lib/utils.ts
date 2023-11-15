@@ -38,3 +38,17 @@ export const getErrors = (err: AxiosError): string => {
     return `We can't connect to the server right now. Please check your internet connection and try again. ${err.message}`;
   }
 };
+
+export type ContentType = 'TEXT' | 'RICHTEXT' | 'NUMBER' | 'DATE' | 'MEDIA';
+
+export function getInputType(contentType: ContentType): string {
+  const typeMapping: { [K in ContentType]: string } = {
+    TEXT: "text",
+    RICHTEXT: "text",
+    NUMBER: "number",
+    DATE: "date",
+    MEDIA: "file",
+  };
+
+  return typeMapping[contentType];
+}
