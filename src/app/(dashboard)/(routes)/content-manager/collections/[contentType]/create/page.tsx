@@ -8,15 +8,25 @@ import { Button } from "@/components/ui/Button";
 import { getCollectionByApiId } from "@/services/CollectionService";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import { getInputType } from "@/lib/utils";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 const CreateEntryPage = ({ params }: Params) => {
   const router = useRouter();
 
   const [collection, setCollection] = useState(null);
   const [error, setError] = useState("");
+  const [richTextFieldValues, setRichTextFieldValues] = useState({});
   const { contentType } = params;
 
   const handleBackClick = () => {
     router.back();
+  };
+
+  const handleRichTextChange = (fieldName, content) => {
+    setRichTextFieldValues((prevValues) => ({
+      ...prevValues,
+      [fieldName]: content,
+    }));
   };
 
   useEffect(() => {
@@ -72,22 +82,42 @@ const CreateEntryPage = ({ params }: Params) => {
 
             {/* Dynamically create form fields based on attributes */}
             {collection &&
-              collection.attributes.map((attribute) => (
-                <FormGrid>
-                  <div className="sm:col-span-3">
-                    {/* Replace with your actual form field component */}
-                    <FormFieldGroup
-                      label={attribute.name}
-                      name={attribute.name}
-                      id={attribute.name}
-                      type={getInputType(attribute.contentType)}
-                      // value={formData[attribute.name]}
-                      // onChange={handleInputChange}
-                      required={attribute.required}
-                    />
-                  </div>
-                </FormGrid>
-              ))}
+              collection.attributes.map((attribute) => {
+                if (attribute.contentType === "RICHTEXT") {
+                  // Use ReactQuill for RICHTEXT attributes
+                  return (
+                    <div key={attribute.name} className="sm:col-span-3 mt-4">
+                      <label>{attribute.name}</label>
+                      <div className="bg-white p-2">
+                      <ReactQuill
+                        value={richTextFieldValues[attribute.name] || ""}
+                        onChange={(content) =>
+                          handleRichTextChange(attribute.name, content)
+                        }
+                      />
+                      </div>
+                    </div>
+                  );
+                } else {
+                  // Use a standard input for other types of attributes
+                  return (
+                    <FormGrid>
+                      <div key={attribute.name} className="sm:col-span-3">
+                        {/* Replace with your actual form field component */}
+                        <FormFieldGroup
+                          label={attribute.name}
+                          name={attribute.name}
+                          id={attribute.name}
+                          type={getInputType(attribute.contentType)}
+                          // value={formData[attribute.name]}
+                          // onChange={handleInputChange}
+                          required={attribute.required}
+                        />
+                      </div>
+                    </FormGrid>
+                  );
+                }
+              })}
           </div>
 
           {/* Sidebar Section */}
