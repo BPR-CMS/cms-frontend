@@ -103,14 +103,11 @@ const CreateEntryPage = ({ params }: Params) => {
               {/* Dynamically create form fields based on attributes */}
               {collection &&
                 collection.attributes.map((attribute) => {
-                  console.log(
-                    `Name: ${attribute.name}, Value: ${values[attribute.name]}`
-                  );
+                  const useTextarea = attribute.textType === "LONG";
                   const isRequired = attribute.required;
                   console.log(isRequired);
                   const label = `${attribute.name}${isRequired ? " *" : ""}`;
                   if (attribute.contentType === "RICHTEXT") {
-                    // Use ReactQuill for RICHTEXT attributes
                     return (
                       <div
                         key={attribute.attributeId}
@@ -120,7 +117,6 @@ const CreateEntryPage = ({ params }: Params) => {
                         <div className="p-2 ">
                           <div className="max-w-4xl bg-white">
                             {" "}
-                            {/* Set a max width and center it */}
                             <ReactQuill
                               theme="snow"
                               value={richTextFieldValues[attribute.name] || ""}
@@ -132,12 +128,30 @@ const CreateEntryPage = ({ params }: Params) => {
                         </div>
                       </div>
                     );
-                  } else {
-                    // Use a standard input for other types of attributes
+                  } else if (useTextarea) {
                     return (
                       <FormGrid>
                         <div key={attribute.name} className="sm:col-span-3">
-                          {/* Replace with your actual form field component */}
+                          <FormFieldGroup
+                            label={label}
+                            name={attribute.name}
+                            id={attribute.name}
+                            useTextarea={true}
+                            type={getInputType(attribute.contentType)}
+                            value={values[attribute.name] || ""}
+                            onChangeTextArea={handleChange}
+                            required={attribute.required}
+                            minLength={attribute.minimumLength}
+                            maxLength={attribute.maximumLength}
+                            error={errors[attribute.name] || ""}
+                          />
+                        </div>
+                      </FormGrid>
+                    );
+                  } else {
+                    return (
+                      <FormGrid>
+                        <div key={attribute.name} className="sm:col-span-3">
                           <FormFieldGroup
                             label={label}
                             name={attribute.name}
