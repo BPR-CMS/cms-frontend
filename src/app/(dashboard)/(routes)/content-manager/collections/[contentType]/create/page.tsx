@@ -8,14 +8,19 @@ import { Button } from "@/components/ui/Button";
 import { getCollectionByApiId } from "@/services/CollectionService";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import { getInputType } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { Input } from "@/components/ui/Input";
+import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 const CreateEntryPage = ({ params }: Params) => {
   const router = useRouter();
 
+  const { values, errors, isValid, handleChange, setValues } =
+    useFormWithValidation({});
+  const { toast } = useToast();
   const [collection, setCollection] = useState(null);
   const [error, setError] = useState("");
+  const [submitted, setSubmitted] = useState(false);
   const [richTextFieldValues, setRichTextFieldValues] = useState({});
   const { contentType } = params;
 
@@ -41,6 +46,20 @@ const CreateEntryPage = ({ params }: Params) => {
         });
     }
   }, [contentType]);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSubmitted(true);
+
+    if (!isValid) {
+      toast({
+        title: "Error",
+        description: "Please correct the errors in the form",
+        variant: "destructive",
+      });
+      return;
+    }
+  };
 
   if (collection) {
     console.log(collection);
@@ -72,60 +91,71 @@ const CreateEntryPage = ({ params }: Params) => {
                 </div>
               )}
               <div className="flex items-center space-x-2">
-                <Button>
-                  Publish
-                </Button>
-                <Button variant="secondary">
-                  Save
-                </Button>
+                <Button disabled={submitted || !isValid}>Publish</Button>
               </div>
             </div>
-
-            {/* Dynamically create form fields based on attributes */}
-            {collection &&
-              collection.attributes.map((attribute) => {
-                const isRequired = attribute.required;
-                console.log(isRequired)
-                const label = `${attribute.name}${isRequired ? ' *' : ''}`;
-                if (attribute.contentType === "RICHTEXT") {
-                  // Use ReactQuill for RICHTEXT attributes
-                  return (
-                    <div key={attribute.name} className="sm:col-span-3 mt-4">
-                      <label>{label}</label>
-                      <div className="p-2 ">
-                        <div className="max-w-4xl bg-white"> {/* Set a max width and center it */}
-                          <ReactQuill
-                            theme="snow"
-                            value={richTextFieldValues[attribute.name] || ""}
-                            onChange={(content) =>
-                              handleRichTextChange(attribute.name, content)
-                            }
-                          />
+            <form
+              onSubmit={handleSubmit}
+              id="entry-form"
+              className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
+              noValidate
+            >
+              {/* Dynamically create form fields based on attributes */}
+              {collection &&
+                collection.attributes.map((attribute) => {
+                  console.log(
+                    `Name: ${attribute.name}, Value: ${values[attribute.name]}`
+                  );
+                  const isRequired = attribute.required;
+                  console.log(isRequired);
+                  const label = `${attribute.name}${isRequired ? " *" : ""}`;
+                  if (attribute.contentType === "RICHTEXT") {
+                    // Use ReactQuill for RICHTEXT attributes
+                    return (
+                      <div
+                        key={attribute.attributeId}
+                        className="sm:col-span-3 mt-4"
+                      >
+                        <label>{label}</label>
+                        <div className="p-2 ">
+                          <div className="max-w-4xl bg-white">
+                            {" "}
+                            {/* Set a max width and center it */}
+                            <ReactQuill
+                              theme="snow"
+                              value={richTextFieldValues[attribute.name] || ""}
+                              onChange={(content) =>
+                                handleRichTextChange(attribute.name, content)
+                              }
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                  
-                } else {
-                  // Use a standard input for other types of attributes
-                  return (
-                    <FormGrid>
-                      <div key={attribute.name} className="sm:col-span-3">
-                        {/* Replace with your actual form field component */}
-                        <FormFieldGroup
-                          label={label}
-                          name={attribute.name}
-                          id={attribute.name}
-                          type={getInputType(attribute.contentType)}
-                          // value={formData[attribute.name]}
-                          // onChange={handleInputChange}
-                          required={attribute.required}
-                        />
-                      </div>
-                    </FormGrid>
-                  );
-                }
-              })}
+                    );
+                  } else {
+                    // Use a standard input for other types of attributes
+                    return (
+                      <FormGrid>
+                        <div key={attribute.name} className="sm:col-span-3">
+                          {/* Replace with your actual form field component */}
+                          <FormFieldGroup
+                            label={label}
+                            name={attribute.name}
+                            id={attribute.name}
+                            type={getInputType(attribute.contentType)}
+                            value={values[attribute.name] || ""}
+                            onChangeInput={handleChange}
+                            required={attribute.required}
+                            minLength={attribute.minimumLength}
+                            maxLength={attribute.maximumLength}
+                            error={errors[attribute.name] || ""}
+                          />
+                        </div>
+                      </FormGrid>
+                    );
+                  }
+                })}
+            </form>
           </div>
           {/* Sidebar Section */}
           <div className="  p-8 border-l self-center">
