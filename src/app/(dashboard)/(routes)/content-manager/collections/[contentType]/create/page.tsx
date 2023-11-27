@@ -62,9 +62,6 @@ const CreateEntryPage = ({ params }: Params) => {
     }
   };
 
-
-
-
   return (
     <div className="md:flex">
       <ContentBuilderSideBar title="Content" />
@@ -105,10 +102,31 @@ const CreateEntryPage = ({ params }: Params) => {
                 collection.attributes.map((attribute) => {
                   const useTextarea = attribute.textType === "LONG";
                   const stepValue = getStepValue(attribute.formatType);
-
                   const isRequired = attribute.required;
 
                   const label = `${attribute.name}${isRequired ? " *" : ""}`;
+
+                  if (attribute.contentType === "DATE") {
+                    const dateInputType = getInputType(
+                      attribute.contentType,
+                      attribute.dateType
+                    );
+                    return (
+                      <FormGrid>
+                        <div key={attribute.name} className="sm:col-span-3">
+                          <FormFieldGroup
+                            label={label}
+                            name={attribute.name}
+                            id={attribute.name}
+                            type={dateInputType}
+                            value={values[attribute.name] || ""}
+                            onChangeInput={handleChange}
+                            required={attribute.required}
+                          />
+                        </div>
+                      </FormGrid>
+                    );
+                  }
                   if (attribute.contentType === "RICHTEXT") {
                     return (
                       <div

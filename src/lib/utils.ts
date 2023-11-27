@@ -40,18 +40,29 @@ export const getErrors = (err: AxiosError): string => {
 };
 
 export type ContentType = 'TEXT' | 'RICHTEXT' | 'NUMBER' | 'DATE' | 'MEDIA';
+export type DateType = 'DATE' | 'DATETIME' | 'TIME'; 
 
-export function getInputType(contentType: ContentType): string {
+export function getInputType(contentType: ContentType, dateType?: DateType): string {
+  if (contentType === 'DATE' && dateType) {
+    const dateTypeMapping: { [K in DateType]: string } = {
+      DATE: "date",
+      DATETIME: "datetime-local",
+      TIME: "time",
+    };
+    return dateTypeMapping[dateType];
+  }
+
   const typeMapping: { [K in ContentType]: string } = {
     TEXT: "text",
     RICHTEXT: "text",
     NUMBER: "number",
-    DATE: "date",
+    DATE: "date", // Default to date if no dateType is provided
     MEDIA: "file",
   };
 
   return typeMapping[contentType];
 }
+
 
 export const getStepValue = (numberType: string) => {
   switch (numberType) {
