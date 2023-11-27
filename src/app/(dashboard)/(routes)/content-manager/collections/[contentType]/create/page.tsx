@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
+import { getStepValue } from "@/lib/utils";
 const CreateEntryPage = ({ params }: Params) => {
   const router = useRouter();
 
@@ -61,9 +62,8 @@ const CreateEntryPage = ({ params }: Params) => {
     }
   };
 
-  if (collection) {
-    console.log(collection);
-  }
+
+
 
   return (
     <div className="md:flex">
@@ -104,8 +104,10 @@ const CreateEntryPage = ({ params }: Params) => {
               {collection &&
                 collection.attributes.map((attribute) => {
                   const useTextarea = attribute.textType === "LONG";
+                  const stepValue = getStepValue(attribute.formatType);
+
                   const isRequired = attribute.required;
-                  console.log(isRequired);
+
                   const label = `${attribute.name}${isRequired ? " *" : ""}`;
                   if (attribute.contentType === "RICHTEXT") {
                     return (
@@ -163,6 +165,7 @@ const CreateEntryPage = ({ params }: Params) => {
                             minLength={attribute.minimumLength}
                             maxLength={attribute.maximumLength}
                             error={errors[attribute.name] || ""}
+                            step={stepValue}
                           />
                         </div>
                       </FormGrid>

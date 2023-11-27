@@ -52,3 +52,15 @@ export function getInputType(contentType: ContentType): string {
 
   return typeMapping[contentType];
 }
+
+export const getStepValue = (numberType: string) => {
+  switch (numberType) {
+    case "INTEGER":
+      return "1";
+    case "DECIMAL":
+    case "FLOAT":
+      return "any";
+    default:
+      return "any";
+  }
+};
