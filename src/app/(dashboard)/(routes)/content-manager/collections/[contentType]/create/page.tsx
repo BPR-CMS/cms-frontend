@@ -13,8 +13,10 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { getStepValue } from "@/lib/utils";
+import { FaExclamationCircle } from "react-icons/fa";
 const CreateEntryPage = ({ params }: Params) => {
   const router = useRouter();
+  const [isRichTextFieldValid, setIsRichTextFieldValid] = useState(false);
 
   const { values, errors, isValid, handleChange, setValues } =
     useFormWithValidation({});
@@ -23,17 +25,42 @@ const CreateEntryPage = ({ params }: Params) => {
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [richTextFieldValues, setRichTextFieldValues] = useState({});
-  const { contentType } = params;
+  const [richTextError, setRichTextError] = useState("");
+  const [showRichTextErrorTooltip, setShowRichTextErrorTooltip] =
+    useState(false);
 
+  const { contentType } = params;
+  const hasRichText =
+    collection &&
+    collection.attributes.some((attr) => attr.contentType === "RICHTEXT");
   const handleBackClick = () => {
     router.back();
   };
 
+  const toggleRichTextErrorTooltip = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+    setShowRichTextErrorTooltip(!showRichTextErrorTooltip);
+  };
+
+  const isContentEffectivelyEmpty = (htmlContent) => {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = htmlContent;
+    return tempDiv.textContent.trim() === "";
+  };
+
   const handleRichTextChange = (fieldName, content) => {
+    const isContentEmpty = isContentEffectivelyEmpty(content);
     setRichTextFieldValues((prevValues) => ({
       ...prevValues,
       [fieldName]: content,
     }));
+    setIsRichTextFieldValid(!isContentEmpty);
+    setRichTextError(isContentEmpty ? "This field is required." : "");
+    if (!isContentEmpty) {
+      setShowRichTextErrorTooltip(false);
+    }
   };
 
   useEffect(() => {
@@ -51,8 +78,14 @@ const CreateEntryPage = ({ params }: Params) => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setSubmitted(true);
-
-    if (!isValid) {
+    console.log(isRichTextFieldValid);
+    const combinedFormData = {
+      ...values,
+      description: richTextFieldValues.content,
+    };
+    console.log("Combined Form Data:", combinedFormData);
+    const isFormValid = isValid && (!hasRichText || isRichTextFieldValid);
+    if (!isFormValid) {
       toast({
         title: "Error",
         description: "Please correct the errors in the form",
@@ -87,9 +120,6 @@ const CreateEntryPage = ({ params }: Params) => {
                   </p>
                 </div>
               )}
-              <div className="flex items-center space-x-2">
-                <Button disabled={submitted || !isValid}>Publish</Button>
-              </div>
             </div>
             <form
               onSubmit={handleSubmit}
@@ -97,6 +127,17 @@ const CreateEntryPage = ({ params }: Params) => {
               className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
               noValidate
             >
+              <div className="flex items-center space-x-2">
+                <Button
+                  disabled={
+                    submitted ||
+                    !isValid ||
+                    (hasRichText && !isRichTextFieldValid)
+                  }
+                >
+                  Publish
+                </Button>
+              </div>
               {/* Dynamically create form fields based on attributes */}
               {collection &&
                 collection.attributes.map((attribute) => {
@@ -146,6 +187,19 @@ const CreateEntryPage = ({ params }: Params) => {
                             />
                           </div>
                         </div>
+                        {richTextError && (
+                          <button
+                            className="mt-2 text-red-500 cursor-pointer relative p-1 border border-red-500 rounded hover:bg-red-100 focus:outline-none"
+                            onClick={toggleRichTextErrorTooltip}
+                          >
+                            <FaExclamationCircle />
+                            {showRichTextErrorTooltip && (
+                              <div className="absolute left-full top-0 mt-0 ml-2 w-48 p-2 bg-white text-sm text-red-500 border border-red-500 rounded-md shadow-md z-10">
+                                {richTextError}
+                              </div>
+                            )}
+                          </button>
+                        )}
                       </div>
                     );
                   } else if (useTextarea) {
