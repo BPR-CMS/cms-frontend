@@ -14,6 +14,7 @@ import "react-quill/dist/quill.snow.css";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { getStepValue } from "@/lib/utils";
 import { FaExclamationCircle } from "react-icons/fa";
+import { addPost } from "@/services/PostService";
 const CreateEntryPage = ({ params }: Params) => {
   const router = useRouter();
   const [isRichTextFieldValid, setIsRichTextFieldValid] = useState(false);
@@ -78,10 +79,18 @@ const CreateEntryPage = ({ params }: Params) => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setSubmitted(true);
+
+    const payload = {
+      attributes: {
+        ...values,
+        description: richTextFieldValues.content,
+      }
+    };
+
     console.log(isRichTextFieldValid);
     const combinedFormData = {
       ...values,
-      description: richTextFieldValues.content,
+      ...richTextFieldValues.content,
     };
     console.log("Combined Form Data:", combinedFormData);
     const isFormValid = isValid && (!hasRichText || isRichTextFieldValid);
@@ -93,6 +102,16 @@ const CreateEntryPage = ({ params }: Params) => {
       });
       return;
     }
+    
+   try {
+    // Assuming collection.id is the collectionId you need
+    const response = await addPost(collection.id, payload);
+    console.log("Post created:", response);
+    // Handle success - maybe redirect or show a success message
+  } catch (error) {
+    console.error("Error creating post:", error);
+    // Handle error - show error message
+  }
   };
 
   return (
