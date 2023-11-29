@@ -80,19 +80,28 @@ const CreateEntryPage = ({ params }: Params) => {
     event.preventDefault();
     setSubmitted(true);
 
-    const payload = {
-      attributes: {
-        ...values,
-        description: richTextFieldValues.content,
+    // Converting number fields from string to number
+    const convertedValues = { ...values };
+    collection.attributes.forEach((attribute) => {
+      if (
+        attribute.contentType === "NUMBER" &&
+        convertedValues[attribute.name]
+      ) {
+        convertedValues[attribute.name] = Number(
+          convertedValues[attribute.name]
+        );
       }
+    });
+
+    // Combining regular form values and rich text field values
+    const attributesPayload = {
+      ...convertedValues,
+      ...richTextFieldValues,
     };
 
-    console.log(isRichTextFieldValid);
-    const combinedFormData = {
-      ...values,
-      ...richTextFieldValues.content,
+    const payload = {
+      attributes: attributesPayload,
     };
-    console.log("Combined Form Data:", combinedFormData);
     const isFormValid = isValid && (!hasRichText || isRichTextFieldValid);
     if (!isFormValid) {
       toast({
@@ -102,16 +111,16 @@ const CreateEntryPage = ({ params }: Params) => {
       });
       return;
     }
-    
-   try {
-    // Assuming collection.id is the collectionId you need
-    const response = await addPost(collection.id, payload);
-    console.log("Post created:", response);
-    // Handle success - maybe redirect or show a success message
-  } catch (error) {
-    console.error("Error creating post:", error);
-    // Handle error - show error message
-  }
+
+    try {
+      // Assuming collection.id is the collectionId you need
+      const response = await addPost(collection.id, payload);
+      console.log("Post created:", response);
+      // Handle success - maybe redirect or show a success message
+    } catch (error) {
+      console.error("Error creating post:", error);
+      // Handle error - show error message
+    }
   };
 
   return (
