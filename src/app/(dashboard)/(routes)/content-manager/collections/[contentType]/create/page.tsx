@@ -15,10 +15,13 @@ import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { getStepValue } from "@/lib/utils";
 import { FaExclamationCircle } from "react-icons/fa";
 import { addPost } from "@/services/PostService";
+import { useAuth } from "@/contexts/AuthContext";
+import { User } from "@/models/User";
 const CreateEntryPage = ({ params }: Params) => {
   const router = useRouter();
+  const { user } = useAuth();
   const [isRichTextFieldValid, setIsRichTextFieldValid] = useState(false);
-
+  const [creator, setCreator] = useState<User>();
   const { values, errors, isValid, handleChange, setValues } =
     useFormWithValidation({});
   const { toast } = useToast();
@@ -115,11 +118,11 @@ const CreateEntryPage = ({ params }: Params) => {
     try {
       const response = await addPost(collection.id, payload);
       console.log("Post created:", response);
+      setCreator(user);
     } catch (error) {
       console.error("Error creating post:", error);
     }
   };
-
   return (
     <div className="md:flex">
       <ContentBuilderSideBar title="Content" />
@@ -283,7 +286,9 @@ const CreateEntryPage = ({ params }: Params) => {
               </div>
               <div className="text-xs text-gray-600">
                 <p>Created by</p>
-                <span>-</span>
+                <span>
+                  {creator ? `${creator.firstName} ${creator.lastName}` : "-"}
+                </span>
               </div>
             </div>
           </div>
