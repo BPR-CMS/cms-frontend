@@ -1,3 +1,4 @@
+"use client";
 import { Post } from "@/models/Post";
 import { Files, PlusIcon } from "lucide-react";
 import { DataTable } from "./custom/DataTable";
@@ -6,6 +7,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { getPostsByCollectionId } from "@/services/PostService";
 import { useEffect, useState } from "react";
 import { Attribute } from "@/models/Attribute";
+import { useRouter } from "next/navigation";
 export const columns: ColumnDef<Post>[] = [
   {
     accessorKey: "attributes.title",
@@ -28,6 +30,7 @@ export const PostsTable: React.FC<PostsTableProps> = ({
   attributes,
 }) => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const router = useRouter();
   // Function to format the date
   const formatDate = (dateString) => {
     const options = {
@@ -66,9 +69,14 @@ export const PostsTable: React.FC<PostsTableProps> = ({
     cell: ({ row }) => formatDate(row.original._id.date),
   });
 
+  // View specific post details
+  const handleRowClick = (post: Post) => {
+    router.push(`/content-manager/collections/media/${post.postId}`);
+  };
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   console.log(collectionId);
+
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
@@ -99,10 +107,11 @@ export const PostsTable: React.FC<PostsTableProps> = ({
   return (
     <>
       <DataTable
-      defaultButtonLabel="Create new entry"
+        defaultButtonLabel="Create new entry"
         id="fieldsTable"
         columns={dynamicColumns}
         data={posts}
+        onRowClick={handleRowClick}
         emptyStateComponent={
           <div className="flex flex-col items-center space-y-4">
             <Files size={60} color="#0075ff" />
