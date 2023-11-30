@@ -6,7 +6,6 @@ let TOKEN = "";
 
 if (typeof window !== "undefined") {
   TOKEN = window.localStorage.getItem("token") || "";
-  console.log(TOKEN);
   if (!TOKEN) {
     console.log("Token is missing from local storage");
   }

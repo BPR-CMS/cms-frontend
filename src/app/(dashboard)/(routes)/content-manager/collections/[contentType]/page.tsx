@@ -33,11 +33,9 @@ import { PostsTable } from "@/components/PostsTable";
 export default function ContentTypePage({ params }: Params) {
   const { contentType } = params;
 
-  const router = useRouter()
+  const router = useRouter();
   const { values, errors, isValid, handleChange, setValues } =
-    useFormWithValidation({
-
-    });
+    useFormWithValidation({});
   const [collections, setCollections] = useState<Collection[]>([]);
 
   const [fieldsData, setFieldsData] = useState<Attribute[]>([]);
@@ -62,10 +60,8 @@ export default function ContentTypePage({ params }: Params) {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-  
   };
 
   const selectedContentType = collections.find(
@@ -80,16 +76,15 @@ export default function ContentTypePage({ params }: Params) {
   //   ? selectedContentType.attributes
   //   : [];
 
- const posts : Post[] = []
 
- const redirectToCreatePage = (contentType) => {
-  router.push(`/content-manager/collections/${contentType}/create`);
-};
+  const redirectToCreatePage = (contentType) => {
+    router.push(`/content-manager/collections/${contentType}/create`);
+  };
 
   return (
     <>
       <div className="md:flex">
-        <ContentBuilderSideBar title="Content"   />
+        <ContentBuilderSideBar title="Content" />
         <div className="flex-grow md:ml-72 mt-4">
           <h2>{selectedContentType.name}</h2>
           <p>{selectedContentType.description}</p>
@@ -97,57 +92,12 @@ export default function ContentTypePage({ params }: Params) {
             <div className="mt-6">
               <div className="container mx-auto py-10">
                 <PostsTable
-                  posts={posts}
-                  onAddFieldClick={() => redirectToCreatePage(params.contentType)}
+                  collectionId={selectedContentType.id}
+                  attributes={selectedContentType.attributes}
+                  onAddFieldClick={() =>
+                    redirectToCreatePage(params.contentType)
+                  }
                 />
-
-                <Dialog
-                  open={isDialogOpen}
-                  onOpenChange={() => {
-                   
-                    setIsDialogOpen(!isDialogOpen);
-                  }}
-                >
-                  <DialogContent className="w-full max-w-xl sm:max-w-3xl">
-                    <form onSubmit={handleSubmit} noValidate>
-                      <DialogHeader className="flex justify-between">
-                   
-                          <>
-                            <DialogTitle>
-                              {selectedContentType.name}
-                            </DialogTitle>
-                            <DialogDescription>
-                              Select a field for your collection type
-                            </DialogDescription>
-                          </>
-                  
-                     
-                  
-                      </DialogHeader>
-
-                          <DialogFooter>
-                            <DialogClose>
-                              <Button
-                                variant="outline"
-                                type="button"
-                                id="cancelButton"
-                              >
-                                Cancel
-                              </Button>
-                            </DialogClose>
-                            <Button
-                              id="finishButton"
-                              type="submit"
-                              disabled={!isValid}
-                            >
-                              Finish
-                            </Button>
-                          </DialogFooter>
-                   
-                 
-                    </form>
-                  </DialogContent>
-                </Dialog>
               </div>
             </div>
           </div>
