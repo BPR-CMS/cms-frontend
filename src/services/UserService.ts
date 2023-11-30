@@ -51,3 +51,16 @@ export const setPassword = async (
     throw error;
   }
 };
+
+export const getUserById = async (userId: string): Promise<User> => {
+  try {
+    const response = await axios.get(`${BASE_URL}/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

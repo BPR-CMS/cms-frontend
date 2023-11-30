@@ -113,13 +113,10 @@ const CreateEntryPage = ({ params }: Params) => {
     }
 
     try {
-      // Assuming collection.id is the collectionId you need
       const response = await addPost(collection.id, payload);
       console.log("Post created:", response);
-      // Handle success - maybe redirect or show a success message
     } catch (error) {
       console.error("Error creating post:", error);
-      // Handle error - show error message
     }
   };
 
