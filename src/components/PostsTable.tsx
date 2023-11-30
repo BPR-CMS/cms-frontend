@@ -20,6 +20,7 @@ export const columns: ColumnDef<Post>[] = [
 ];
 type PostsTableProps = {
   collectionId: string;
+  collectionName: string;
   onAddFieldClick: () => void;
   attributes: Attribute[];
 };
@@ -28,6 +29,7 @@ export const PostsTable: React.FC<PostsTableProps> = ({
   collectionId,
   onAddFieldClick,
   attributes,
+  collectionName
 }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const router = useRouter();
@@ -71,7 +73,7 @@ export const PostsTable: React.FC<PostsTableProps> = ({
 
   // View specific post details
   const handleRowClick = (post: Post) => {
-    router.push(`/content-manager/collections/media/${post.postId}`);
+    router.push(`/content-manager/collections/${collectionName}/${post.postId}`);
   };
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

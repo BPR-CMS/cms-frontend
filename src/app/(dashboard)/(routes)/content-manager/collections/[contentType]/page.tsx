@@ -92,6 +92,7 @@ export default function ContentTypePage({ params }: Params) {
             <div className="mt-6">
               <div className="container mx-auto py-10">
                 <PostsTable
+                collectionName={selectedContentType.name}
                   collectionId={selectedContentType.id}
                   attributes={selectedContentType.attributes}
                   onAddFieldClick={() =>
