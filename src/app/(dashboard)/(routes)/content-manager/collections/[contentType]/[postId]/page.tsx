@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import ContentBuilderSideBar from "@/components/custom/ContentBuilderSideBar";
 import FormFieldGroup from "@/components/custom/FormFieldGroup";
 import FormGrid from "@/components/custom/FormGrid";
@@ -8,23 +7,23 @@ import { Button } from "@/components/ui/Button";
 import { getCollectionByApiId } from "@/services/CollectionService";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import { getInputType } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { getStepValue } from "@/lib/utils";
-import { FaExclamationCircle } from "react-icons/fa";
-import { addPost } from "@/services/PostService";
+import { getPostById } from "@/services/PostService";
+import { Post } from "@/models/Post";
+import { getUserById } from "@/services/UserService";
+import { User } from "@/models/User";
+import { Attribute } from "@/models/Attribute";
 const PostDetailsPage = ({ params }: Params) => {
-
   const { values, errors, isValid, handleChange, setValues } =
     useFormWithValidation({});
   const [collection, setCollection] = useState(null);
   const [error, setError] = useState("");
-
   const { contentType, postId } = params;
-
-
+  const [post, setPost] = useState<Post>();
+  const [user, setUser] = useState<User>();
 
   useEffect(() => {
     if (contentType) {
@@ -38,7 +37,129 @@ const PostDetailsPage = ({ params }: Params) => {
     }
   }, [contentType]);
 
+  useEffect(() => {
+    if (postId && collection) {
+      getPostById(postId)
+        .then((data) => {
+          if (data.userId) {
+            getUserById(data.userId)
+              .then((userData) => {
+                setUser(userData);
+              })
+              .catch((error) => {
+                console.error("Error fetching user data:", error);
+              });
+          }
+          // Merges content types from the collection into post attributes
+          const attributesArray = Object.keys(data.attributes).map((key) => {
+            const attributeFromCollection =
+              collection.attributes.find((attr) => attr.name === key) || {};
+            return {
+              name: key,
+              value: data.attributes[key],
+              contentType: attributeFromCollection.contentType,
+            };
+          });
 
+          setPost({ ...data, attributes: attributesArray });
+        })
+        .catch((error) => {
+          setError(
+            error.message || "An error occurred while fetching the post"
+          );
+        });
+    }
+  }, [postId, collection]);
+
+  const renderFormField = (attribute: Attribute) => {
+    const useTextarea = attribute.textType === "LONG";
+    const stepValue = getStepValue(attribute.formatType);
+    const isRequired = attribute.required;
+    const dateInputType = getInputType(
+      attribute.contentType,
+      attribute.dateType
+    );
+
+    const label = `${attribute.name}${isRequired ? " *" : ""}`;
+    console.log("Rendering field for:", attribute);
+    switch (attribute.contentType) {
+      case "TEXT":
+        console.log("is text");
+        if (useTextarea)
+          return (
+            <FormGrid>
+              <div key={attribute.name} className="sm:col-span-3">
+                <FormFieldGroup
+                  label={label}
+                  name={attribute.name}
+                  id={attribute.name}
+                  useTextarea={true}
+                  type={getInputType(attribute.contentType)}
+                  value={attribute.value}
+                  onChangeTextArea={handleChange}
+                  required={attribute.required}
+                  minLength={attribute.minimumLength}
+                  maxLength={attribute.maximumLength}
+                  error={errors[attribute.name] || ""}
+                />
+              </div>
+            </FormGrid>
+          );
+
+      case "NUMBER":
+        console.log(attribute.value);
+        return (
+          <FormGrid>
+            <div key={attribute.name} className="sm:col-span-3">
+              <FormFieldGroup
+                label={label}
+                name={attribute.name}
+                id={attribute.name}
+                type={getInputType(attribute.contentType)}
+                value={attribute.value}
+                onChangeInput={handleChange}
+                required={attribute.required}
+                minLength={attribute.minimumLength}
+                maxLength={attribute.maximumLength}
+                error={errors[attribute.name] || ""}
+                step={stepValue}
+              />
+            </div>
+          </FormGrid>
+        );
+      case "DATE":
+        console.log(attribute.value);
+        return (
+          <FormGrid>
+            <div key={attribute.name} className="sm:col-span-3">
+              <FormFieldGroup
+                label={label}
+                name={attribute.name}
+                id={attribute.name}
+                type={dateInputType}
+                value={attribute.value}
+                onChangeInput={handleChange}
+                required={attribute.required}
+              />
+            </div>
+          </FormGrid>
+        );
+      case "RICHTEXT":
+        return (
+          <div key={attribute.attributeId} className="sm:col-span-3 mt-4">
+            <label>{attribute.name}</label>
+            <div className="p-2">
+              <div className="max-w-4xl bg-white">
+                <ReactQuill theme="snow" value={attribute.value} />
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        console.log("Default case hit", attribute);
+        return null;
+    }
+  };
 
   return (
     <div className="md:flex">
@@ -50,7 +171,6 @@ const PostDetailsPage = ({ params }: Params) => {
             <div className="mb-4">
               <Button
                 variant="link"
-                // onClick={handleBackClick}
                 className="text-blue-600 hover:text-blue-700 focus:outline-none transition duration-150 ease-in-out"
               >
                 ← Back
@@ -67,116 +187,18 @@ const PostDetailsPage = ({ params }: Params) => {
               )}
             </div>
             <form
-            //   onSubmit={handleSubmit}
               id="entry-form"
               className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
               noValidate
             >
               <div className="flex items-center space-x-2">
-                <Button
-                //   disabled={
-                //     submitted ||
-                //     !isValid ||
-                //     (hasRichText && !isRichTextFieldValid)
-                //   }
-                >
-                  Publish
-                </Button>
+                <Button>Publish</Button>
               </div>
-              {/* Dynamically create form fields based on attributes */}
-              {collection &&
-                collection.attributes.map((attribute) => {
-                  const useTextarea = attribute.textType === "LONG";
-                  const stepValue = getStepValue(attribute.formatType);
-                  const isRequired = attribute.required;
-
-                  const label = `${attribute.name}${isRequired ? " *" : ""}`;
-
-                  if (attribute.contentType === "DATE") {
-                    const dateInputType = getInputType(
-                      attribute.contentType,
-                      attribute.dateType
-                    );
-                    return (
-                      <FormGrid>
-                        <div key={attribute.name} className="sm:col-span-3">
-                          <FormFieldGroup
-                            label={label}
-                            name={attribute.name}
-                            id={attribute.name}
-                            type={dateInputType}
-                            value={values[attribute.name] || ""}
-                            onChangeInput={handleChange}
-                            required={attribute.required}
-                          />
-                        </div>
-                      </FormGrid>
-                    );
-                  }
-                  if (attribute.contentType === "RICHTEXT") {
-                    return (
-                      <div
-                        key={attribute.attributeId}
-                        className="sm:col-span-3 mt-4"
-                      >
-                        <label>{label}</label>
-                        <div className="p-2 ">
-                          <div className="max-w-4xl bg-white">
-                            {" "}
-                            <ReactQuill
-                              theme="snow"
-                            //   value={richTextFieldValues[attribute.name] || ""}
-                            //   onChange={(content) =>
-                            //     handleRichTextChange(attribute.name, content)
-                            //   }
-                            />
-                          </div>
-                        </div>
-                 
-                      </div>
-                    );
-                  } else if (useTextarea) {
-                    return (
-                      <FormGrid>
-                        <div key={attribute.name} className="sm:col-span-3">
-                          <FormFieldGroup
-                            label={label}
-                            name={attribute.name}
-                            id={attribute.name}
-                            useTextarea={true}
-                            type={getInputType(attribute.contentType)}
-                            value={values[attribute.name] || ""}
-                            onChangeTextArea={handleChange}
-                            required={attribute.required}
-                            minLength={attribute.minimumLength}
-                            maxLength={attribute.maximumLength}
-                            error={errors[attribute.name] || ""}
-                          />
-                        </div>
-                      </FormGrid>
-                    );
-                  } else {
-                    return (
-                      <FormGrid>
-                        <div key={attribute.name} className="sm:col-span-3">
-                          <FormFieldGroup
-                            label={label}
-                            name={attribute.name}
-                            id={attribute.name}
-                            type={getInputType(attribute.contentType)}
-                            value={values[attribute.name] || ""}
-                            onChangeInput={handleChange}
-                            required={attribute.required}
-                            minLength={attribute.minimumLength}
-                            maxLength={attribute.maximumLength}
-                            error={errors[attribute.name] || ""}
-                            step={stepValue}
-                          />
-                        </div>
-                      </FormGrid>
-                    );
-                  }
-                })}
+              {post ? (
+                post.attributes.map((attribute) => renderFormField(attribute))
+              ) : (
+                <p>Loading or no post data...</p> // Fallback content
+              )}
             </form>
           </div>
           {/* Sidebar Section */}
@@ -191,7 +213,9 @@ const PostDetailsPage = ({ params }: Params) => {
               </div>
               <div className="text-xs text-gray-600">
                 <p>Created by</p>
-                <span>-</span>
+                <span>
+                  {user ? `${user.firstName} ${user.lastName}` : "Loading..."}
+                </span>
               </div>
             </div>
           </div>
