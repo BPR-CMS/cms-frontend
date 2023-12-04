@@ -36,7 +36,7 @@ export const getPostsByCollectionId = async (
 ): Promise<Post[]> => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/posts/${collectionId}`,
+      `${BASE_URL}/posts/collection/${collectionId}`,
       {
         headers: {
           Authorization: `Bearer ${TOKEN}`,
