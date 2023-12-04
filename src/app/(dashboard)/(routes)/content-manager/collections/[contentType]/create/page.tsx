@@ -32,39 +32,16 @@ const CreateEntryPage = ({ params }: Params) => {
   const [richTextError, setRichTextError] = useState("");
   const [showRichTextErrorTooltip, setShowRichTextErrorTooltip] =
     useState(false);
+  const [isFormValid, setIsFormValid] = useState(isValid);
+  const [richTextFieldsValidity, setRichTextFieldsValidity] = useState({});
 
   const { contentType } = params;
   const hasRichText =
     collection &&
     collection.attributes.some((attr) => attr.contentType === "RICHTEXT");
+
   const handleBackClick = () => {
     router.back();
-  };
-
-  const toggleRichTextErrorTooltip = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    event.preventDefault();
-    setShowRichTextErrorTooltip(!showRichTextErrorTooltip);
-  };
-
-  const isContentEffectivelyEmpty = (htmlContent) => {
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = htmlContent;
-    return tempDiv.textContent.trim() === "";
-  };
-
-  const handleRichTextChange = (fieldName, content) => {
-    const isContentEmpty = isContentEffectivelyEmpty(content);
-    setRichTextFieldValues((prevValues) => ({
-      ...prevValues,
-      [fieldName]: content,
-    }));
-    setIsRichTextFieldValid(!isContentEmpty);
-    setRichTextError(isContentEmpty ? "This field is required." : "");
-    if (!isContentEmpty) {
-      setShowRichTextErrorTooltip(false);
-    }
   };
 
   useEffect(() => {
@@ -105,7 +82,7 @@ const CreateEntryPage = ({ params }: Params) => {
     const payload = {
       attributes: attributesPayload,
     };
-    const isFormValid = isValid && (!hasRichText || isRichTextFieldValid);
+
     if (!isFormValid) {
       toast({
         title: "Error",
@@ -118,11 +95,49 @@ const CreateEntryPage = ({ params }: Params) => {
     try {
       const response = await addPost(collection.id, payload);
       console.log("Post created:", response);
+      console.log(payload);
       setCreator(user);
     } catch (error) {
       console.error("Error creating post:", error);
     }
   };
+
+  const validateRichTextField = (attributeId, content, isRequired) => {
+    const valid = !isRequired || (content && content.trim() !== "");
+    setRichTextFieldsValidity((prevState) => ({
+      ...prevState,
+      [attributeId]: valid,
+    }));
+  };
+
+  useEffect(() => {
+    // Checsk if any field (regular or rich text) is filled
+    const isAnyFieldFilled =
+      Object.keys(values).some((key) => values[key]) ||
+      Object.values(richTextFieldValues).some(
+        (value) => value && value.trim() !== ""
+      );
+
+    // Checks if every required field (regular and rich text) is valid
+    const areAllRequiredFieldsValid =
+      collection &&
+      collection.attributes.every((attr) => {
+        if (attr.required) {
+          if (attr.contentType === "RICHTEXT") {
+            // Checks validity of required rich text fields
+            return richTextFieldsValidity[attr.attributeId];
+          } else {
+            // Checks validity of required regular fields
+            return values[attr.name] && !errors[attr.name];
+          }
+        }
+        return true;
+      });
+
+    // The form is valid if all required fields are valid and if at least one field is filled
+    setIsFormValid(areAllRequiredFieldsValid && isAnyFieldFilled);
+  }, [collection, values, errors, richTextFieldsValidity, richTextFieldValues]);
+
   return (
     <div className="md:flex">
       <ContentBuilderSideBar title="Content" />
@@ -156,17 +171,9 @@ const CreateEntryPage = ({ params }: Params) => {
               noValidate
             >
               <div className="flex items-center space-x-2">
-                <Button
-                  disabled={
-                    submitted ||
-                    !isValid ||
-                    (hasRichText && !isRichTextFieldValid)
-                  }
-                >
-                  Publish
-                </Button>
+                <Button disabled={submitted || !isFormValid}>Publish</Button>
               </div>
-              {/* Dynamically create form fields based on attributes */}
+              {/* Dynamically creates form fields based on attributes */}
               {collection &&
                 collection.attributes.map((attribute) => {
                   const useTextarea = attribute.textType === "LONG";
@@ -190,7 +197,11 @@ const CreateEntryPage = ({ params }: Params) => {
                             type={dateInputType}
                             value={values[attribute.name] || ""}
                             onChangeInput={handleChange}
-                            required={attribute.required}
+                            required={isRequired}
+                            maxLength={attribute.maximumLength}
+                            minLength={attribute.minimumLength}
+                            minValue={attribute.minValue}
+                            maxValue={attribute.maxValue}
                           />
                         </div>
                       </FormGrid>
@@ -209,9 +220,17 @@ const CreateEntryPage = ({ params }: Params) => {
                             <ReactQuill
                               theme="snow"
                               value={richTextFieldValues[attribute.name] || ""}
-                              onChange={(content) =>
-                                handleRichTextChange(attribute.name, content)
-                              }
+                              onChange={(content) => {
+                                setRichTextFieldValues({
+                                  ...richTextFieldValues,
+                                  [attribute.name]: content,
+                                });
+                                validateRichTextField(
+                                  attribute.attributeId,
+                                  content,
+                                  attribute.required
+                                );
+                              }}
                             />
                           </div>
                         </div>
@@ -243,8 +262,10 @@ const CreateEntryPage = ({ params }: Params) => {
                             value={values[attribute.name] || ""}
                             onChangeTextArea={handleChange}
                             required={attribute.required}
-                            minLength={attribute.minimumLength}
+                            minValue={attribute.minValue}
+                            maxValue={attribute.maxValue}
                             maxLength={attribute.maximumLength}
+                            minLength={attribute.minimumLength}
                             error={errors[attribute.name] || ""}
                           />
                         </div>
