@@ -48,3 +48,16 @@ export const getPostsByCollectionId = async (
     throw error;
   }
 };
+
+export const getPostById = async (id: string): Promise<Post> => {
+  try {
+    const response = await axios.get(`${BASE_URL}/posts/${id}`, {
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
