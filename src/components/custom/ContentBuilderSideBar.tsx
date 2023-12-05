@@ -1,11 +1,12 @@
-import { getCollections } from "@/services/CollectionService";
-import { useEffect, useState } from "react";
+"use client";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Collection } from "@/models/Collection";
 import { useToast } from "@/hooks/use-toast";
 import ContentModelDialog from "./ContentModelDialog";
 import { usePathname } from "next/navigation";
-
+import CollectionsContext from "@/contexts/CollectionsContext";
+import Link from "next/link";
 interface ContentBuilderSideBarProps {
   title: string;
   showContentModelDialog?: boolean;
@@ -16,57 +17,24 @@ function ContentBuilderSideBar({
   showContentModelDialog,
   basePath,
 }: ContentBuilderSideBarProps) {
-  const [collections, setCollections] = useState<Collection[]>([]);
-
   const router = useRouter();
   const pathname = usePathname();
   const [selectedContentType, setSelectedContentType] =
     useState<Collection | null>(null);
 
   const { toast } = useToast();
+  const { collections } = useContext(CollectionsContext);
 
-  const handleContentTypeClick = (contentType: Collection) => {
-    setSelectedContentType(contentType);
+  const generateContentTypeUrl = (contentType: Collection) => {
     let basePath;
     if (pathname.includes("content-manager")) {
       basePath = "/content-manager/collections";
     } else if (pathname.includes("content-type-builder")) {
       basePath = "/content-type-builder/collections";
     }
-    router.push(`${basePath}/${contentType.name}`, undefined);
+    return `${basePath}/${contentType.name}`;
   };
 
-  const fetchCollections = async () => {
-    try {
-      const allCollections = await getCollections();
-
-      if (allCollections.length === 0) {
-        setCollections([]);
-
-        return;
-      }
-
-      setCollections(allCollections);
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error fetching collections:", error.message);
-
-        if (error.message !== "No collections found") {
-          toast({
-            title: "Error",
-            description: "Failed to fetch collections.",
-            variant: "destructive",
-          });
-        }
-      } else {
-        console.error("An unknown error occurred:", error);
-      }
-    }
-  };
-
-  useEffect(() => {
-    fetchCollections();
-  }, []);
   return (
     <div className="h-full md:w-72 md:flex-col md:fixed md:inset-y-0 z-80 border-r border-gray-300">
       <div className="space-y-4 py-4 flex flex-col h-full text-white">
@@ -85,12 +53,12 @@ function ContentBuilderSideBar({
                     key={index}
                     className="text-sm font-medium text-customBlue"
                   >
-                    <button
-                      onClick={() => handleContentTypeClick(contentType)}
+                    <Link
+                      href={generateContentTypeUrl(contentType)}
                       className="text-customBlue hover:opacity-70 focus:outline-none"
                     >
                       {contentType.name}
-                    </button>
+                    </Link>
                   </li>
                 ))
               ) : (
