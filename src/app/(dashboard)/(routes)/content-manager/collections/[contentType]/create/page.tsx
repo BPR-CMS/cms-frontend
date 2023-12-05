@@ -195,7 +195,11 @@ const CreateEntryPage = ({ params }: Params) => {
                             name={attribute.name}
                             id={attribute.name}
                             type={dateInputType}
-                            value={values[attribute.name] || ""}
+                            value={
+                              values[attribute.name] ||
+                              "" ||
+                              attribute.defaultValue
+                            }
                             onChangeInput={handleChange}
                             required={isRequired}
                             maxLength={attribute.maximumLength}
@@ -219,7 +223,11 @@ const CreateEntryPage = ({ params }: Params) => {
                             {" "}
                             <ReactQuill
                               theme="snow"
-                              value={richTextFieldValues[attribute.name] || ""}
+                              value={
+                                richTextFieldValues[attribute.name] ||
+                                "" ||
+                                attribute.defaultValue
+                              }
                               onChange={(content) => {
                                 setRichTextFieldValues({
                                   ...richTextFieldValues,
@@ -259,7 +267,11 @@ const CreateEntryPage = ({ params }: Params) => {
                             id={attribute.name}
                             useTextarea={true}
                             type={getInputType(attribute.contentType)}
-                            value={values[attribute.name] || ""}
+                            value={
+                              values[attribute.name] ||
+                              "" ||
+                              attribute.defaultValue
+                            }
                             onChangeTextArea={handleChange}
                             required={attribute.required}
                             minValue={attribute.minValue}
@@ -280,7 +292,11 @@ const CreateEntryPage = ({ params }: Params) => {
                             name={attribute.name}
                             id={attribute.name}
                             type={getInputType(attribute.contentType)}
-                            value={values[attribute.name] || ""}
+                            value={
+                              values[attribute.name] ||
+                              "" ||
+                              attribute.defaultValue
+                            }
                             onChangeInput={handleChange}
                             required={attribute.required}
                             minLength={attribute.minimumLength}
