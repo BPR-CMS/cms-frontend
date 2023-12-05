@@ -5,77 +5,25 @@ type Params = {
   };
 };
 import { useRouter } from "next/navigation";
-import { Collection } from "@/models/Collection";
-import { Post } from "@/models/Post";
-import { ArrowLeftIcon } from "lucide-react";
-import React, { useState, useEffect, useCallback } from "react";
-import { getCollections } from "@/services/CollectionService";
-import { useToast } from "@/hooks/use-toast";
-import { Attribute, AttributeType } from "@/models/Attribute";
-import { Button } from "@/components/ui/Button";
-import { fields } from "@/utils/constants";
+import React, { useContext } from "react";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
-import { addAttributesToCollection } from "@/services/ContentModelService";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/Dialog";
-import { DialogClose } from "@radix-ui/react-dialog";
-import DetailedView from "@/components/DetailedView";
-import GridView from "@/components/GridView";
-import ContentBuilderSideBar from "@/components/custom/ContentBuilderSideBar";
 import { PostsTable } from "@/components/PostsTable";
-
+import CollectionsContext from "@/contexts/CollectionsContext";
 export default function ContentTypePage({ params }: Params) {
   const { contentType } = params;
 
   const router = useRouter();
   const { values, errors, isValid, handleChange, setValues } =
     useFormWithValidation({});
-  const [collections, setCollections] = useState<Collection[]>([]);
-
-  const [fieldsData, setFieldsData] = useState<Attribute[]>([]);
-  const { toast } = useToast();
-  const fetchCollections = async () => {
-    try {
-      const allCollections = await getCollections();
-      setCollections(allCollections);
-    } catch (error) {
-      console.error("Error fetching collections:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch collections.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  useEffect(() => {
-    fetchCollections();
-  }, []);
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-  };
+  const { collections } = useContext(CollectionsContext);
 
   const selectedContentType = collections.find(
     (item) => item.name === contentType
   );
+
   if (!selectedContentType) {
-    console.log(selectedContentType);
-    return <div>Content type not found.</div>;
+    console.log("no data");
   }
-
-  // const attributes: Attribute[] = selectedContentType
-  //   ? selectedContentType.attributes
-  //   : [];
-
 
   const redirectToCreatePage = (contentType) => {
     router.push(`/content-manager/collections/${contentType}/create`);
@@ -83,8 +31,7 @@ export default function ContentTypePage({ params }: Params) {
 
   return (
     <>
-      <div className="md:flex">
-        <ContentBuilderSideBar title="Content" />
+      {selectedContentType && (
         <div className="flex-grow md:ml-72 mt-4">
           <h2>{selectedContentType.name}</h2>
           <p>{selectedContentType.description}</p>
@@ -92,7 +39,7 @@ export default function ContentTypePage({ params }: Params) {
             <div className="mt-6">
               <div className="container mx-auto py-10">
                 <PostsTable
-                collectionName={selectedContentType.name}
+                  collectionName={selectedContentType.name}
                   collectionId={selectedContentType.id}
                   attributes={selectedContentType.attributes}
                   onAddFieldClick={() =>
@@ -103,7 +50,7 @@ export default function ContentTypePage({ params }: Params) {
             </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
