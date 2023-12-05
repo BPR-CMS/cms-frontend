@@ -4,16 +4,22 @@ import { useRouter } from "next/navigation";
 import { Collection } from "@/models/Collection";
 import { useToast } from "@/hooks/use-toast";
 import ContentModelDialog from "./ContentModelDialog";
+import { usePathname } from "next/navigation";
 
 interface ContentBuilderSideBarProps {
   title: string;
   showContentModelDialog?: boolean;
   basePath?: string;
 }
-function ContentBuilderSideBar({ title, showContentModelDialog,  basePath }: ContentBuilderSideBarProps) {
+function ContentBuilderSideBar({
+  title,
+  showContentModelDialog,
+  basePath,
+}: ContentBuilderSideBarProps) {
   const [collections, setCollections] = useState<Collection[]>([]);
 
   const router = useRouter();
+  const pathname = usePathname();
   const [selectedContentType, setSelectedContentType] =
     useState<Collection | null>(null);
 
@@ -21,10 +27,13 @@ function ContentBuilderSideBar({ title, showContentModelDialog,  basePath }: Con
 
   const handleContentTypeClick = (contentType: Collection) => {
     setSelectedContentType(contentType);
-    router.push(
-      `${basePath}/${contentType.name}`,
-      undefined
-    );
+    let basePath;
+    if (pathname.includes("content-manager")) {
+      basePath = "/content-manager/collections";
+    } else if (pathname.includes("content-type-builder")) {
+      basePath = "/content-type-builder/collections";
+    }
+    router.push(`${basePath}/${contentType.name}`, undefined);
   };
 
   const fetchCollections = async () => {
