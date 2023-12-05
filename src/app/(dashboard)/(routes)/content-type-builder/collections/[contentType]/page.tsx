@@ -4,11 +4,8 @@ type Params = {
     contentType: string;
   };
 };
-
-import { Collection } from "@/models/Collection";
 import { ArrowLeftIcon } from "lucide-react";
-import React, { useState, useEffect, useCallback } from "react";
-import { getCollections } from "@/services/CollectionService";
+import React, { useState, useCallback, useContext } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Attribute, AttributeType } from "@/models/Attribute";
 import { Button } from "@/components/ui/Button";
@@ -26,11 +23,13 @@ import {
 import { DialogClose } from "@radix-ui/react-dialog";
 import DetailedView from "@/components/DetailedView";
 import GridView from "@/components/GridView";
-import ContentBuilderSideBar from "@/components/custom/ContentBuilderSideBar";
 import { CollectionFieldsTable } from "@/components/CollectionFieldsTable";
-
+import CollectionsContext from "@/contexts/CollectionsContext";
 export default function ContentTypePage({ params }: Params) {
   const { contentType } = params;
+
+  const { collections, updateCollection } = useContext(CollectionsContext);
+
   type CheckboxStateValues = boolean | string;
   const [checkboxStates, setCheckboxStates] = useState<
     Record<string, CheckboxStateValues>
@@ -53,7 +52,6 @@ export default function ContentTypePage({ params }: Params) {
       maximumValue: "",
       defaultValue: "",
     });
-  const [collections, setCollections] = useState<Collection[]>([]);
 
   const [selectedFieldType, setSelectedFieldType] =
     useState<AttributeType | null>(null);
@@ -62,23 +60,6 @@ export default function ContentTypePage({ params }: Params) {
 
   const [fieldsData, setFieldsData] = useState<Attribute[]>([]);
   const { toast } = useToast();
-  const fetchCollections = async () => {
-    try {
-      const allCollections = await getCollections();
-      setCollections(allCollections);
-    } catch (error) {
-      console.error("Error fetching collections:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch collections.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  useEffect(() => {
-    fetchCollections();
-  }, []);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentView, setCurrentView] = useState("grid"); // 'grid' or 'detail'
@@ -115,17 +96,7 @@ export default function ContentTypePage({ params }: Params) {
         await addAttributesToCollection(selectedContentType.id, newField);
         console.log(newField);
         setFieldsData((prevFields) => [...prevFields, newField]);
-        setCollections((prevCollections) => {
-          return prevCollections.map((collection) => {
-            if (collection.id === selectedContentType.id) {
-              return {
-                ...collection,
-                attributes: [...collection.attributes, newField],
-              };
-            }
-            return collection;
-          });
-        });
+        updateCollection(selectedContentType.id, newField);
 
         setIsDialogOpen(false);
 
@@ -134,7 +105,7 @@ export default function ContentTypePage({ params }: Params) {
           description: "Field added successfully.",
           variant: "success",
         });
-        resetDialog()
+        resetDialog();
       } catch (error) {
         console.error("Error adding new field:", error);
 
@@ -158,8 +129,7 @@ export default function ContentTypePage({ params }: Params) {
     (item) => item.name === contentType
   );
   if (!selectedContentType) {
-
-    return <div>Content type not found.</div>;
+    console.log("no data");
   }
 
   const attributes: Attribute[] = selectedContentType
@@ -185,11 +155,11 @@ export default function ContentTypePage({ params }: Params) {
 
   return (
     <>
-      <div className="md:flex">
-        <ContentBuilderSideBar title="Content-Type Builder" showContentModelDialog={true}  />
+      {selectedContentType && (
         <div className="flex-grow md:ml-72 mt-4">
           <h2>{selectedContentType.name}</h2>
           <p>{selectedContentType.description}</p>
+
           <div className="pl-56 pr-56">
             <div className="mt-6">
               <div className="container mx-auto py-10">
@@ -288,7 +258,7 @@ export default function ContentTypePage({ params }: Params) {
             </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
