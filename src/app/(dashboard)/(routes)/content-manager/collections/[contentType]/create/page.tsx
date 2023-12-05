@@ -148,7 +148,6 @@ const CreateEntryPage = ({ params }: Params) => {
 
   return (
     <div className="md:flex">
-      <ContentBuilderSideBar title="Content" />
       <div className="flex-grow md:ml-72 mt-4">
         <div className="flex flex-col md:flex-row p-8">
           {/* Form Section */}
