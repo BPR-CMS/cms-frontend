@@ -29,7 +29,7 @@ export const PostsTable: React.FC<PostsTableProps> = ({
   collectionId,
   onAddFieldClick,
   attributes,
-  collectionName
+  collectionName,
 }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const router = useRouter();
@@ -49,18 +49,21 @@ export const PostsTable: React.FC<PostsTableProps> = ({
     );
   };
 
-  // Extracting the first attribute key from the first post
-  const firstAttributeKey =
-    posts.length > 0 ? Object.keys(posts[0].attributes)[0] : null;
+  // Find the first TEXT and required attribute from attributes prop
+  const firstTextRequiredAttribute = attributes.find(
+    (attr) => attr.contentType === "TEXT" && attr.required
+  );
 
-  // Defining columns for the first attribute and the created date
+  // Defining columns for the first required TEXT type attribute, and the created date
   let dynamicColumns = [];
 
-  if (firstAttributeKey) {
+  if (firstTextRequiredAttribute) {
     dynamicColumns.push({
-      accessorKey: `attributes.${firstAttributeKey}`,
+      accessorKey: `attributes.${firstTextRequiredAttribute.name}`,
       header:
-        firstAttributeKey.charAt(0).toUpperCase() + firstAttributeKey.slice(1),
+        firstTextRequiredAttribute.label ||
+        firstTextRequiredAttribute.name.charAt(0).toUpperCase() +
+          firstTextRequiredAttribute.name.slice(1),
     });
   }
 
@@ -73,7 +76,9 @@ export const PostsTable: React.FC<PostsTableProps> = ({
 
   // View specific post details
   const handleRowClick = (post: Post) => {
-    router.push(`/content-manager/collections/${collectionName}/${post.postId}`);
+    router.push(
+      `/content-manager/collections/${collectionName}/${post.postId}`
+    );
   };
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
