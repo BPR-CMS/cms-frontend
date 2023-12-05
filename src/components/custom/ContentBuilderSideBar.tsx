@@ -35,6 +35,11 @@ function ContentBuilderSideBar({
     return `${basePath}/${contentType.name}`;
   };
 
+  const isActive = (contentType: Collection) => {
+    const url = generateContentTypeUrl(contentType);
+    return pathname === url;
+  };
+
   return (
     <div className="h-full md:w-72 md:flex-col md:fixed md:inset-y-0 z-80 border-r border-gray-300">
       <div className="space-y-4 py-4 flex flex-col h-full text-white">
@@ -51,11 +56,19 @@ function ContentBuilderSideBar({
                 collections.map((contentType, index) => (
                   <li
                     key={index}
-                    className="text-sm font-medium text-customBlue"
+                    className={`text-sm font-medium ${
+                      isActive(contentType)
+                        ? "text-gray-500"
+                        : "text-customBlue"
+                    }`}
                   >
                     <Link
                       href={generateContentTypeUrl(contentType)}
-                      className="text-customBlue hover:opacity-70 focus:outline-none"
+                      className={`${
+                        isActive(contentType)
+                          ? "text-gray-500"
+                          : "text-customBlue"
+                      } hover:opacity-70 focus:outline-none`}
                     >
                       {contentType.name}
                     </Link>
