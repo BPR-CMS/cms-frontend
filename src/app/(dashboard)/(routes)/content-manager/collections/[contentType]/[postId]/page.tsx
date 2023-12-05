@@ -192,7 +192,7 @@ const PostDetailsPage = ({ params }: Params) => {
               noValidate
             >
               <div className="flex items-center space-x-2">
-                <Button>Publish</Button>
+                <Button className="ml-auto">Publish</Button>
               </div>
               {post ? (
                 post.attributes.map((attribute) => renderFormField(attribute))

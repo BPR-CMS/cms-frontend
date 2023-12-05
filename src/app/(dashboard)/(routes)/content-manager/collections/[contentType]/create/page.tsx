@@ -49,6 +49,14 @@ const CreateEntryPage = ({ params }: Params) => {
       getCollectionByApiId(contentType)
         .then((data) => {
           setCollection(data);
+          // Initializes form values with default values for attributes that have them
+          const initialValues = {};
+          data.attributes.forEach((attribute) => {
+            if (attribute.defaultValue !== undefined) {
+              initialValues[attribute.name] = attribute.defaultValue;
+            }
+          });
+          setValues((prevValues) => ({ ...prevValues, ...initialValues }));
         })
         .catch((error) => {
           setError(error.message || "An error occurred");
@@ -171,7 +179,12 @@ const CreateEntryPage = ({ params }: Params) => {
               noValidate
             >
               <div className="flex items-center space-x-2">
-                <Button disabled={submitted || !isFormValid}>Publish</Button>
+                <Button
+                  className="ml-auto"
+                  disabled={submitted || !isFormValid}
+                >
+                  Publish
+                </Button>
               </div>
               {/* Dynamically creates form fields based on attributes */}
               {collection &&
