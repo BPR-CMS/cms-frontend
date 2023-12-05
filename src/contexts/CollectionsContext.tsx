@@ -1,7 +1,7 @@
 "use client";
 import { Collection } from "@/models/Collection";
 import { getCollections } from "@/services/CollectionService";
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 const CollectionsContext = createContext(null);
 
@@ -37,12 +37,26 @@ export const CollectionsProvider = ({ children }) => {
     }
   };
 
+  const updateCollection = useCallback((collectionId, newField) => {
+    setCollections((prevCollections) => {
+      return prevCollections.map((collection) => {
+        if (collection.id === collectionId) {
+          return {
+            ...collection,
+            attributes: [...collection.attributes, newField],
+          };
+        }
+        return collection;
+      });
+    });
+  }, []);
+
   useEffect(() => {
     fetchCollections();
   }, []);
 
   return (
-    <CollectionsContext.Provider value={{ collections }}>
+    <CollectionsContext.Provider value={{ collections, updateCollection }}>
       {children}
     </CollectionsContext.Provider>
   );
