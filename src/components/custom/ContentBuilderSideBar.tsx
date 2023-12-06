@@ -37,9 +37,9 @@ function ContentBuilderSideBar({
 
   const isActive = (contentType: Collection) => {
     const url = generateContentTypeUrl(contentType);
-    return pathname === url;
+    return pathname.startsWith(url);
   };
-
+  
   return (
     <div className="h-full md:w-72 md:flex-col md:fixed md:inset-y-0 z-80 border-r border-gray-300">
       <div className="space-y-4 py-4 flex flex-col h-full text-white">
