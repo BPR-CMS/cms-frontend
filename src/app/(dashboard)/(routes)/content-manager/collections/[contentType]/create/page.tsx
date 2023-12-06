@@ -263,7 +263,7 @@ const CreateEntryPage = ({ params }: Params) => {
                         attribute.dateType
                       );
                       return (
-                        <FormGrid>
+                        <FormGrid key={attribute.name}>
                           <div key={attribute.name} className="sm:col-span-3">
                             <FormFieldGroup
                               label={label}
@@ -336,7 +336,7 @@ const CreateEntryPage = ({ params }: Params) => {
                       );
                     } else if (useTextarea) {
                       return (
-                        <FormGrid>
+                        <FormGrid key={attribute.name}>
                           <div key={attribute.name} className="sm:col-span-3">
                             <FormFieldGroup
                               label={label}
@@ -362,7 +362,7 @@ const CreateEntryPage = ({ params }: Params) => {
                       );
                     } else {
                       return (
-                        <FormGrid>
+                        <FormGrid key={attribute.name}>
                           <div key={attribute.name} className="sm:col-span-3">
                             <FormFieldGroup
                               label={label}
