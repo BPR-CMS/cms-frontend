@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
     const fetchUserData = async () => {
       try {
         const userId = getUserIdFromToken();
@@ -40,10 +41,13 @@ export const AuthProvider = ({ children }) => {
     };
 
     fetchUserData();
+  }
   }, []);
 
   const isAuthenticated = () => {
+    if (typeof window !== 'undefined') {
     return !!window.localStorage.getItem("token");
+    }
   };
 
   return (

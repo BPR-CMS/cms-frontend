@@ -3,9 +3,12 @@
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 export default function ContentTypeBuilderRedirect() {
-  const router = useRouter();
-  const pathname = usePathname();
-  if (pathname === "/content-type-builder") {
-    router.push("/content-type-builder/collections");
-  }
+  // const router = useRouter();
+  // const pathname = usePathname();
+  // if (pathname === "/content-type-builder") {
+  //   router.push("/content-type-builder/collections");
+  // }
+  return (
+    <p>hello</p>
+  )
 }
