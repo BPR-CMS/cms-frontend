@@ -9,7 +9,7 @@ export const CollectionsProvider = ({ children }) => {
   const { toast } = useToast();
   const [collections, setCollections] = useState<Collection[]>([]);
 
-  const fetchCollections = async () => {
+  const fetchCollections = useCallback(async () => {
     try {
       const allCollections = await getCollections();
 
@@ -35,7 +35,7 @@ export const CollectionsProvider = ({ children }) => {
         console.error("An unknown error occurred:", error);
       }
     }
-  };
+  }, [getCollections, toast]);
 
   const updateCollection = useCallback((collectionId, newField) => {
     setCollections((prevCollections) => {
@@ -53,10 +53,12 @@ export const CollectionsProvider = ({ children }) => {
 
   useEffect(() => {
     fetchCollections();
-  }, []);
+  }, [fetchCollections]);
 
   return (
-    <CollectionsContext.Provider value={{ collections, updateCollection }}>
+    <CollectionsContext.Provider
+      value={{ collections, updateCollection, fetchCollections }}
+    >
       {children}
     </CollectionsContext.Provider>
   );
