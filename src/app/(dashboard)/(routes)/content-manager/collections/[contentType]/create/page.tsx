@@ -115,37 +115,59 @@ const CreateEntryPage = ({ params }: Params) => {
       console.log("Post created:", response);
       console.log(payload);
       setCreator(user);
+      toast({
+        title: "Success",
+        description: "Post created successfully",
+        variant: "success",
+      });
     } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create post",
+        variant: "destructive",
+      });
       console.error("Error creating post:", error);
     }
   };
 
-  const validateRichTextField = (attributeId, content, isRequired, minLength, maxLength) => {
+  const validateRichTextField = (
+    attributeId,
+    content,
+    isRequired,
+    minLength,
+    maxLength
+  ) => {
     const isEmpty = content === "<p><br></p>" || content.trim() === "";
     const contentLength = content.trim().length;
-  
+
     let errorMessage = "";
     if (isRequired && isEmpty) {
       errorMessage = "This field is required.";
-    } else if (minLength !== undefined && minLength !== null && contentLength < minLength) {
+    } else if (
+      minLength !== undefined &&
+      minLength !== null &&
+      contentLength < minLength
+    ) {
       errorMessage = `Minimum length of ${minLength} characters required.`;
-    } else if (maxLength !== undefined && maxLength !== null && contentLength > maxLength) {
+    } else if (
+      maxLength !== undefined &&
+      maxLength !== null &&
+      contentLength > maxLength
+    ) {
       errorMessage = `Maximum length of ${maxLength} characters exceeded.`;
     }
-  
+
     const valid = !errorMessage;
     setRichTextFieldsValidity((prevState) => ({
       ...prevState,
       [attributeId]: valid,
     }));
-  
+
     setRichTextErrors((prevErrors) => ({
       ...prevErrors,
       [attributeId]: errorMessage,
     }));
   };
-  
-  
 
   useEffect(() => {
     // Checsk if any field (regular or rich text) is filled
