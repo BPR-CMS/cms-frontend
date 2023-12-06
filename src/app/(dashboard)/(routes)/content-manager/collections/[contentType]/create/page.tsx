@@ -28,7 +28,7 @@ const CreateEntryPage = ({ params }: Params) => {
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [richTextFieldValues, setRichTextFieldValues] = useState({});
-  const [richTextError, setRichTextError] = useState("");
+  const [richTextErrors, setRichTextErrors] = useState({});
   const [showRichTextErrorTooltip, setShowRichTextErrorTooltip] =
     useState(false);
   const [isFormValid, setIsFormValid] = useState(isValid);
@@ -41,6 +41,13 @@ const CreateEntryPage = ({ params }: Params) => {
 
   const handleBackClick = () => {
     router.back();
+  };
+
+  const toggleRichTextErrorTooltip = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+    setShowRichTextErrorTooltip(!showRichTextErrorTooltip);
   };
 
   useEffect(() => {
@@ -113,13 +120,32 @@ const CreateEntryPage = ({ params }: Params) => {
     }
   };
 
-  const validateRichTextField = (attributeId, content, isRequired) => {
-    const valid = !isRequired || (content && content.trim() !== "");
+  const validateRichTextField = (attributeId, content, isRequired, minLength, maxLength) => {
+    const isEmpty = content === "<p><br></p>" || content.trim() === "";
+    const contentLength = content.trim().length;
+  
+    let errorMessage = "";
+    if (isRequired && isEmpty) {
+      errorMessage = "This field is required.";
+    } else if (minLength !== undefined && minLength !== null && contentLength < minLength) {
+      errorMessage = `Minimum length of ${minLength} characters required.`;
+    } else if (maxLength !== undefined && maxLength !== null && contentLength > maxLength) {
+      errorMessage = `Maximum length of ${maxLength} characters exceeded.`;
+    }
+  
+    const valid = !errorMessage;
     setRichTextFieldsValidity((prevState) => ({
       ...prevState,
       [attributeId]: valid,
     }));
+  
+    setRichTextErrors((prevErrors) => ({
+      ...prevErrors,
+      [attributeId]: errorMessage,
+    }));
   };
+  
+  
 
   useEffect(() => {
     // Checsk if any field (regular or rich text) is filled
@@ -263,13 +289,15 @@ const CreateEntryPage = ({ params }: Params) => {
                                   validateRichTextField(
                                     attribute.attributeId,
                                     content,
-                                    attribute.required
+                                    attribute.required,
+                                    attribute.minimumLength,
+                                    attribute.maximumLength
                                   );
                                 }}
                               />
                             </div>
                           </div>
-                          {richTextError && (
+                          {richTextErrors[attribute.attributeId] && (
                             <button
                               className="mt-2 text-red-500 cursor-pointer relative p-1 border border-red-500 rounded hover:bg-red-100 focus:outline-none"
                               onClick={toggleRichTextErrorTooltip}
@@ -277,7 +305,7 @@ const CreateEntryPage = ({ params }: Params) => {
                               <FaExclamationCircle />
                               {showRichTextErrorTooltip && (
                                 <div className="absolute left-full top-0 mt-0 ml-2 w-48 p-2 bg-white text-sm text-red-500 border border-red-500 rounded-md shadow-md z-10">
-                                  {richTextError}
+                                  {richTextErrors[attribute.attributeId]}
                                 </div>
                               )}
                             </button>
