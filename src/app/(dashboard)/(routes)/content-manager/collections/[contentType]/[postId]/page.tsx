@@ -16,7 +16,9 @@ import { Post } from "@/models/Post";
 import { getUserById } from "@/services/UserService";
 import { User } from "@/models/User";
 import { Attribute } from "@/models/Attribute";
+import { useRouter } from "next/navigation";
 const PostDetailsPage = ({ params }: Params) => {
+  const router = useRouter();
   const { values, errors, isValid, handleChange, setValues } =
     useFormWithValidation({});
   const [collection, setCollection] = useState(null);
@@ -70,6 +72,10 @@ const PostDetailsPage = ({ params }: Params) => {
         });
     }
   }, [postId, collection]);
+
+  const handleBackClick = () => {
+    router.back();
+  };
 
   const renderFormField = (attribute: Attribute) => {
     const useTextarea = attribute.textType === "LONG";
@@ -170,6 +176,7 @@ const PostDetailsPage = ({ params }: Params) => {
             <div className="mb-4">
               <Button
                 variant="link"
+                onClick={handleBackClick}
                 className="text-blue-600 hover:text-blue-700 focus:outline-none transition duration-150 ease-in-out"
               >
                 ← Back
