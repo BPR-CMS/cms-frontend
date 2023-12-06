@@ -52,18 +52,20 @@ const PostDetailsPage = ({ params }: Params) => {
                 console.error("Error fetching user data:", error);
               });
           }
-          // Merges content types from the collection into post attributes
-          const attributesArray = Object.keys(data.attributes).map((key) => {
-            const attributeFromCollection =
-              collection.attributes.find((attr) => attr.name === key) || {};
-            return {
-              name: key,
-              value: data.attributes[key],
-              contentType: attributeFromCollection.contentType,
-            };
-          });
 
-          setPost({ ...data, attributes: attributesArray });
+          // Merges content types from the collection into post attributes
+          const mergedAttributes = collection.attributes.map(
+            (collectionAttr) => {
+              const postAttr = data.attributes[collectionAttr.name];
+              return {
+                name: collectionAttr.name,
+                value: postAttr ? postAttr : "", // Uses existing value or initializes to empty
+                contentType: collectionAttr.contentType,
+              };
+            }
+          );
+
+          setPost({ ...data, attributes: mergedAttributes });
         })
         .catch((error) => {
           setError(
