@@ -3,7 +3,7 @@ import { User } from "@/models/User";
 
 // const BASE_URL = "http://localhost:8080/api/v1/invitations";
 const BASE_URL = "https://cms-backend-production-0a2c.up.railway.app/api/v1/invitations";
-
+let TOKEN = ""
 if (typeof window !== "undefined") {
   TOKEN = window.localStorage.getItem("token") || "";
   if (!TOKEN) {
