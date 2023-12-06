@@ -1,7 +1,8 @@
 import axios from "axios";
 import { Attribute } from "@/models/Attribute";
 
-const BASE_URL = "http://localhost:8080/api/v1/collections";
+// const BASE_URL = "http://localhost:8080/api/v1/collections";
+const BASE_URL = "https://cms-backend-production-0a2c.up.railway.app/api/v1/collections";
 
 let TOKEN = "";
 
