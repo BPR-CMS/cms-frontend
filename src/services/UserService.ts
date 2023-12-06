@@ -4,12 +4,12 @@ import { User } from "@/models/User";
 const BASE_URL = "http://localhost:8080/api/v1/users";
 let TOKEN = "";
 
-if (typeof window !== "undefined") {
-  TOKEN = window.localStorage.getItem("token") || "";
-  if (!TOKEN) {
-    console.log("Token is missing from local storage");
+const getToken = () => {
+  if (typeof window !== "undefined") {
+    return window.localStorage.getItem("token") || "";
   }
-}
+  return "";
+};
 
 export const loginUser = async (data: User): Promise<User> => {
   try {
@@ -24,7 +24,7 @@ export const getUsers = async (): Promise<User[]> => {
   try {
     const response = await axios.get(`${BASE_URL}`, {
       headers: {
-        Authorization: `Bearer ${TOKEN}`,
+        Authorization: `Bearer ${getToken()}`,
       },
     });
     return response.data;
@@ -43,7 +43,7 @@ export const setPassword = async (
       { password: newPassword },
       {
         headers: {
-          Authorization: `Bearer ${TOKEN}`,
+          Authorization: `Bearer ${getToken()}`,
         },
       }
     );
@@ -56,7 +56,7 @@ export const getUserById = async (userId: string): Promise<User> => {
   try {
     const response = await axios.get(`${BASE_URL}/${userId}`, {
       headers: {
-        Authorization: `Bearer ${TOKEN}`,
+        Authorization: `Bearer ${getToken()}`,
       },
     });
     return response.data;

@@ -14,6 +14,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const setUserAuthenticated = (user: User) => {
+    setUser(user);
+  };
+
   const getUserIdFromToken = () => {
     const token = localStorage.getItem("token");
     const decodedToken = parseJwt(token);
@@ -38,8 +42,16 @@ export const AuthProvider = ({ children }) => {
     fetchUserData();
   }, []);
 
+  const isAuthenticated = () => {
+    return !!window.localStorage.getItem("token");
+  };
+
   return (
-    <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated: isAuthenticated(), setUserAuthenticated }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
 };
 
