@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import ContentBuilderSideBar from "@/components/custom/ContentBuilderSideBar";
 import FormFieldGroup from "@/components/custom/FormFieldGroup";
 import FormGrid from "@/components/custom/FormGrid";
 import { Button } from "@/components/ui/Button";
@@ -34,7 +33,7 @@ const CreateEntryPage = ({ params }: Params) => {
     useState(false);
   const [isFormValid, setIsFormValid] = useState(isValid);
   const [richTextFieldsValidity, setRichTextFieldsValidity] = useState({});
-
+  const [isLoading, setIsLoading] = useState(true);
   const { contentType } = params;
   const hasRichText =
     collection &&
@@ -46,6 +45,7 @@ const CreateEntryPage = ({ params }: Params) => {
 
   useEffect(() => {
     if (contentType) {
+      setIsLoading(true);
       getCollectionByApiId(contentType)
         .then((data) => {
           setCollection(data);
@@ -60,6 +60,9 @@ const CreateEntryPage = ({ params }: Params) => {
         })
         .catch((error) => {
           setError(error.message || "An error occurred");
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     }
   }, [contentType]);
@@ -171,157 +174,170 @@ const CreateEntryPage = ({ params }: Params) => {
                 </div>
               )}
             </div>
-            <form
-              onSubmit={handleSubmit}
-              id="entry-form"
-              className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
-              noValidate
-            >
-              <div className="flex items-center space-x-2">
-                <Button
-                  className="ml-auto"
-                  disabled={submitted || !isFormValid}
-                >
-                  Publish
-                </Button>
+
+            {isLoading ? (
+              <div className="text-center py-10">
+                <p>Loading...</p>
               </div>
-              {/* Dynamically creates form fields based on attributes */}
-              {collection &&
-                collection.attributes.map((attribute) => {
-                  const useTextarea = attribute.textType === "LONG";
-                  const stepValue = getStepValue(attribute.formatType);
-                  const isRequired = attribute.required;
+            ) : collection && collection.attributes.length === 0 ? (
+              <div className="text-center py-10">
+                <p className="text-gray-600">
+                  There are no fields to display for this collection.
+                </p>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                id="entry-form"
+                className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
+                noValidate
+              >
+                <div className="flex items-center space-x-2">
+                  <Button
+                    className="ml-auto"
+                    disabled={submitted || !isFormValid}
+                  >
+                    Publish
+                  </Button>
+                </div>
+                {/* Dynamically creates form fields based on attributes */}
+                {collection &&
+                  collection.attributes.map((attribute) => {
+                    const useTextarea = attribute.textType === "LONG";
+                    const stepValue = getStepValue(attribute.formatType);
+                    const isRequired = attribute.required;
 
-                  const label = `${attribute.name}${isRequired ? " *" : ""}`;
+                    const label = `${attribute.name}${isRequired ? " *" : ""}`;
 
-                  if (attribute.contentType === "DATE") {
-                    const dateInputType = getInputType(
-                      attribute.contentType,
-                      attribute.dateType
-                    );
-                    return (
-                      <FormGrid>
-                        <div key={attribute.name} className="sm:col-span-3">
-                          <FormFieldGroup
-                            label={label}
-                            name={attribute.name}
-                            id={attribute.name}
-                            type={dateInputType}
-                            value={
-                              values[attribute.name] ||
-                              "" ||
-                              attribute.defaultValue
-                            }
-                            onChangeInput={handleChange}
-                            required={isRequired}
-                            maxLength={attribute.maximumLength}
-                            minLength={attribute.minimumLength}
-                            minValue={attribute.minValue}
-                            maxValue={attribute.maxValue}
-                          />
-                        </div>
-                      </FormGrid>
-                    );
-                  }
-                  if (attribute.contentType === "RICHTEXT") {
-                    return (
-                      <div
-                        key={attribute.attributeId}
-                        className="sm:col-span-3 mt-4"
-                      >
-                        <label>{label}</label>
-                        <div className="p-2 ">
-                          <div className="max-w-4xl bg-white">
-                            {" "}
-                            <ReactQuill
-                              theme="snow"
+                    if (attribute.contentType === "DATE") {
+                      const dateInputType = getInputType(
+                        attribute.contentType,
+                        attribute.dateType
+                      );
+                      return (
+                        <FormGrid>
+                          <div key={attribute.name} className="sm:col-span-3">
+                            <FormFieldGroup
+                              label={label}
+                              name={attribute.name}
+                              id={attribute.name}
+                              type={dateInputType}
                               value={
-                                richTextFieldValues[attribute.name] ||
+                                values[attribute.name] ||
                                 "" ||
                                 attribute.defaultValue
                               }
-                              onChange={(content) => {
-                                setRichTextFieldValues({
-                                  ...richTextFieldValues,
-                                  [attribute.name]: content,
-                                });
-                                validateRichTextField(
-                                  attribute.attributeId,
-                                  content,
-                                  attribute.required
-                                );
-                              }}
+                              onChangeInput={handleChange}
+                              required={isRequired}
+                              maxLength={attribute.maximumLength}
+                              minLength={attribute.minimumLength}
+                              minValue={attribute.minValue}
+                              maxValue={attribute.maxValue}
                             />
                           </div>
+                        </FormGrid>
+                      );
+                    }
+                    if (attribute.contentType === "RICHTEXT") {
+                      return (
+                        <div
+                          key={attribute.attributeId}
+                          className="sm:col-span-3 mt-4"
+                        >
+                          <label>{label}</label>
+                          <div className="p-2 ">
+                            <div className="max-w-4xl bg-white">
+                              {" "}
+                              <ReactQuill
+                                theme="snow"
+                                value={
+                                  richTextFieldValues[attribute.name] ||
+                                  "" ||
+                                  attribute.defaultValue
+                                }
+                                onChange={(content) => {
+                                  setRichTextFieldValues({
+                                    ...richTextFieldValues,
+                                    [attribute.name]: content,
+                                  });
+                                  validateRichTextField(
+                                    attribute.attributeId,
+                                    content,
+                                    attribute.required
+                                  );
+                                }}
+                              />
+                            </div>
+                          </div>
+                          {richTextError && (
+                            <button
+                              className="mt-2 text-red-500 cursor-pointer relative p-1 border border-red-500 rounded hover:bg-red-100 focus:outline-none"
+                              onClick={toggleRichTextErrorTooltip}
+                            >
+                              <FaExclamationCircle />
+                              {showRichTextErrorTooltip && (
+                                <div className="absolute left-full top-0 mt-0 ml-2 w-48 p-2 bg-white text-sm text-red-500 border border-red-500 rounded-md shadow-md z-10">
+                                  {richTextError}
+                                </div>
+                              )}
+                            </button>
+                          )}
                         </div>
-                        {richTextError && (
-                          <button
-                            className="mt-2 text-red-500 cursor-pointer relative p-1 border border-red-500 rounded hover:bg-red-100 focus:outline-none"
-                            onClick={toggleRichTextErrorTooltip}
-                          >
-                            <FaExclamationCircle />
-                            {showRichTextErrorTooltip && (
-                              <div className="absolute left-full top-0 mt-0 ml-2 w-48 p-2 bg-white text-sm text-red-500 border border-red-500 rounded-md shadow-md z-10">
-                                {richTextError}
-                              </div>
-                            )}
-                          </button>
-                        )}
-                      </div>
-                    );
-                  } else if (useTextarea) {
-                    return (
-                      <FormGrid>
-                        <div key={attribute.name} className="sm:col-span-3">
-                          <FormFieldGroup
-                            label={label}
-                            name={attribute.name}
-                            id={attribute.name}
-                            useTextarea={true}
-                            type={getInputType(attribute.contentType)}
-                            value={
-                              values[attribute.name] ||
-                              "" ||
-                              attribute.defaultValue
-                            }
-                            onChangeTextArea={handleChange}
-                            required={attribute.required}
-                            minValue={attribute.minValue}
-                            maxValue={attribute.maxValue}
-                            maxLength={attribute.maximumLength}
-                            minLength={attribute.minimumLength}
-                            error={errors[attribute.name] || ""}
-                          />
-                        </div>
-                      </FormGrid>
-                    );
-                  } else {
-                    return (
-                      <FormGrid>
-                        <div key={attribute.name} className="sm:col-span-3">
-                          <FormFieldGroup
-                            label={label}
-                            name={attribute.name}
-                            id={attribute.name}
-                            type={getInputType(attribute.contentType)}
-                            value={
-                              values[attribute.name] ||
-                              "" ||
-                              attribute.defaultValue
-                            }
-                            onChangeInput={handleChange}
-                            required={attribute.required}
-                            minLength={attribute.minimumLength}
-                            maxLength={attribute.maximumLength}
-                            error={errors[attribute.name] || ""}
-                            step={stepValue}
-                          />
-                        </div>
-                      </FormGrid>
-                    );
-                  }
-                })}
-            </form>
+                      );
+                    } else if (useTextarea) {
+                      return (
+                        <FormGrid>
+                          <div key={attribute.name} className="sm:col-span-3">
+                            <FormFieldGroup
+                              label={label}
+                              name={attribute.name}
+                              id={attribute.name}
+                              useTextarea={true}
+                              type={getInputType(attribute.contentType)}
+                              value={
+                                values[attribute.name] ||
+                                "" ||
+                                attribute.defaultValue
+                              }
+                              onChangeTextArea={handleChange}
+                              required={attribute.required}
+                              minValue={attribute.minValue}
+                              maxValue={attribute.maxValue}
+                              maxLength={attribute.maximumLength}
+                              minLength={attribute.minimumLength}
+                              error={errors[attribute.name] || ""}
+                            />
+                          </div>
+                        </FormGrid>
+                      );
+                    } else {
+                      return (
+                        <FormGrid>
+                          <div key={attribute.name} className="sm:col-span-3">
+                            <FormFieldGroup
+                              label={label}
+                              name={attribute.name}
+                              id={attribute.name}
+                              type={getInputType(attribute.contentType)}
+                              value={
+                                values[attribute.name] ||
+                                "" ||
+                                attribute.defaultValue
+                              }
+                              onChangeInput={handleChange}
+                              required={attribute.required}
+                              minLength={attribute.minimumLength}
+                              maxLength={attribute.maximumLength}
+                              error={errors[attribute.name] || ""}
+                              step={stepValue}
+                            />
+                          </div>
+                        </FormGrid>
+                      );
+                    }
+                  })}
+              </form>
+            )}
           </div>
           {/* Sidebar Section */}
           <div className="  p-8 border-l self-center">
