@@ -3,7 +3,7 @@ import { Button } from "../ui/Button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/Dialog";
 import FormFieldGroup from "./FormFieldGroup";
 import FormGrid from "./FormGrid";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Collection } from "@/models/Collection";
 import { addCollection, getCollections } from "@/services/CollectionService";
 import {  useToast } from "@/hooks/use-toast";
@@ -11,10 +11,10 @@ import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { AxiosError } from "axios";
 import { getErrors } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-
+import CollectionsContext from "@/contexts/CollectionsContext";
 function ContentModelDialog() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [collections, setCollections] = useState<Collection[]>([]);
+    const { collections, updateCollection, fetchCollections } = useContext(CollectionsContext);
     const [submitted, setSubmitted] = useState(false);
     const closeDialogButtonRef = useRef<HTMLButtonElement | null>(null);
     const { values, errors, isValid, handleChange, setValues } =
@@ -24,38 +24,10 @@ function ContentModelDialog() {
     });
     const { toast } = useToast();
     const router = useRouter();
-    const fetchCollections = async () => {
-        try {
-          const allCollections = await getCollections();
-    
-          if (allCollections.length === 0) {
-            setCollections([]);
-    
-            return;
-          }
-    
-          setCollections(allCollections);
-        } catch (error) {
-          if (error instanceof Error) {
-            console.error("Error fetching collections:", error.message);
-    
-            if (error.message !== "No collections found") {
-              toast({
-                title: "Error",
-                description: "Failed to fetch collections.",
-                variant: "destructive",
-              });
-            }
-          } else {
-            console.error("An unknown error occurred:", error);
-          }
-        }
-      };
-    
-      useEffect(() => {
-        fetchCollections();
-      }, []);
 
+    useEffect(() => {
+      fetchCollections();
+    }, []);
     const createCollection = async (collectionData: Collection) => {
         // Check if collection name already exists
         const doesNameExist = collections.some(
@@ -74,7 +46,9 @@ function ContentModelDialog() {
         try {
           const newCollection = await addCollection(collectionData);
           // Add the new collection to the state
-          setCollections((prevCollections) => [...prevCollections, newCollection]);
+          updateCollection(newCollection.id, newCollection);
+          console.log(newCollection)
+         await fetchCollections()
     
           toast({
             title: "Success",
@@ -109,6 +83,8 @@ function ContentModelDialog() {
         setSubmitted(true);
         createCollection(collectionData);
       };
+
+
     return (
         <Dialog
         open={isDialogOpen}
