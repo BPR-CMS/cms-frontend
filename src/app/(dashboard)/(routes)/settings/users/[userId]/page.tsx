@@ -10,6 +10,7 @@ import { getUserById } from "@/services/UserService";
 import FormGrid from "@/components/custom/FormGrid";
 import FormFieldGroup from "@/components/custom/FormFieldGroup";
 import { Label } from "@/components/ui/Label";
+import { updateUser } from "@/services/UserService";
 import {
   Select,
   SelectContent,
@@ -17,7 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/Select";
-
+import { useToast } from "@/hooks/use-toast";
+import { AxiosError } from "axios";
+import { getErrors } from "@/lib/utils";
 interface UserFormValues {
   firstName: string;
   lastName: string;
@@ -27,7 +30,8 @@ interface UserFormValues {
 
 const UserDetailsPage = ({ params }: Params) => {
   const router = useRouter();
-  const { values, errors, isValid, handleChange, setValues } =
+  const { toast } = useToast();
+  const { values, errors, isValid, handleChange, setValues, setIsValid } =
     useFormWithValidation<UserFormValues>({
       firstName: "",
       lastName: "",
@@ -38,10 +42,12 @@ const UserDetailsPage = ({ params }: Params) => {
   const [error, setError] = useState("");
   const { userId } = params;
   const [user, setUser] = useState<User>();
+  const [submitted, setSubmitted] = useState(false);
 
   const handleBackClick = () => {
     router.back();
   };
+  
   useEffect(() => {
     getUserById(userId)
       .then((data) => {
@@ -52,6 +58,7 @@ const UserDetailsPage = ({ params }: Params) => {
           email: data.email || "",
           userType: data.userType || "",
         });
+        setIsValid(true);
       })
       .catch((error) => setError(error.message));
   }, [userId, setValues]);
@@ -62,7 +69,35 @@ const UserDetailsPage = ({ params }: Params) => {
       userType: userType,
     }));
   };
-  console.log(user);
+
+  const updateUserDetails = async (userData: UserFormValues) => {
+    try {
+      await updateUser(userId, userData);
+      toast({
+        title: "Success",
+        description: "User details updated successfully.",
+        variant: "success",
+      });
+      setSubmitted(false);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      const errorMessage = getErrors(axiosError);
+      console.error("Error updating user:", errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      setSubmitted(false);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSubmitted(true);
+    updateUserDetails(values);
+  };
+
   return (
     <div className="md:flex">
       <div className="flex-grow md:ml-72 mt-4">
@@ -87,12 +122,15 @@ const UserDetailsPage = ({ params }: Params) => {
               </div>
             </div>
             <form
+              onSubmit={handleSubmit}
               id="entry-form"
               className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
               noValidate
             >
               <div className="flex items-center space-x-2">
-                <Button className="ml-auto">Save</Button>
+                <Button disabled={submitted || !isValid} className="ml-auto">
+                  Save
+                </Button>
               </div>
 
               {user && (
