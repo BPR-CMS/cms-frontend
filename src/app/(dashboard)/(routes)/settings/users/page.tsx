@@ -36,7 +36,6 @@ export default function UsersPage() {
   return (
     <div>
       <div className=" mt-4">
-        <SettingsSideBar />
         <div className="flex-grow md:ml-72 mt-4 flex p-10 px-14">
           <div className="flex-grow">
             <h1 className="text-2xl leading-tight font-semibold text-black">
