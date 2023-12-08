@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { usePathname } from "next/navigation";
 import { Separator } from "@/components/ui/Separator";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,6 @@ function SettingsSideBar() {
       href: "/settings/pending-invitations",
     },
   ];
-
   return (
     <div className="h-full md:w-72 md:flex-col md:fixed md:inset-y-0 z-80 border-r border-gray-300">
       <div className="space-y-4  flex flex-col h-full text-white">
@@ -39,7 +38,9 @@ function SettingsSideBar() {
                   key={route.href}
                   className={cn(
                     "text-sm font-medium pt-2 pb-2 pl-8",
-                    pathname === route.href ? "text-black" : "text-customBlue"
+                    pathname.includes(route.href)
+                      ? "text-black"
+                      : "text-customBlue"
                   )}
                 >
                   <Link href={route.href}>{route.label}</Link>
