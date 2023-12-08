@@ -64,3 +64,19 @@ export const getUserById = async (userId: string): Promise<User> => {
     throw error;
   }
 };
+
+export const updateUser = async (
+  userId: string,
+  updateData: Partial<User>
+): Promise<User> => {
+  try {
+    const response = await axios.patch(`${BASE_URL}/${userId}`, updateData, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
