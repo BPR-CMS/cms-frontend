@@ -10,7 +10,7 @@ import { getUserById } from "@/services/UserService";
 import FormGrid from "@/components/custom/FormGrid";
 import FormFieldGroup from "@/components/custom/FormFieldGroup";
 import { Label } from "@/components/ui/Label";
-import { updateUser } from "@/services/UserService";
+import { updateUser, deleteUser } from "@/services/UserService";
 import {
   Select,
   SelectContent,
@@ -21,6 +21,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
 import { getErrors } from "@/lib/utils";
+import DeleteUserDialog from "@/components/custom/DeleteUserDialog";
 interface UserFormValues {
   firstName: string;
   lastName: string;
@@ -43,11 +44,12 @@ const UserDetailsPage = ({ params }: Params) => {
   const { userId } = params;
   const [user, setUser] = useState<User>();
   const [submitted, setSubmitted] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleBackClick = () => {
     router.back();
   };
-  
+
   useEffect(() => {
     getUserById(userId)
       .then((data) => {
@@ -98,6 +100,27 @@ const UserDetailsPage = ({ params }: Params) => {
     updateUserDetails(values);
   };
 
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      await deleteUser(userId);
+      toast({
+        title: "User Deleted",
+        description: "The user has been successfully deleted.",
+        variant: "success",
+      });
+      router.push("/settings/users");
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      const errorMessage = getErrors(axiosError);
+      console.error("Error deleting user:", errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="md:flex">
       <div className="flex-grow md:ml-72 mt-4">
@@ -116,7 +139,9 @@ const UserDetailsPage = ({ params }: Params) => {
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h1 className="text-2xl font-bold">
-                  Edit {user ? `${user.firstName} ${user.lastName}` : "User"}
+                  {user
+                    ? `${user.firstName} ${user.lastName}'s Information`
+                    : "User"}
                 </h1>
                 <p className="text-sm text-gray-600">User Details:</p>
               </div>
@@ -129,7 +154,7 @@ const UserDetailsPage = ({ params }: Params) => {
             >
               <div className="flex items-center space-x-2">
                 <Button disabled={submitted || !isValid} className="ml-auto">
-                  Save
+                  Update
                 </Button>
               </div>
 
@@ -211,6 +236,15 @@ const UserDetailsPage = ({ params }: Params) => {
                 </>
               )}
             </form>
+            <div className="mt-4">
+              <DeleteUserDialog
+                userId={userId}
+                onDelete={(userId) => {
+                  handleDeleteUser(userId);
+                  setIsDeleteDialogOpen(false);
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
