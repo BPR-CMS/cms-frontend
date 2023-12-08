@@ -17,10 +17,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/Select";
+
+interface UserFormValues {
+  firstName: string;
+  lastName: string;
+  email: string;
+  userType: string;
+}
+
 const UserDetailsPage = ({ params }: Params) => {
   const router = useRouter();
   const { values, errors, isValid, handleChange, setValues } =
-    useFormWithValidation({});
+    useFormWithValidation<UserFormValues>({
+      firstName: "",
+      lastName: "",
+      email: "",
+      userType: "",
+    });
+
   const [error, setError] = useState("");
   const { userId } = params;
   const [user, setUser] = useState<User>();
@@ -30,9 +44,24 @@ const UserDetailsPage = ({ params }: Params) => {
   };
   useEffect(() => {
     getUserById(userId)
-      .then((data) => setUser(data))
+      .then((data) => {
+        setUser(data);
+        setValues({
+          firstName: data.firstName || "",
+          lastName: data.lastName || "",
+          email: data.email || "",
+          userType: data.userType || "",
+        });
+      })
       .catch((error) => setError(error.message));
-  }, [userId]);
+  }, [userId, setValues]);
+
+  const handleUserTypeChange = (userType: string) => {
+    setValues((prevValues) => ({
+      ...prevValues,
+      userType: userType,
+    }));
+  };
   console.log(user);
   return (
     <div className="md:flex">
@@ -76,7 +105,7 @@ const UserDetailsPage = ({ params }: Params) => {
                         id="firstName"
                         type="text"
                         required
-                        value={user.firstName}
+                        value={values.firstName || ""}
                         onChangeInput={handleChange}
                         error={errors.firstName}
                         minLength={2}
@@ -93,7 +122,7 @@ const UserDetailsPage = ({ params }: Params) => {
                         id="lastName"
                         type="text"
                         required
-                        value={user.lastName}
+                        value={values.lastName}
                         onChangeInput={handleChange}
                         error={errors.lastName}
                         minLength={2}
@@ -110,20 +139,19 @@ const UserDetailsPage = ({ params }: Params) => {
                         id="email"
                         type="email"
                         required
-                        value={user.email}
+                        value={values.email}
                         onChangeInput={handleChange}
                         error={errors.email}
                       />
                     </div>
                   </FormGrid>
-
                   <FormGrid>
                     <div>
                       <Label className="flex mb-4">Role</Label>
                       <Select
                         required
-                        value={user.userType}
-                        //  onValueChange={handleUserTypeChange}
+                        value={values.userType}
+                        onValueChange={handleUserTypeChange}
                       >
                         <SelectTrigger className="w-[380px]">
                           <SelectValue placeholder="Choose here" />
