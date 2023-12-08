@@ -92,3 +92,9 @@ export const deleteUser = async (userId: string): Promise<void> => {
     throw error;
   }
 };
+
+export const logoutUser = (): void => {
+  if (typeof window !== "undefined") {
+    window.localStorage.removeItem("token");
+  }
+};
