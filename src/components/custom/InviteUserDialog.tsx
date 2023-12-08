@@ -20,6 +20,14 @@ import { User } from "@/models/User";
 import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
 import { getErrors } from "@/lib/utils";
+import { Label } from "../ui/Label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/Select";
 function InviteUserDialog() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -127,8 +135,30 @@ function InviteUserDialog() {
                 error={errors.email}
               />
             </div>
+            <div>
+              <Label className="flex mb-4">Role</Label>
+              <Select
+                required
+                // value={userRole}
+                // onValueChange={(value: string) => setUserRole(value)}
+              >
+                <SelectTrigger className="w-[380px]">
+                  <SelectValue placeholder="Choose here" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem id="admin" value="ADMIN">
+                    Admin
+                  </SelectItem>
+                  <SelectItem id="editor" value="EDITOR">
+                    Editor
+                  </SelectItem>
+                  <SelectItem id="default" value="DEFAULT">
+                    Default
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </FormGrid>
-
           <DialogFooter style={{ paddingTop: "48px" }}>
             <DialogClose ref={closeDialogButtonRef}>
               <Button variant="outline" type="button" id="cancelButton">
