@@ -80,3 +80,15 @@ export const updateUser = async (
     throw error;
   }
 };
+
+export const deleteUser = async (userId: string): Promise<void> => {
+  try {
+    await axios.delete(`${BASE_URL}/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
