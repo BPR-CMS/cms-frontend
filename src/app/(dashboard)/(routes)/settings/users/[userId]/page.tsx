@@ -67,75 +67,82 @@ const UserDetailsPage = ({ params }: Params) => {
               </div>
 
               {user && (
-                <FormGrid>
-                  <div className="sm:col-span-3">
-                    <FormFieldGroup
-                      label="First name"
-                      name="firstName"
-                      id="firstName"
-                      type="text"
-                      required
-                      value={user.firstName}
-                      onChangeInput={handleChange}
-                      error={errors.firstName}
-                      minLength={2}
-                      maxLength={20}
-                      pattern="^[a-zA-Z\s]+$"
-                    />
-                  </div>
+                <>
+                  <FormGrid>
+                    <div className="sm:col-span-3">
+                      <FormFieldGroup
+                        label="First name"
+                        name="firstName"
+                        id="firstName"
+                        type="text"
+                        required
+                        value={user.firstName}
+                        onChangeInput={handleChange}
+                        error={errors.firstName}
+                        minLength={2}
+                        maxLength={20}
+                        pattern="^[a-zA-Z\s]+$"
+                      />
+                    </div>
+                  </FormGrid>
+                  <FormGrid>
+                    <div className="sm:col-span-3">
+                      <FormFieldGroup
+                        label="Last name"
+                        name="lastName"
+                        id="lastName"
+                        type="text"
+                        required
+                        value={user.lastName}
+                        onChangeInput={handleChange}
+                        error={errors.lastName}
+                        minLength={2}
+                        maxLength={20}
+                        pattern="^[a-zA-Z\s]+$"
+                      />
+                    </div>
+                  </FormGrid>
+                  <FormGrid>
+                    <div className="sm:col-span-3">
+                      <FormFieldGroup
+                        label="Email address"
+                        name="email"
+                        id="email"
+                        type="email"
+                        required
+                        value={user.email}
+                        onChangeInput={handleChange}
+                        error={errors.email}
+                      />
+                    </div>
+                  </FormGrid>
 
-                  <div className="sm:col-span-3">
-                    <FormFieldGroup
-                      label="Last name"
-                      name="lastName"
-                      id="lastName"
-                      type="text"
-                      required
-                      value={user.lastName}
-                      onChangeInput={handleChange}
-                      error={errors.lastName}
-                      minLength={2}
-                      maxLength={20}
-                      pattern="^[a-zA-Z\s]+$"
-                    />
-                  </div>
-
-                  <div className="sm:col-span-3">
-                    <FormFieldGroup
-                      label="Email address"
-                      name="email"
-                      id="email"
-                      type="email"
-                      required
-                      value={user.email}
-                      onChangeInput={handleChange}
-                      error={errors.email}
-                    />
-                  </div>
-                  <div>
-                    <Label className="flex mb-4">Role</Label>
-                    <Select
-                      required
-                      value={user.userType}
-                      //  onValueChange={handleUserTypeChange}
-                    >
-                      <SelectTrigger className="w-[380px]">
-                        <SelectValue placeholder="Choose here" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem id="admin" value="ADMIN">
-                          Admin
-                        </SelectItem>
-                        <SelectItem id="editor" value="EDITOR">
-                          Editor
-                        </SelectItem>
-                        <SelectItem id="default" value="DEFAULT">
-                          Default
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </FormGrid>
+                  <FormGrid>
+                    <div>
+                      <Label className="flex mb-4">Role</Label>
+                      <Select
+                        required
+                        value={user.userType}
+                        //  onValueChange={handleUserTypeChange}
+                      >
+                        <SelectTrigger className="w-[380px]">
+                          <SelectValue placeholder="Choose here" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem id="admin" value="ADMIN">
+                            Admin
+                          </SelectItem>
+                          <SelectItem id="editor" value="EDITOR">
+                            Editor
+                          </SelectItem>
+                          <SelectItem id="default" value="DEFAULT">
+                            Default
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </FormGrid>
+                </>
               )}
             </form>
           </div>
