@@ -44,13 +44,14 @@ const UserDetailsPage = ({ params }: Params) => {
   const { userId } = params;
   const [user, setUser] = useState<User>();
   const [submitted, setSubmitted] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleBackClick = () => {
     router.back();
   };
 
   useEffect(() => {
+    setLoading(true);
     getUserById(userId)
       .then((data) => {
         setUser(data);
@@ -61,8 +62,12 @@ const UserDetailsPage = ({ params }: Params) => {
           userType: data.userType || "",
         });
         setIsValid(true);
+        setLoading(false);
       })
-      .catch((error) => setError(error.message));
+      .catch((error) => {
+        setError(error.message);
+        setLoading(false);
+      });
   }, [userId, setValues]);
 
   const handleUserTypeChange = (userType: string) => {
@@ -136,115 +141,124 @@ const UserDetailsPage = ({ params }: Params) => {
                 ← Back
               </Button>
             </div>
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h1 className="text-2xl font-bold">
-                  {user
-                    ? `${user.firstName} ${user.lastName}'s Information`
-                    : "User"}
-                </h1>
-                <p className="text-sm text-gray-600">User Details:</p>
-              </div>
-            </div>
-            <form
-              onSubmit={handleSubmit}
-              id="entry-form"
-              className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
-              noValidate
-            >
-              <div className="flex items-center space-x-2">
-                <Button disabled={submitted || !isValid} className="ml-auto">
-                  Update
-                </Button>
-              </div>
+            {loading ? (
+              <p>Loading...</p>
+            ) : (
+              <>
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h1 className="text-2xl font-bold">
+                      {user &&
+                        `${user.firstName} ${user.lastName}'s Information`}
+                    </h1>
+                    <p className="text-sm text-gray-600">User Details:</p>
+                  </div>
+                </div>
 
-              {user && (
-                <>
-                  <FormGrid>
-                    <div className="sm:col-span-3">
-                      <FormFieldGroup
-                        label="First name"
-                        name="firstName"
-                        id="firstName"
-                        type="text"
-                        required
-                        value={values.firstName || ""}
-                        onChangeInput={handleChange}
-                        error={errors.firstName}
-                        minLength={2}
-                        maxLength={20}
-                        pattern="^[a-zA-Z\s]+$"
-                      />
-                    </div>
-                  </FormGrid>
-                  <FormGrid>
-                    <div className="sm:col-span-3">
-                      <FormFieldGroup
-                        label="Last name"
-                        name="lastName"
-                        id="lastName"
-                        type="text"
-                        required
-                        value={values.lastName}
-                        onChangeInput={handleChange}
-                        error={errors.lastName}
-                        minLength={2}
-                        maxLength={20}
-                        pattern="^[a-zA-Z\s]+$"
-                      />
-                    </div>
-                  </FormGrid>
-                  <FormGrid>
-                    <div className="sm:col-span-3">
-                      <FormFieldGroup
-                        label="Email address"
-                        name="email"
-                        id="email"
-                        type="email"
-                        required
-                        value={values.email}
-                        onChangeInput={handleChange}
-                        error={errors.email}
-                      />
-                    </div>
-                  </FormGrid>
-                  <FormGrid>
-                    <div>
-                      <Label className="flex mb-4">Role</Label>
-                      <Select
-                        required
-                        value={values.userType}
-                        onValueChange={handleUserTypeChange}
-                      >
-                        <SelectTrigger className="w-[380px]">
-                          <SelectValue placeholder="Choose here" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem id="admin" value="ADMIN">
-                            Admin
-                          </SelectItem>
-                          <SelectItem id="editor" value="EDITOR">
-                            Editor
-                          </SelectItem>
-                          <SelectItem id="default" value="DEFAULT">
-                            Default
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </FormGrid>
-                </>
-              )}
-            </form>
-            <div className="mt-4">
-              <DeleteUserDialog
-                userId={userId}
-                onDelete={(userId) => {
-                  handleDeleteUser(userId);
-                  setIsDeleteDialogOpen(false);
-                }}
-              />
-            </div>
+                <form
+                  onSubmit={handleSubmit}
+                  id="entry-form"
+                  className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
+                  noValidate
+                >
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      disabled={submitted || !isValid}
+                      className="ml-auto"
+                    >
+                      Update
+                    </Button>
+                  </div>
+
+                  {user && (
+                    <>
+                      <FormGrid>
+                        <div className="sm:col-span-3">
+                          <FormFieldGroup
+                            label="First name"
+                            name="firstName"
+                            id="firstName"
+                            type="text"
+                            required
+                            value={values.firstName || ""}
+                            onChangeInput={handleChange}
+                            error={errors.firstName}
+                            minLength={2}
+                            maxLength={20}
+                            pattern="^[a-zA-Z\s]+$"
+                          />
+                        </div>
+                      </FormGrid>
+                      <FormGrid>
+                        <div className="sm:col-span-3">
+                          <FormFieldGroup
+                            label="Last name"
+                            name="lastName"
+                            id="lastName"
+                            type="text"
+                            required
+                            value={values.lastName}
+                            onChangeInput={handleChange}
+                            error={errors.lastName}
+                            minLength={2}
+                            maxLength={20}
+                            pattern="^[a-zA-Z\s]+$"
+                          />
+                        </div>
+                      </FormGrid>
+                      <FormGrid>
+                        <div className="sm:col-span-3">
+                          <FormFieldGroup
+                            label="Email address"
+                            name="email"
+                            id="email"
+                            type="email"
+                            required
+                            value={values.email}
+                            onChangeInput={handleChange}
+                            error={errors.email}
+                          />
+                        </div>
+                      </FormGrid>
+                      <FormGrid>
+                        <div>
+                          <Label className="flex mb-4">Role</Label>
+                          <Select
+                            required
+                            value={values.userType}
+                            onValueChange={handleUserTypeChange}
+                          >
+                            <SelectTrigger className="w-[380px]">
+                              <SelectValue placeholder="Choose here" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem id="admin" value="ADMIN">
+                                Admin
+                              </SelectItem>
+                              <SelectItem id="editor" value="EDITOR">
+                                Editor
+                              </SelectItem>
+                              <SelectItem id="default" value="DEFAULT">
+                                Default
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </FormGrid>
+                    </>
+                  )}
+                </form>
+
+                <div className="mt-4">
+                  <DeleteUserDialog
+                    userId={userId}
+                    onDelete={(userId) => {
+                      handleDeleteUser(userId);
+                    }}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
