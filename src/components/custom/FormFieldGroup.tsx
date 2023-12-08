@@ -24,6 +24,9 @@ interface FormFieldGroupProps {
   rows?: number;
   cols?: number;
   ref? : Ref<HTMLInputElement> | undefined;
+  step?: string | number;
+  minValue?: number;
+  maxValue?: number; 
 }
 
 const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
@@ -44,7 +47,10 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
   onChangeTextArea,
   rows,
   cols,
-  ref
+  ref,
+  step,
+  minValue,
+  maxValue
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -83,6 +89,9 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
           pattern={pattern}
           ref={ref}
           readOnly={readonly}
+          step={step}
+          min={minValue}
+          max={maxValue}
         />
       )}
 

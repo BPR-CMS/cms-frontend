@@ -19,6 +19,9 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background:rgb(0 117 255 / 23%);
+  background: rgb(0 117 255 / 23%);
+}
 
+.clickable-row:hover {
+  cursor: pointer;
 }

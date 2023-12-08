@@ -6,11 +6,19 @@ import {
   CalendarIcon,
   ImageIcon,
   SettingsIcon,
+  FeatherIcon,
 } from "lucide-react";
 
 export const MAX_FREE_COUNTS = 5;
 
 export const tools = [
+  {
+    label: "Content Manager",
+    icon: FeatherIcon,
+    href: "/content-manager",
+    color: "text-green-500",
+    bgColor: "bg-green-500/10",
+  },
   {
     label: "Content-Type Builder",
     icon: LayoutIcon,

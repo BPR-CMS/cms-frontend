@@ -18,11 +18,12 @@ import { Button } from "../ui/Button";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  emptyStateComponent?: React.ReactNode; // New prop for empty state
+  emptyStateComponent?: React.ReactNode;
   id: string;
   renderButton?: (rowData: TData) => React.ReactNode;
   onButtonClick?: (rowData: TData) => () => void;
-  defaultButtonLabel: string; 
+  defaultButtonLabel: string;
+  onRowClick?: (rowData: TData) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -32,6 +33,7 @@ export function DataTable<TData, TValue>({
   renderButton,
   onButtonClick,
   defaultButtonLabel,
+  onRowClick,
   emptyStateComponent = <span>No results.</span>, // Default to "No results." if not provided
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
@@ -52,9 +54,9 @@ export function DataTable<TData, TValue>({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                   </TableHead>
                 );
               })}
@@ -68,6 +70,8 @@ export function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                className={onRowClick ? "clickable-row" : ""}
+                onClick={() => onRowClick && onRowClick(row.original)}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
@@ -75,15 +79,15 @@ export function DataTable<TData, TValue>({
                   </TableCell>
                 ))}
                 {renderButton && (
-           <TableCell>
-           <Button
-             disabled={!renderButton || !renderButton(row.original)}
-             onClick={onButtonClick ? onButtonClick(row.original) : undefined}
-           >
-             {defaultButtonLabel}
-           </Button>
-         </TableCell>
-         
+                  <TableCell>
+                    <Button
+                      disabled={!renderButton || !renderButton(row.original)}
+                      onClick={onButtonClick ? onButtonClick(row.original) : undefined}
+                    >
+                      {defaultButtonLabel}
+                    </Button>
+                  </TableCell>
+
                 )}
               </TableRow>
             ))

@@ -24,5 +24,7 @@ export const useFormWithValidation = <T extends Record<string, any>>(
     isValid,
     handleChange,
     setValues,
+    setErrors,
+    setIsValid
   };
 };

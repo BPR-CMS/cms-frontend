@@ -38,3 +38,40 @@ export const getErrors = (err: AxiosError): string => {
     return `We can't connect to the server right now. Please check your internet connection and try again. ${err.message}`;
   }
 };
+
+export type ContentType = 'TEXT' | 'RICHTEXT' | 'NUMBER' | 'DATE' | 'MEDIA';
+export type DateType = 'DATE' | 'DATETIME' | 'TIME'; 
+
+export function getInputType(contentType: ContentType, dateType?: DateType): string {
+  if (contentType === 'DATE' && dateType) {
+    const dateTypeMapping: { [K in DateType]: string } = {
+      DATE: "date",
+      DATETIME: "datetime-local",
+      TIME: "time",
+    };
+    return dateTypeMapping[dateType];
+  }
+
+  const typeMapping: { [K in ContentType]: string } = {
+    TEXT: "text",
+    RICHTEXT: "text",
+    NUMBER: "number",
+    DATE: "date", // Default to date if no dateType is provided
+    MEDIA: "file",
+  };
+
+  return typeMapping[contentType];
+}
+
+
+export const getStepValue = (numberType: string) => {
+  switch (numberType) {
+    case "INTEGER":
+      return "1";
+    case "DECIMAL":
+    case "FLOAT":
+      return "any";
+    default:
+      return "any";
+  }
+};
