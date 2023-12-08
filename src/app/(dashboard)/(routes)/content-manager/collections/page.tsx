@@ -4,7 +4,7 @@ import React, { useState, useContext } from "react";
 import { Collection } from "@/models/Collection";
 import Link from "next/link";
 import CollectionsContext from "@/contexts/CollectionsContext";
-export default function ContentManagerPage() {
+export default function ContentManagerCollectionsPage() {
   const [selectedContentType, setSelectedContentType] =
     useState<Collection | null>(null);
 
