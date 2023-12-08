@@ -57,6 +57,7 @@ function InviteUserDialog() {
         description: "You have successfully sent an invitation.",
         variant: "success",
       });
+      resetForm();
       setIsDialogOpen(false);
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -85,11 +86,24 @@ function InviteUserDialog() {
       setSubmitted(false);
     });
   };
-
+  const resetForm = () => {
+    setValues({
+      firstName: "",
+      lastName: "",
+      email: "",
+      userType: "DEFAULT",
+    });
+    setSubmitted(false);
+  };
   return (
     <Dialog
       open={isDialogOpen}
-      onOpenChange={() => setIsDialogOpen(!isDialogOpen)}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          resetForm();
+        }
+        setIsDialogOpen(isOpen);
+      }}
     >
       <DialogTrigger asChild>
         <Button id="inviteNewUserButton">&#9993; Invite new user</Button>
