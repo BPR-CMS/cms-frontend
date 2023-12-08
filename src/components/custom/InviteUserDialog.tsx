@@ -32,13 +32,22 @@ function InviteUserDialog() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const closeDialogButtonRef = useRef<HTMLButtonElement | null>(null);
-  const { values, errors, isValid, handleChange } = useFormWithValidation({
-    firstName: "",
-    lastName: "",
-    email: "",
-  });
+  const { values, errors, isValid, handleChange, setValues } =
+    useFormWithValidation({
+      firstName: "",
+      lastName: "",
+      email: "",
+      userType: "DEFAULT",
+    });
   const { toast } = useToast();
 
+  const handleUserTypeChange = (userType: string) => {
+    // Update the form state with the new userType
+    setValues((prevValues) => ({
+      ...prevValues,
+      userType: userType,
+    }));
+  };
   const sendInvitation = async (userData: User) => {
     try {
       await inviteUser(userData);
@@ -69,6 +78,7 @@ function InviteUserDialog() {
       firstName: values.firstName,
       lastName: values.lastName,
       email: values.email,
+      userType: values.userType,
     };
 
     sendInvitation(userData).finally(() => {
@@ -139,8 +149,8 @@ function InviteUserDialog() {
               <Label className="flex mb-4">Role</Label>
               <Select
                 required
-                // value={userRole}
-                // onValueChange={(value: string) => setUserRole(value)}
+                value={values.userType}
+                onValueChange={handleUserTypeChange}
               >
                 <SelectTrigger className="w-[380px]">
                   <SelectValue placeholder="Choose here" />
