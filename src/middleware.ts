@@ -10,7 +10,8 @@ export function middleware(request: NextRequest) {
   if (
     pathname.startsWith("/_next") ||
     pathname === "/sign-in" ||
-    pathname === "/sign-up"
+    pathname === "/sign-up" ||
+    pathname === "/"
   ) {
     return NextResponse.next();
   }
