@@ -1,5 +1,6 @@
 import axios from "axios";
 import { User } from "@/models/User";
+import Cookies from "js-cookie";
 
 const BASE_URL = "http://localhost:8080/api/v1/users";
 let TOKEN = "";
@@ -97,4 +98,5 @@ export const logoutUser = (): void => {
   if (typeof window !== "undefined") {
     window.localStorage.removeItem("token");
   }
+  Cookies.remove("token");
 };
