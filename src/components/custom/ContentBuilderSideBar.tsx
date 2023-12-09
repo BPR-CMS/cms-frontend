@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Collection } from "@/models/Collection";
 import { useToast } from "@/hooks/use-toast";
@@ -23,7 +23,7 @@ function ContentBuilderSideBar({
     useState<Collection | null>(null);
 
   const { toast } = useToast();
-  const { collections } = useContext(CollectionsContext);
+  const { collections, fetchCollections } = useContext(CollectionsContext);
 
   const generateContentTypeUrl = (contentType: Collection) => {
     let basePath;
@@ -39,7 +39,9 @@ function ContentBuilderSideBar({
     const url = generateContentTypeUrl(contentType);
     return pathname.startsWith(url);
   };
-  
+  useEffect(() => {
+    fetchCollections();
+  }, [fetchCollections]);
   return (
     <div className="h-full md:w-72 md:flex-col md:fixed md:inset-y-0 z-80 border-r border-gray-300">
       <div className="space-y-4 py-4 flex flex-col h-full text-white">

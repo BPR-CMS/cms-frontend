@@ -99,4 +99,5 @@ export const logoutUser = (): void => {
     window.localStorage.removeItem("token");
   }
   Cookies.remove("token");
+  
 };

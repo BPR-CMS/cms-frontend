@@ -1,15 +1,47 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
-  import { useRouter } from "next/navigation";
+import { ArrowRight, LucideIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 
 import { tools } from "@/utils/constants";
+import Cookies from "js-cookie";
+import { parseJwt } from "@/utils/auth";
+import { useEffect, useState } from "react";
+interface Tool {
+  label: string;
+  icon: LucideIcon;
+  href: string;
+  color: string;
+  bgColor: string;
+}
 
 export default function HomePage() {
   const router = useRouter();
+  const [userRole, setUserRole] = useState("DEFAULT");
+  const [accessibleTools, setAccessibleTools] = useState<Tool[]>([]);
+
+  useEffect(() => {
+    const token = Cookies.get("token");
+    const payload = token ? parseJwt(token) : null;
+    const role = payload ? payload._userRole : "DEFAULT";
+    setUserRole(role);
+
+    const newAccessibleTools = tools.filter((tool) => {
+      if (role === "ADMIN") {
+        return true; // Admin has access to all tools
+      } else if (role === "EDITOR") {
+        return !["/content-type-builder", "/settings"].includes(tool.href);
+      } else if (role === "DEFAULT") {
+        return ["/dashboard"].includes(tool.href);
+      }
+      return false;
+    });
+
+    setAccessibleTools(newAccessibleTools);
+  }, []);
 
   return (
     <div>
@@ -22,7 +54,7 @@ export default function HomePage() {
         </p>
       </div>
       <div className="px-4 md:px-20 lg:px-32 space-y-4">
-        {tools.map((tool) => (
+        {accessibleTools.map((tool) => (
           <Card
             onClick={() => router.push(tool.href)}
             key={tool.href}

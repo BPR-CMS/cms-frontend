@@ -2,17 +2,20 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getUserById } from "../services/UserService";
 import { User } from "@/models/User";
+import Cookies from "js-cookie";
 interface AuthContextType {
   user: User | null;
   isAuthenticated: () => boolean;
   setUserAuthenticated: (user: User) => void;
+  resetUser: () => void;
 }
 
 // Create the context with the defined interface
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User | null>(null);
+
   const parseJwt = (token: string) => {
     try {
       return JSON.parse(atob(token.split(".")[1]));
@@ -26,13 +29,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   const getUserIdFromToken = () => {
-    const token = localStorage.getItem("token");
+    const token = Cookies.get("token");
     if (!token) {
-      console.log("No token found in localStorage");
+      console.log("No token found");
       return null;
     }
     const decodedToken = parseJwt(token);
-    console.log('decoded')
+    console.log("decoded");
     console.log(decodedToken);
     return decodedToken ? decodedToken._id : null;
   };
@@ -52,21 +55,21 @@ export const AuthProvider = ({ children }) => {
         console.error("Error fetching user data:", error);
       }
     };
-  
+
     fetchUserData();
   }, []);
-  
+
+  const resetUser = () => {
+    setUser(null); // Reset the user state
+  };
 
   const isAuthenticated: () => boolean = () => {
-    if (typeof window !== 'undefined') {
-      return !!window.localStorage.getItem("token");
-    }
-    return false;
+    return !!Cookies.get("token");
   };
-  
+
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, setUserAuthenticated }}
+      value={{ user, isAuthenticated, setUserAuthenticated, resetUser }}
     >
       {children}
     </AuthContext.Provider>
@@ -76,8 +79,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === null) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
-
