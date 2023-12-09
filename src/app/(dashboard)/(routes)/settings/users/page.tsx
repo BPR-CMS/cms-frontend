@@ -11,14 +11,17 @@ import { useToast } from "@/hooks/use-toast";
 export default function UsersPage() {
   const { toast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const fetchUsers = async () => {
     try {
+      setIsLoading(true);
       const allUsers = await getUsers();
       const createdUsers = allUsers.filter(
         (user) => user.accountStatus === "CREATED"
       );
 
       setUsers(createdUsers);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast({
@@ -26,6 +29,7 @@ export default function UsersPage() {
         description: "Failed to fetch users.",
         variant: "destructive",
       });
+      setIsLoading(false);
     }
   };
 
@@ -36,7 +40,6 @@ export default function UsersPage() {
   return (
     <div>
       <div className=" mt-4">
-        <SettingsSideBar />
         <div className="flex-grow md:ml-72 mt-4 flex p-10 px-14">
           <div className="flex-grow">
             <h1 className="text-2xl leading-tight font-semibold text-black">
@@ -54,7 +57,7 @@ export default function UsersPage() {
         <div className="pl-56 pr-56">
           <div className="mt-6">
             <div className=" mx-auto ">
-              <UsersTable users={users} />
+              {isLoading ? <p>Loading...</p> : <UsersTable users={users} />}
             </div>
           </div>
         </div>

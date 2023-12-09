@@ -11,6 +11,7 @@ import { loginUser } from "@/services/UserService";
 import { AxiosError } from "axios";
 import { getErrors } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 const Login = () => {
   const { values, errors, isValid, handleChange } = useFormWithValidation({
     email: "",
@@ -25,7 +26,9 @@ const Login = () => {
       const response = await loginUser(userData);
       const token = response;
       if (token) {
+        Cookies.set("token", token); 
         localStorage.setItem("token", token);
+        console.log('the token')
       }
       console.log(token);
       toast({

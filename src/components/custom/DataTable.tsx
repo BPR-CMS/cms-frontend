@@ -22,7 +22,7 @@ interface DataTableProps<TData, TValue> {
   id: string;
   renderButton?: (rowData: TData) => React.ReactNode;
   onButtonClick?: (rowData: TData) => () => void;
-  defaultButtonLabel: string;
+  defaultButtonLabel?: string;
   onRowClick?: (rowData: TData) => void;
 }
 

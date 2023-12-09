@@ -69,7 +69,7 @@ export const CollectionsProvider = ({ children }) => {
 
   return (
     <CollectionsContext.Provider
-      value={{ collections, updateCollection, fetchCollections }}
+      value={{ collections, updateCollection, fetchCollections, isAuthenticated }}
     >
       {children}
     </CollectionsContext.Provider>

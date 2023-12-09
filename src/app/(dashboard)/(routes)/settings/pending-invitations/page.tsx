@@ -6,29 +6,35 @@ import { getUsers } from "@/services/UserService";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PendingInvitationsTable } from "@/components/PendingInvitationsTable";
-import { isTokenExpired, resendInvitation } from "@/services/EmailInvitationService";
+import {
+  isTokenExpired,
+  resendInvitation,
+} from "@/services/EmailInvitationService";
 export default function PendingInvitationsPage() {
   const { toast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const fetchUsers = async () => {
     try {
+      setIsLoading(true);
       const allUsers = await getUsers();
       const pendingUsers = allUsers.filter(
         (user) => user.accountStatus === "PENDING"
       );
-  
+
       // Fetch expiration status for each user concurrently
       const expirationStatuses = await Promise.all(
-        pendingUsers.map(user => isTokenExpired(user.userId!))
+        pendingUsers.map((user) => isTokenExpired(user.userId!))
       );
-  
+
       // Update each user object with the fetched status
       pendingUsers.forEach((user, index) => {
         user.isTokenExpired = expirationStatuses[index];
-        console.log(user.isTokenExpired)
+        console.log(user.isTokenExpired);
       });
-  
+
       setUsers(pendingUsers);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast({
@@ -36,9 +42,9 @@ export default function PendingInvitationsPage() {
         description: "Failed to fetch users.",
         variant: "destructive",
       });
+      setIsLoading(false);
     }
   };
-  
 
   useEffect(() => {
     fetchUsers();
@@ -81,7 +87,6 @@ export default function PendingInvitationsPage() {
   return (
     <div>
       <div className=" mt-4">
-        <SettingsSideBar />
         <div className="flex-grow md:ml-72 mt-4 flex p-10 px-14">
           <div className="flex-grow">
             <h1 className="text-2xl leading-tight font-semibold text-black">
@@ -98,11 +103,15 @@ export default function PendingInvitationsPage() {
         <div className="pl-56 pr-56">
           <div className="mt-6">
             <div className=" mx-auto ">
-              <PendingInvitationsTable
-                users={users}
-                buttonLabel="Resend Invitation"
-                onButtonClick={handleButtonClick}
-              />
+              {isLoading ? (
+                <p>Loading...</p>
+              ) : (
+                <PendingInvitationsTable
+                  users={users}
+                  buttonLabel="Resend Invitation"
+                  onButtonClick={handleButtonClick}
+                />
+              )}
             </div>
           </div>
         </div>

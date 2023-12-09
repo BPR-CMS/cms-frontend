@@ -1,5 +1,6 @@
 import axios from "axios";
 import { User } from "@/models/User";
+import Cookies from "js-cookie";
 
 const BASE_URL = "http://localhost:8080/api/v1/users";
 let TOKEN = "";
@@ -63,4 +64,40 @@ export const getUserById = async (userId: string): Promise<User> => {
   } catch (error) {
     throw error;
   }
+};
+
+export const updateUser = async (
+  userId: string,
+  updateData: Partial<User>
+): Promise<User> => {
+  try {
+    const response = await axios.patch(`${BASE_URL}/${userId}`, updateData, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteUser = async (userId: string): Promise<void> => {
+  try {
+    await axios.delete(`${BASE_URL}/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const logoutUser = (): void => {
+  if (typeof window !== "undefined") {
+    window.localStorage.removeItem("token");
+  }
+  Cookies.remove("token");
+  
 };
