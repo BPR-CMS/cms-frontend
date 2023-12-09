@@ -7,7 +7,11 @@ export function middleware(request: NextRequest) {
   const isAuthenticated = request.cookies.get("token") !== undefined;
 
   // Allow the requests for the sign-in page or static files
-  if (pathname.startsWith("/_next") || pathname === "/sign-in") {
+  if (
+    pathname.startsWith("/_next") ||
+    pathname === "/sign-in" ||
+    pathname === "/sign-up"
+  ) {
     return NextResponse.next();
   }
 
