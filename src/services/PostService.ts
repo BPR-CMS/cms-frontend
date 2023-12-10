@@ -82,3 +82,18 @@ export const updatePost = async (
     throw error;
   }
 };
+
+export const deletePost = async (postId: string): Promise<void> => {
+  try {
+    await axios.delete(
+      `${BASE_URL}/posts/${postId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      }
+    );
+  } catch (error) {
+    throw error;
+  }
+};
