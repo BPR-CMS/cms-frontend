@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import FormFieldGroup from "./custom/FormFieldGroup";
+import { getStepValue } from "@/lib/utils";
 type CheckboxStateValues = boolean | string;
 export type SettingsTabsProps = {
   selectedField: any;
@@ -48,7 +49,9 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
     <Tabs defaultValue="basic">
       <TabsList className="flex justify-end">
         <TabsTrigger value="basic">Basic settings</TabsTrigger>
-        <TabsTrigger id="advanced" value="advanced">Advanced settings</TabsTrigger>
+        <TabsTrigger id="advanced" value="advanced">
+          Advanced settings
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="basic">
         <div className=" mb-6 w-[400px]">
@@ -101,12 +104,18 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 <SelectValue placeholder="Choose here" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem id="integer" value="INTEGER">integer (ex: 10)</SelectItem>
+                <SelectItem id="integer" value="INTEGER">
+                  integer (ex: 10)
+                </SelectItem>
                 <SelectItem id="bigInteger" value="BIGINTEGER">
                   big integer (ex: 123456789)
                 </SelectItem>
-                <SelectItem  id="decimal" value="DECIMAL">decimal (ex: 2.22)</SelectItem>
-                <SelectItem id="float" value="FLOAT">float (ex: 3.33333333)</SelectItem>
+                <SelectItem id="decimal" value="DECIMAL">
+                  decimal (ex: 2.22)
+                </SelectItem>
+                <SelectItem id="float" value="FLOAT">
+                  float (ex: 3.33333333)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -124,11 +133,15 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 <SelectValue placeholder="Choose here" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem id="date" value="DATE">date (ex: 01/01/2023)</SelectItem>
+                <SelectItem id="date" value="DATE">
+                  date (ex: 01/01/2023)
+                </SelectItem>
                 <SelectItem id="dateTime" value="DATETIME">
                   datetime (ex: 01/01/2023 00:00 AM)
                 </SelectItem>
-                <SelectItem id="time" value="TIME">time (ex: 00:00 AM)</SelectItem>
+                <SelectItem id="time" value="TIME">
+                  time (ex: 00:00 AM)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -277,6 +290,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 value={values.defaultValue}
                 onChangeInput={handleChange}
                 error={errors.defaultValue}
+                step={getStepValue(numberFormat || "INTEGER")}
               />
             </div>
             <div className="flex items-center space-x-2 mb-4">
@@ -326,7 +340,13 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 label="Default value"
                 name="defaultValue"
                 id="defaultValue"
-                type="date"
+                type={
+                  dateType === "DATE"
+                    ? "date"
+                    : dateType === "DATETIME"
+                    ? "datetime-local"
+                    : "time"
+                }
                 value={values.defaultValue}
                 onChangeInput={handleChange}
                 error={errors.defaultValue}
