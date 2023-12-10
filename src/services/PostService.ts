@@ -61,3 +61,24 @@ export const getPostById = async (id: string): Promise<Post> => {
     throw error;
   }
 };
+
+export const updatePost = async (
+  collectionId: string,
+  postId: string,
+  postData: Partial<Post>
+): Promise<Post> => {
+  try {
+    const response = await axios.patch(
+      `${BASE_URL}/posts/${collectionId}/${postId}`,
+      postData,
+      {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
