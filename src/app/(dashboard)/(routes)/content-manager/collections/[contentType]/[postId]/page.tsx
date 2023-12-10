@@ -74,7 +74,8 @@ const PostDetailsPage = ({ params }: Params) => {
     const richTextFieldsValid = collection.attributes.every((attr) => {
       if (attr.contentType === "RICHTEXT" && attr.required) {
         const content = richTextFieldValues[attr.name] || "";
-        return content.trim() !== "";
+        const isEmpty = content.replace(/<[^>]*>/g, "").trim() === "";
+        return !isEmpty;
       }
       return true;
     });
@@ -189,6 +190,27 @@ const PostDetailsPage = ({ params }: Params) => {
       ...prevErrors,
       [attributeId]: errorMessage,
     }));
+
+    setIsFormValid(validateForm());
+  };
+
+  const handleRichTextFieldChange = (
+    attributeName: string,
+    content: string
+  ) => {
+    const attribute = collection?.attributes.find(
+      (attr) => attr.name === attributeName
+    );
+    if (attribute) {
+      setRichTextFieldValues((prev) => ({ ...prev, [attributeName]: content }));
+      validateRichTextField(
+        attribute.attributeId,
+        content,
+        attribute.required ?? false,
+        attribute.minimumLength ?? 0,
+        attribute.maximumLength ?? Infinity
+      );
+    }
   };
 
   const renderFormField = (attribute: Attribute) => {
@@ -285,20 +307,9 @@ const PostDetailsPage = ({ params }: Params) => {
                 <ReactQuill
                   theme="snow"
                   value={richTextFieldValues[attribute.name] || ""}
-                  onChange={(content) => {
-                    setRichTextFieldValues({
-                      ...richTextFieldValues,
-                      [attribute.name]: content,
-                    });
-                    setIsFormValid(validateForm());
-                    validateRichTextField(
-                      collectionAttribute.attributeId,
-                      content,
-                      collectionAttribute?.required ?? false, // Default to false if undefined
-                      collectionAttribute?.minimumLength ?? 0, // Default to 0 if undefined
-                      collectionAttribute?.maximumLength ?? Infinity // Default to Infinity if undefined
-                    );
-                  }}
+                  onChange={(content) =>
+                    handleRichTextFieldChange(attribute.name, content)
+                  }
                 />
               </div>
             </div>
@@ -390,7 +401,7 @@ const PostDetailsPage = ({ params }: Params) => {
   useEffect(() => {
     const isFormNowValid = validateForm();
     setIsFormValid(isFormNowValid);
-  }, [collection, values, errors, richTextFieldsValidity]);
+  }, [values, errors, richTextFieldValues, collection]);
 
   const handleDeletePost = async (postId: string) => {
     try {

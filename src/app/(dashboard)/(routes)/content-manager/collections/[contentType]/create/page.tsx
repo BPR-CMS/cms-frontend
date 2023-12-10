@@ -27,7 +27,9 @@ const CreateEntryPage = ({ params }: Params) => {
   const [collection, setCollection] = useState(null);
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [richTextFieldValues, setRichTextFieldValues] = useState<Record<string, string>>({});
+  const [richTextFieldValues, setRichTextFieldValues] = useState<
+    Record<string, string>
+  >({});
 
   const [richTextErrors, setRichTextErrors] = useState({});
   const [showRichTextErrorTooltip, setShowRichTextErrorTooltip] =
@@ -35,6 +37,7 @@ const CreateEntryPage = ({ params }: Params) => {
   const [isFormValid, setIsFormValid] = useState(isValid);
   const [richTextFieldsValidity, setRichTextFieldsValidity] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmittedSuccessfully, setIsSubmittedSuccessfully] = useState(false);
   const { contentType } = params;
   const hasRichText =
     collection &&
@@ -113,6 +116,7 @@ const CreateEntryPage = ({ params }: Params) => {
 
     try {
       const response = await addPost(collection.id, payload);
+      setIsSubmittedSuccessfully(true);
       console.log("Post created:", response);
       console.log(payload);
       setCreator(user);
@@ -282,6 +286,7 @@ const CreateEntryPage = ({ params }: Params) => {
                               minLength={attribute.minimumLength}
                               minValue={attribute.minValue}
                               maxValue={attribute.maxValue}
+                              readonly={isSubmittedSuccessfully}
                             />
                           </div>
                         </FormGrid>
@@ -299,6 +304,7 @@ const CreateEntryPage = ({ params }: Params) => {
                               {" "}
                               <ReactQuill
                                 theme="snow"
+                                readOnly={isSubmittedSuccessfully}
                                 value={
                                   richTextFieldValues[attribute.name] ||
                                   "" ||
@@ -357,6 +363,7 @@ const CreateEntryPage = ({ params }: Params) => {
                               maxLength={attribute.maximumLength}
                               minLength={attribute.minimumLength}
                               error={errors[attribute.name] || ""}
+                              readonly={isSubmittedSuccessfully}
                             />
                           </div>
                         </FormGrid>
@@ -381,6 +388,7 @@ const CreateEntryPage = ({ params }: Params) => {
                               maxLength={attribute.maximumLength}
                               error={errors[attribute.name] || ""}
                               step={stepValue}
+                              readonly={isSubmittedSuccessfully}
                             />
                           </div>
                         </FormGrid>
