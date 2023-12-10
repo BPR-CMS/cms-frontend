@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import ContentBuilderSideBar from "@/components/custom/ContentBuilderSideBar";
 import FormFieldGroup from "@/components/custom/FormFieldGroup";
 import FormGrid from "@/components/custom/FormGrid";
 import { Button } from "@/components/ui/Button";
@@ -8,24 +7,81 @@ import { getCollectionByApiId } from "@/services/CollectionService";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import { getInputType } from "@/lib/utils";
 import ReactQuill from "react-quill";
+import { FaExclamationCircle } from "react-icons/fa";
 import "react-quill/dist/quill.snow.css";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { getStepValue } from "@/lib/utils";
-import { getPostById } from "@/services/PostService";
+import { deletePost, getPostById, updatePost } from "@/services/PostService";
 import { Post } from "@/models/Post";
 import { getUserById } from "@/services/UserService";
 import { User } from "@/models/User";
 import { Attribute } from "@/models/Attribute";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import { AxiosError } from "axios";
+import { getErrors } from "@/lib/utils";
+import { Collection } from "@/models/Collection";
+import DeletePostDialog from "@/components/custom/DeletePostDialog";
+
+type FormValues = {
+  [key: string]: string;
+};
+
 const PostDetailsPage = ({ params }: Params) => {
   const router = useRouter();
+  const { toast } = useToast();
   const { values, errors, isValid, handleChange, setValues } =
-    useFormWithValidation({});
-  const [collection, setCollection] = useState(null);
+    useFormWithValidation<FormValues>({});
+  const [collection, setCollection] = useState<Collection>();
   const [error, setError] = useState("");
   const { contentType, postId } = params;
   const [post, setPost] = useState<Post>();
   const [user, setUser] = useState<User>();
+  const [richTextFieldValues, setRichTextFieldValues] = useState<
+    Record<string, string>
+  >({});
+
+  const [richTextErrors, setRichTextErrors] = useState<Record<string, string>>(
+    {}
+  );
+  const [richTextFieldsValidity, setRichTextFieldsValidity] = useState({});
+  const [showRichTextErrorTooltip, setShowRichTextErrorTooltip] =
+    useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(isValid);
+
+  const toggleRichTextErrorTooltip = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+    setShowRichTextErrorTooltip(!showRichTextErrorTooltip);
+  };
+
+  const validateForm = () => {
+    if (!collection) {
+      return false;
+    }
+
+    // Check regular fields validity
+    const regularFieldsValid = collection.attributes.every((attr) => {
+      if (attr.contentType !== "RICHTEXT" && attr.required) {
+        return values[attr.name] && !errors[attr.name];
+      }
+      return true;
+    });
+
+    // Check rich text fields validity
+    const richTextFieldsValid = collection.attributes.every((attr) => {
+      if (attr.contentType === "RICHTEXT" && attr.required) {
+        const content = richTextFieldValues[attr.name] || "";
+        const isEmpty = content.replace(/<[^>]*>/g, "").trim() === "";
+        return !isEmpty;
+      }
+      return true;
+    });
+
+    return regularFieldsValid && richTextFieldsValid;
+  };
 
   useEffect(() => {
     if (contentType) {
@@ -55,7 +111,7 @@ const PostDetailsPage = ({ params }: Params) => {
 
           // Merges content types from the collection into post attributes
           const mergedAttributes = collection.attributes.map(
-            (collectionAttr) => {
+            (collectionAttr: any) => {
               const postAttr = data.attributes[collectionAttr.name];
               return {
                 name: collectionAttr.name,
@@ -66,6 +122,24 @@ const PostDetailsPage = ({ params }: Params) => {
           );
 
           setPost({ ...data, attributes: mergedAttributes });
+          const initialValues: FormValues = {};
+
+          mergedAttributes.forEach((attr) => {
+            initialValues[attr.name] = String(attr.value) || "";
+          });
+
+          setValues(initialValues);
+
+          const richTextValues: FormValues = {};
+          mergedAttributes.forEach((attr) => {
+            if (attr.contentType === "RICHTEXT") {
+              richTextValues[attr.name] = attr.value || "";
+            }
+          });
+
+          setRichTextFieldValues(richTextValues);
+          const isFormNowValid = validateForm();
+          setIsFormValid(isFormNowValid);
         })
         .catch((error) => {
           setError(
@@ -79,20 +153,91 @@ const PostDetailsPage = ({ params }: Params) => {
     router.back();
   };
 
+  const validateRichTextField = (
+    attributeId: string,
+    content: string,
+    isRequired: boolean,
+    minLength: number,
+    maxLength: number
+  ) => {
+    const isEmpty = content === "<p><br></p>" || content.trim() === "";
+    const contentLength = content.trim().length;
+
+    let errorMessage = "";
+    if (isRequired && isEmpty) {
+      errorMessage = "This field is required.";
+    } else if (
+      minLength !== undefined &&
+      minLength !== null &&
+      contentLength < minLength
+    ) {
+      errorMessage = `Minimum length of ${minLength} characters required.`;
+    } else if (
+      maxLength !== undefined &&
+      maxLength !== null &&
+      contentLength > maxLength
+    ) {
+      errorMessage = `Maximum length of ${maxLength} characters exceeded.`;
+    }
+
+    const valid = !errorMessage;
+    setRichTextFieldsValidity((prevState) => ({
+      ...prevState,
+      [attributeId]: valid,
+    }));
+
+    setRichTextErrors((prevErrors) => ({
+      ...prevErrors,
+      [attributeId]: errorMessage,
+    }));
+
+    setIsFormValid(validateForm());
+  };
+
+  const handleRichTextFieldChange = (
+    attributeName: string,
+    content: string
+  ) => {
+    const attribute = collection?.attributes.find(
+      (attr) => attr.name === attributeName
+    );
+    if (attribute) {
+      setRichTextFieldValues((prev) => ({ ...prev, [attributeName]: content }));
+      validateRichTextField(
+        attribute.attributeId,
+        content,
+        attribute.required ?? false,
+        attribute.minimumLength ?? 0,
+        attribute.maximumLength ?? Infinity
+      );
+    }
+  };
+
   const renderFormField = (attribute: Attribute) => {
-    const useTextarea = attribute.textType === "LONG";
-    const stepValue = getStepValue(attribute.formatType);
-    const isRequired = attribute.required;
+    if (!collection) {
+      console.error(`Collection ${collection} not found`);
+      return null;
+    }
+
+    const collectionAttribute = collection.attributes.find(
+      (attr) => attr.name === attribute.name
+    );
+    if (!collectionAttribute) {
+      console.error(`Attribute ${attribute.name} not found in collection`);
+      return null;
+    }
+    const stepValue = getStepValue(collectionAttribute.formatType || "any");
     const dateInputType = getInputType(
       attribute.contentType,
-      attribute.dateType
+      collectionAttribute.dateType || "DATE"
     );
 
-    const label = `${attribute.name}${isRequired ? " *" : ""}`;
-    console.log("Rendering field for:", attribute);
+    const useTextarea = collectionAttribute.textType === "LONG";
+    const isRequired = collectionAttribute.required;
+
+    const label = `${collectionAttribute.name}${isRequired ? " *" : ""}`;
     switch (attribute.contentType) {
       case "TEXT":
-        console.log("is text");
         if (useTextarea)
           return (
             <FormGrid>
@@ -103,11 +248,11 @@ const PostDetailsPage = ({ params }: Params) => {
                   id={attribute.name}
                   useTextarea={true}
                   type={getInputType(attribute.contentType)}
-                  value={attribute.value}
+                  value={values[attribute.name] || ""}
                   onChangeTextArea={handleChange}
-                  required={attribute.required}
-                  minLength={attribute.minimumLength}
-                  maxLength={attribute.maximumLength}
+                  required={collectionAttribute.required}
+                  minLength={collectionAttribute.minimumLength}
+                  maxLength={collectionAttribute.maximumLength}
                   error={errors[attribute.name] || ""}
                 />
               </div>
@@ -115,7 +260,6 @@ const PostDetailsPage = ({ params }: Params) => {
           );
 
       case "NUMBER":
-        console.log(attribute.value);
         return (
           <FormGrid>
             <div key={attribute.name} className="sm:col-span-3">
@@ -124,11 +268,11 @@ const PostDetailsPage = ({ params }: Params) => {
                 name={attribute.name}
                 id={attribute.name}
                 type={getInputType(attribute.contentType)}
-                value={attribute.value}
+                value={values[attribute.name] || ""}
                 onChangeInput={handleChange}
-                required={attribute.required}
-                minLength={attribute.minimumLength}
-                maxLength={attribute.maximumLength}
+                required={collectionAttribute.required}
+                minValue={collectionAttribute.minimumLength}
+                maxValue={collectionAttribute.maximumLength}
                 error={errors[attribute.name] || ""}
                 step={stepValue}
               />
@@ -136,7 +280,6 @@ const PostDetailsPage = ({ params }: Params) => {
           </FormGrid>
         );
       case "DATE":
-        console.log(attribute.value);
         return (
           <FormGrid>
             <div key={attribute.name} className="sm:col-span-3">
@@ -145,27 +288,139 @@ const PostDetailsPage = ({ params }: Params) => {
                 name={attribute.name}
                 id={attribute.name}
                 type={dateInputType}
-                value={attribute.value}
+                value={values[attribute.name] || ""}
                 onChangeInput={handleChange}
-                required={attribute.required}
+                required={collectionAttribute.required}
               />
             </div>
           </FormGrid>
         );
       case "RICHTEXT":
         return (
-          <div key={attribute.attributeId} className="sm:col-span-3 mt-4">
-            <label>{attribute.name}</label>
+          <div
+            key={collectionAttribute.attributeId}
+            className="sm:col-span-3 mt-4"
+          >
+            <label>{label}</label>
             <div className="p-2">
               <div className="max-w-4xl bg-white">
-                <ReactQuill theme="snow" value={attribute.value} />
+                <ReactQuill
+                  theme="snow"
+                  value={richTextFieldValues[attribute.name] || ""}
+                  onChange={(content) =>
+                    handleRichTextFieldChange(attribute.name, content)
+                  }
+                />
               </div>
             </div>
+            {richTextErrors[collectionAttribute.attributeId] && (
+              <button
+                className="mt-2 text-red-500 cursor-pointer relative p-1 border border-red-500 rounded hover:bg-red-100 focus:outline-none"
+                onClick={toggleRichTextErrorTooltip}
+              >
+                <FaExclamationCircle />
+                {showRichTextErrorTooltip && (
+                  <div className="absolute left-full top-0 mt-0 ml-2 w-48 p-2 bg-white text-sm text-red-500 border border-red-500 rounded-md shadow-md z-10">
+                    {richTextErrors[collectionAttribute.attributeId]}
+                  </div>
+                )}
+              </button>
+            )}
           </div>
         );
       default:
-        console.log("Default case hit", attribute);
         return null;
+    }
+  };
+
+  const updatePostDetails = async (postData: any) => {
+    if (!collection) {
+      console.error("Collection is null");
+      toast({
+        title: "Error",
+        description: "No collection data available.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await updatePost(collection.id, postId, postData);
+      toast({
+        title: "Success",
+        description: "Post updated successfully.",
+        variant: "success",
+      });
+      setSubmitted(false);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      const errorMessage = getErrors(axiosError);
+      console.error("Error updating post:", errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      setSubmitted(false);
+    }
+  };
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSubmitted(true);
+
+    if (!collection || !postId) {
+      console.error("Collection or Post ID is missing");
+      return;
+    }
+
+    // Converting number fields from string to number
+    const convertedValues: Record<string, string | number> = { ...values };
+    collection.attributes.forEach((attribute) => {
+      if (
+        attribute.contentType === "NUMBER" &&
+        convertedValues[attribute.name]
+      ) {
+        convertedValues[attribute.name] = Number(
+          convertedValues[attribute.name]
+        );
+      }
+    });
+
+    const combinedValues = {
+      ...convertedValues,
+      ...richTextFieldValues,
+    };
+
+    const payload = {
+      attributes: combinedValues,
+    };
+
+    updatePostDetails(payload);
+  };
+
+  useEffect(() => {
+    const isFormNowValid = validateForm();
+    setIsFormValid(isFormNowValid);
+  }, [values, errors, richTextFieldValues, collection]);
+
+  const handleDeletePost = async (postId: string) => {
+    try {
+      await deletePost(postId);
+      toast({
+        title: "Post Deleted",
+        description: "The post has been successfully deleted.",
+        variant: "success",
+      });
+      router.push(`/content-manager/collections/${collection?.name}`);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      const errorMessage = getErrors(axiosError);
+      console.error("Error deleting post:", errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     }
   };
 
@@ -195,12 +450,18 @@ const PostDetailsPage = ({ params }: Params) => {
               )}
             </div>
             <form
+              onSubmit={handleSubmit}
               id="entry-form"
               className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
               noValidate
             >
               <div className="flex items-center space-x-2">
-                <Button className="ml-auto">Publish</Button>
+                <Button
+                  disabled={submitted || !isFormValid}
+                  className="ml-auto"
+                >
+                  Update
+                </Button>
               </div>
               {post ? (
                 post.attributes.map((attribute) => renderFormField(attribute))
@@ -208,6 +469,15 @@ const PostDetailsPage = ({ params }: Params) => {
                 <p>Loading or no post data...</p> // Fallback content
               )}
             </form>
+
+            <div className="mt-4">
+              <DeletePostDialog
+                postId={postId}
+                onDelete={(postId) => {
+                  handleDeletePost(postId);
+                }}
+              />
+            </div>
           </div>
           {/* Sidebar Section */}
           <div className="  p-8 border-l self-center">

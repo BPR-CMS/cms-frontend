@@ -1,9 +1,10 @@
 export interface Attribute {
+  attributeId: string;
   name: string;
-  textType: string;
-  mediaType: string;
-  dateType: string;
-  formatType: string;
+  textType?: string;
+  mediaType?: string;
+  dateType?: DateType;
+  formatType?: string;
   contentType: AttributeType;
   minimumLength?: number;
   maximumLength?: number;
@@ -20,3 +21,5 @@ export enum AttributeType {
   Number = "NUMBER",
   Media = "MEDIA",
 }
+
+export type DateType = 'DATE' | 'DATETIME' | 'TIME'; 
