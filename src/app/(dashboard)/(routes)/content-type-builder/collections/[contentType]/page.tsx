@@ -25,6 +25,8 @@ import DetailedView from "@/components/DetailedView";
 import GridView from "@/components/GridView";
 import { CollectionFieldsTable } from "@/components/CollectionFieldsTable";
 import CollectionsContext from "@/contexts/CollectionsContext";
+import { AxiosError } from "axios";
+import { getErrors } from "@/lib/utils";
 export default function ContentTypePage({ params }: Params) {
   const { contentType } = params;
 
@@ -107,16 +109,17 @@ export default function ContentTypePage({ params }: Params) {
         });
         resetDialog();
       } catch (error) {
+        const axiosError = error as AxiosError;
+        const errorMessage = getErrors(axiosError);
         console.error("Error adding new field:", error);
 
         toast({
           title: "Error",
-          description: "Failed to add new field.",
+          description: errorMessage,
           variant: "destructive",
         });
       }
     } else {
-      console.log("error");
       toast({
         title: "Error",
         description: "Please select a field type.",

@@ -225,7 +225,15 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 value={values.maximumLength}
                 onChangeInput={handleChange}
                 error={errors.maximumLength}
+                placeholder={
+                  textType === "SHORT" ? "Max 50 characters allowed" : ""
+                }
               />
+              {textType === "SHORT" && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Maximum length allowed for short text is 50 characters.
+                </p>
+              )}
             </div>
             <div className="col-span-full">
               <FormFieldGroup
