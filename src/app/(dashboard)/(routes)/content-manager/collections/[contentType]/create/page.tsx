@@ -27,7 +27,8 @@ const CreateEntryPage = ({ params }: Params) => {
   const [collection, setCollection] = useState(null);
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [richTextFieldValues, setRichTextFieldValues] = useState({});
+  const [richTextFieldValues, setRichTextFieldValues] = useState<Record<string, string>>({});
+
   const [richTextErrors, setRichTextErrors] = useState({});
   const [showRichTextErrorTooltip, setShowRichTextErrorTooltip] =
     useState(false);
