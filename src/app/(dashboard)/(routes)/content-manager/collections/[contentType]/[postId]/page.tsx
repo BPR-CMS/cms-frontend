@@ -11,7 +11,7 @@ import { FaExclamationCircle } from "react-icons/fa";
 import "react-quill/dist/quill.snow.css";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { getStepValue } from "@/lib/utils";
-import { getPostById, updatePost } from "@/services/PostService";
+import { deletePost, getPostById, updatePost } from "@/services/PostService";
 import { Post } from "@/models/Post";
 import { getUserById } from "@/services/UserService";
 import { User } from "@/models/User";
@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
 import { getErrors } from "@/lib/utils";
 import { Collection } from "@/models/Collection";
+import DeletePostDialog from "@/components/custom/DeletePostDialog";
 
 type FormValues = {
   [key: string]: string;
@@ -391,6 +392,27 @@ const PostDetailsPage = ({ params }: Params) => {
     setIsFormValid(isFormNowValid);
   }, [collection, values, errors, richTextFieldsValidity]);
 
+  const handleDeletePost = async (postId: string) => {
+    try {
+      await deletePost(postId);
+      toast({
+        title: "Post Deleted",
+        description: "The post has been successfully deleted.",
+        variant: "success",
+      });
+      router.push(`/content-manager/collections/${collection?.name}`);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      const errorMessage = getErrors(axiosError);
+      console.error("Error deleting post:", errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="md:flex">
       <div className="flex-grow md:ml-72 mt-4">
@@ -436,6 +458,15 @@ const PostDetailsPage = ({ params }: Params) => {
                 <p>Loading or no post data...</p> // Fallback content
               )}
             </form>
+
+            <div className="mt-4">
+              <DeletePostDialog
+                postId={postId}
+                onDelete={(postId) => {
+                  handleDeletePost(postId);
+                }}
+              />
+            </div>
           </div>
           {/* Sidebar Section */}
           <div className="  p-8 border-l self-center">
