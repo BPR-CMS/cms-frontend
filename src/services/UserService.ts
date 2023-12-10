@@ -12,6 +12,11 @@ const getToken = () => {
   return "";
 };
 
+export const checkUserAuthenticated = (): boolean => {
+  const token = getToken();
+  return !!token;
+};
+
 export const loginUser = async (data: User): Promise<User> => {
   try {
     const response = await axios.post(`${BASE_URL}/login`, data);
@@ -99,5 +104,4 @@ export const logoutUser = (): void => {
     window.localStorage.removeItem("token");
   }
   Cookies.remove("token");
-  
 };

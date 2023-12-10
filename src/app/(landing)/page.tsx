@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { checkAdminExists } from "@/services/AdminService";
 import AdminRegistration from "@/components/AdminRegistration";
+import { checkUserAuthenticated } from "@/services/UserService";
 
 const LandingPage = () => {
   const router = useRouter();
@@ -11,26 +12,32 @@ const LandingPage = () => {
 
   useEffect(() => {
     async function fetchData() {
-      // Check local storage for the adminExists value
+      const isAuthenticated = await checkUserAuthenticated(); // Check if user is authenticated
+      if (isAuthenticated) {
+        router.push("/dashboard"); // Redirect to dashboard if authenticated
+        return;
+      }
+
       const adminExistsInLocalStorage = localStorage.getItem("adminExists");
       if (adminExistsInLocalStorage !== null) {
         setAdminExists(adminExistsInLocalStorage === "true");
-        return; // If found in local storage, skip the API call
+        return;
       }
 
       const result = await checkAdminExists();
-      localStorage.setItem("adminExists", result.toString()); // Convert to string before storing
+      localStorage.setItem("adminExists", result.toString());
       setAdminExists(result);
     }
 
     fetchData();
-  }, []);
+  }, [router]);
+
   useEffect(() => {
     if (adminExists) {
       router.push("/sign-in");
     }
-  }, [adminExists]);
-  //   If adminExists state is null, don't render anything
+  }, [adminExists, router]);
+
   if (adminExists === null) {
     return null;
   }
