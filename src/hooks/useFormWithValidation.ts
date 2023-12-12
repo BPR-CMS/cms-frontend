@@ -1,9 +1,11 @@
 import { useState, ChangeEvent } from "react";
 type FormValues = {
-  [key: string]: string; // Or be more specific about the value type if possible
+  [key: string]: string; 
 };
 
-export const useFormWithValidation = <T extends FormValues>(initialValues: T) => {
+export const useFormWithValidation = <T extends Record<string, any>>(
+  initialValues: T
+) => {
   const [values, setValues] = useState<T>(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isValid, setIsValid] = useState(false);

@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import FormFieldGroup from "./custom/FormFieldGroup";
-import { getStepValue } from "@/lib/utils";
+import { getStepValue } from "@/utils/utils";
 type CheckboxStateValues = boolean | string;
 export type SettingsTabsProps = {
   selectedField: any;
@@ -23,8 +23,6 @@ export type SettingsTabsProps = {
   setTextType: React.Dispatch<React.SetStateAction<string>>;
   dateType: string | undefined;
   setDateType: React.Dispatch<React.SetStateAction<string>>;
-  mediaType: string;
-  setMediaType: React.Dispatch<React.SetStateAction<string>>;
   checkboxStates: Record<string, CheckboxStateValues>;
   handleCheckboxChange: (name: string, checked: CheckboxStateValues) => void;
 };
@@ -40,8 +38,6 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
   setTextType,
   dateType,
   setDateType,
-  mediaType,
-  setMediaType,
   checkboxStates,
   handleCheckboxChange,
 }) => {
@@ -144,27 +140,6 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 </SelectItem>
               </SelectContent>
             </Select>
-          </div>
-        )}
-
-        {selectedField && selectedField.label === "Media" && (
-          <div>
-            <Label className="flex mb-4">Type</Label>
-            <RadioGroup
-              defaultValue="SINGLE"
-              value={mediaType}
-              className="flex justify-between w-[400px]"
-              onValueChange={(value: string) => setMediaType(value)}
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="MULTIPLE" id="multiple-media" />
-                <Label htmlFor="multiple-media">Multiple Media</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="SINGLE" id="single-media" />
-                <Label htmlFor="single-media">Single Media</Label>
-              </div>
-            </RadioGroup>
           </div>
         )}
       </TabsContent>

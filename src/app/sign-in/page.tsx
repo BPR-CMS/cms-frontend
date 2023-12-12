@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { User } from "@/models/User";
 import { loginUser } from "@/services/UserService";
 import { AxiosError } from "axios";
-import { getErrors } from "@/lib/utils";
+import { getErrors } from "@/utils/utils";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 const Login = () => {

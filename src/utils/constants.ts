@@ -4,7 +4,6 @@ import {
   WholeWordIcon,
   FileDigitIcon,
   CalendarIcon,
-  ImageIcon,
   SettingsIcon,
   FeatherIcon,
 } from "lucide-react";
@@ -65,14 +64,6 @@ export const fields = [
     icon: CalendarIcon,
     href: "/content-type-builder",
     description: "A date picker with hours, minutes and seconds",
-    color: "text-violet-500",
-    bgColor: "bg-violet-500/10",
-  },
-  {
-    label: "Media",
-    icon: ImageIcon,
-    href: "/content-type-builder",
-    description: "Files like images, videos, etc",
     color: "text-violet-500",
     bgColor: "bg-violet-500/10",
   },

@@ -14,7 +14,7 @@ const TokenInvalidMessage = () => {
           Token Invalid or Expired
         </h2>
         <p className="mt-4 text-sm sm:text-base md:text-lg text-gray-600">
-          We're sorry, but the link you've clicked on is no longer valid. This
+          We are sorry, but the link you have clicked on is no longer valid. This
           could have happened for a few reasons:
         </p>
 

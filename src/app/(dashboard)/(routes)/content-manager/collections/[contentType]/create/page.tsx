@@ -6,12 +6,12 @@ import FormGrid from "@/components/custom/FormGrid";
 import { Button } from "@/components/ui/Button";
 import { getCollectionByApiId } from "@/services/CollectionService";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
-import { getInputType } from "@/lib/utils";
+import { getInputType } from "@/utils/utils";
 import { useToast } from "@/hooks/use-toast";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
-import { getStepValue } from "@/lib/utils";
+import { getStepValue } from "@/utils/utils";
 import { FaExclamationCircle } from "react-icons/fa";
 import { addPost } from "@/services/PostService";
 import { useAuth } from "@/contexts/AuthContext";
@@ -268,7 +268,7 @@ const CreateEntryPage = ({ params }: Params) => {
                         attribute.dateType
                       );
                       return (
-                        <FormGrid>
+                        <FormGrid key={attribute.attributeId}>
                           <div key={attribute.name} className="sm:col-span-3">
                             <FormFieldGroup
                               label={label}
@@ -343,7 +343,7 @@ const CreateEntryPage = ({ params }: Params) => {
                       );
                     } else if (useTextarea) {
                       return (
-                        <FormGrid>
+                        <FormGrid key={attribute.attributeId}>
                           <div key={attribute.name} className="sm:col-span-3">
                             <FormFieldGroup
                               label={label}
@@ -370,7 +370,7 @@ const CreateEntryPage = ({ params }: Params) => {
                       );
                     } else {
                       return (
-                        <FormGrid>
+                        <FormGrid key={attribute.attributeId}>
                           <div key={attribute.name} className="sm:col-span-3">
                             <FormFieldGroup
                               label={label}

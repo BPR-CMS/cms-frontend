@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { Separator } from "@/components/ui/Separator";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import Link from "next/link";
 function SettingsSideBar() {
   const pathname = usePathname();

@@ -364,69 +364,13 @@ describe("Define content model", () => {
     cy.get(".destructive").should("contain.text", "Error");
   });
 
-  it("should add a new media field with both basic and advanced settings", () => {
-    cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
-    cy.get("#name").type("Collage");
-    cy.get("#multiple-media").click();
-    cy.get("#advanced").click();
-    cy.get("#required").click();
-
-    cy.get("#finishButton").should("be.enabled");
-    cy.get("#finishButton").click();
-
-    cy.get(".success")
-      .should("be.visible")
-      .contains("Field added successfully.");
-    cy.get("#fieldsTable").should("exist");
-    cy.get("#fieldsTable").contains("Collage");
-  });
-
-  it("should add a new media field with only basic settings", () => {
-    cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
-    cy.get("#name").type("Collage");
-    cy.get("#multiple-media").click();
-
-    cy.get("#finishButton").should("be.enabled");
-    cy.get("#finishButton").click();
-
-    cy.get(".success")
-      .should("be.visible")
-      .contains("Field added successfully.");
-    cy.get("#fieldsTable").should("exist");
-    cy.get("#fieldsTable").contains("Collage");
-  });
-
-  it("should not add a new media field with missing name", () => {
-    cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
-
-    cy.get("#multiple-media").click();
-
-    cy.get("#finishButton").should("be.disabled");
-  });
-
-  it("should not add a new media field with special characters in the name", () => {
-    cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
-    cy.get("#name").type("%Avatar&***&");
-
-    cy.get("#multiple-media").click();
-
-    cy.get("#finishButton").should("be.disabled");
-    cy.get("#error-button").should("be.visible").click();
-    cy.get("#error-tooltip")
-      .contains("Please match the format requested.")
-      .should("be.visible");
-  });
 
   it("should not add a new field with numeric values in the name", () => {
     cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
+    cy.get(".card").contains("Text").click();
     cy.get("#name").type("123");
 
-    cy.get("#multiple-media").click();
+    cy.get("#long-text").click();
 
     cy.get("#finishButton").should("be.disabled");
     cy.get("#error-button").should("be.visible").click();
@@ -447,24 +391,4 @@ describe("Define content model", () => {
     cy.get(".destructive").should("contain.text", "Error");
   });
 
-  it("should not add a new media field with duplicate name", () => {
-    cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
-    cy.get("#name").type("Collage");
-    cy.get("#multiple-media").click();
-
-    cy.get("#finishButton").should("be.enabled");
-    cy.get("#finishButton").click();
-
-    cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
-    cy.get("#name").type("Collage");
-    cy.get("#multiple-media").click();
-
-    cy.get("#finishButton").should("be.enabled");
-    cy.get("#finishButton").click();
-
-    cy.get(".destructive").should("be.visible");
-    cy.get(".destructive").should("contain.text", "Error");
-  });
 });

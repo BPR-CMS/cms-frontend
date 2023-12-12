@@ -1,8 +1,7 @@
 export interface Attribute {
-  attributeId: string;
+  attributeId?: string;
   name: string;
   textType?: string;
-  mediaType?: string;
   dateType?: DateType;
   formatType?: string;
   contentType: AttributeType;
@@ -19,7 +18,6 @@ export enum AttributeType {
   RichText = "RICHTEXT",
   Date = "DATE",
   Number = "NUMBER",
-  Media = "MEDIA",
 }
 
 export type DateType = 'DATE' | 'DATETIME' | 'TIME'; 

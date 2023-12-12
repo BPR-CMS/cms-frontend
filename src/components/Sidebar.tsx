@@ -11,7 +11,7 @@ import {
   SettingsIcon,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import { Button } from "./ui/Button";
 import { logoutUser } from "@/services/UserService";
 import { useRouter } from "next/navigation";

@@ -26,7 +26,7 @@ import GridView from "@/components/GridView";
 import { CollectionFieldsTable } from "@/components/CollectionFieldsTable";
 import CollectionsContext from "@/contexts/CollectionsContext";
 import { AxiosError } from "axios";
-import { getErrors } from "@/lib/utils";
+import { getErrors } from "@/utils/utils";
 export default function ContentTypePage({ params }: Params) {
   const { contentType } = params;
 
@@ -67,7 +67,6 @@ export default function ContentTypePage({ params }: Params) {
   const [currentView, setCurrentView] = useState("grid"); // 'grid' or 'detail'
   const [selectedField, setSelectedField] = useState(null);
   const [textType, setTextType] = useState<string>("SHORT");
-  const [mediaType, setMediaType] = useState<string>("SINGLE");
   const handleCardClick = useCallback((field: any) => {
     setSelectedField(field);
     setCurrentView("detail");
@@ -80,7 +79,6 @@ export default function ContentTypePage({ params }: Params) {
       const newField: Attribute = {
         name: values.name,
         textType: textType,
-        mediaType: mediaType,
         dateType: dateType,
         contentType: selectedFieldType,
         formatType: numberFormat,
@@ -229,8 +227,6 @@ export default function ContentTypePage({ params }: Params) {
                             setNumberFormat={setNumberFormat}
                             dateType={dateType}
                             setDateType={setDateType}
-                            mediaType={mediaType}
-                            setMediaType={setMediaType}
                             checkboxStates={checkboxStates}
                             handleCheckboxChange={handleCheckboxChange}
                           />

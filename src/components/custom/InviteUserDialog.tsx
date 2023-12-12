@@ -19,7 +19,7 @@ import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { User } from "@/models/User";
 import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
-import { getErrors } from "@/lib/utils";
+import { getErrors } from "@/utils/utils";
 import { Label } from "../ui/Label";
 import {
   Select,
