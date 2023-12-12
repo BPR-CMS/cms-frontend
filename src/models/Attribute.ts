@@ -7,10 +7,13 @@ export interface Attribute {
   contentType: AttributeType;
   minimumLength?: number;
   maximumLength?: number;
+  minimumValue?: number;
+  maximumValue?: number;
   maximumRichTextLength?: string;
-  required?: boolean;
-  unique?: boolean;
+  required?: boolean | string;
+  unique?: boolean | string;
   format?: string;
+  defaultValue?:string;
 }
 
 export enum AttributeType {

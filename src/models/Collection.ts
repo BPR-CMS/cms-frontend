@@ -1,8 +1,8 @@
 import { Attribute } from "./Attribute";
 
 export interface Collection {
-  id: string;
+  id?: string;
   name: string;
   description: string;
-  attributes: Attribute[]
+  attributes?: Attribute[]
 }

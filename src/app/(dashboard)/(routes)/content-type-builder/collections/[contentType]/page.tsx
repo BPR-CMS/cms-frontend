@@ -26,7 +26,7 @@ import GridView from "@/components/GridView";
 import { CollectionFieldsTable } from "@/components/CollectionFieldsTable";
 import CollectionsContext from "@/contexts/CollectionsContext";
 import { AxiosError } from "axios";
-import { getErrors } from "@/utils/utils";
+import { DateType, getErrors } from "@/utils/utils";
 export default function ContentTypePage({ params }: Params) {
   const { contentType } = params;
 
@@ -58,7 +58,7 @@ export default function ContentTypePage({ params }: Params) {
   const [selectedFieldType, setSelectedFieldType] =
     useState<AttributeType | null>(null);
   const [numberFormat, setNumberFormat] = useState<string>("INTEGER");
-  const [dateType, setDateType] = useState<string>("DATE");
+  const [dateType, setDateType] = useState<DateType>("DATE");
 
   const [fieldsData, setFieldsData] = useState<Attribute[]>([]);
   const { toast } = useToast();
@@ -84,17 +84,16 @@ export default function ContentTypePage({ params }: Params) {
         formatType: numberFormat,
         required: checkboxStates.required || false,
         unique: checkboxStates.unique || false,
-        minimumLength: values.minimumLength,
-        maximumLength: values.maximumLength,
+        minimumLength: parseInt(values.minimumLength) || undefined,
+        maximumLength: parseInt(values.maximumLength) || undefined,
         maximumRichTextLength: values.maximumRichTextLength,
-        minimumValue: values.minimumValue,
-        maximumValue: values.maximumValue,
+        minimumValue: parseFloat(values.minimumValue) || undefined,
+        maximumValue: parseFloat(values.maximumValue) || undefined,
         defaultValue: values.defaultValue,
       };
 
       try {
         await addAttributesToCollection(selectedContentType.id, newField);
-        console.log(newField);
         setFieldsData((prevFields) => [...prevFields, newField]);
         updateCollection(selectedContentType.id, newField);
 
@@ -145,6 +144,7 @@ export default function ContentTypePage({ params }: Params) {
       name: "",
       minimumLength: "",
       maximumLength: "",
+      maximumRichTextLength: "",
       minimumValue: "",
       maximumValue: "",
       defaultValue: "",

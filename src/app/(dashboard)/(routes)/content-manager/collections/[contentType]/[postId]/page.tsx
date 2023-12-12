@@ -120,8 +120,12 @@ const PostDetailsPage = ({ params }: Params) => {
               };
             }
           );
-
-          setPost({ ...data, attributes: mergedAttributes });
+          const attributesRecord: Record<string, Attribute> = {};
+          mergedAttributes.forEach(attr => {
+            attributesRecord[attr.name] = { ...attr };
+          });
+          
+          setPost({ ...data, attributes: attributesRecord });
           const initialValues: FormValues = {};
 
           mergedAttributes.forEach((attr) => {
@@ -161,7 +165,7 @@ const PostDetailsPage = ({ params }: Params) => {
   const validateRichTextField = (
     attributeId: string,
     content: string,
-    isRequired: boolean,
+    isRequired: boolean | string,
     minLength: number,
     maxLength: number
   ) => {
@@ -255,7 +259,7 @@ const PostDetailsPage = ({ params }: Params) => {
                   type={getInputType(attribute.contentType)}
                   value={values[attribute.name] || ""}
                   onChangeTextArea={handleChange}
-                  required={collectionAttribute.required}
+                  required={collectionAttribute.required? true : false}
                   minLength={collectionAttribute.minimumLength}
                   maxLength={collectionAttribute.maximumLength}
                   error={errors[attribute.name] || ""}
@@ -275,7 +279,7 @@ const PostDetailsPage = ({ params }: Params) => {
                 type={getInputType(attribute.contentType)}
                 value={values[attribute.name] || ""}
                 onChangeInput={handleChange}
-                required={collectionAttribute.required}
+                required={collectionAttribute.required? true : false}
                 minValue={collectionAttribute.minimumLength}
                 maxValue={collectionAttribute.maximumLength}
                 error={errors[attribute.name] || ""}
@@ -295,7 +299,7 @@ const PostDetailsPage = ({ params }: Params) => {
                 type={dateInputType}
                 value={values[attribute.name] || ""}
                 onChangeInput={handleChange}
-                required={collectionAttribute.required}
+                required={collectionAttribute.required? true : false}
               />
             </div>
           </FormGrid>
@@ -469,7 +473,10 @@ const PostDetailsPage = ({ params }: Params) => {
                 </Button>
               </div>
               {post ? (
-                post.attributes.map((attribute) => renderFormField(attribute))
+              post.attributes && Object.entries(post.attributes).map(([key, attribute]) => {
+                return renderFormField(attribute);
+              })
+              
               ) : (
                 <p>Loading or no post data...</p> // Fallback content
               )}

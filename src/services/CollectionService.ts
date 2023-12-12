@@ -25,7 +25,7 @@ export const addCollection = async (data: Collection): Promise<Collection> => {
   }
 };
 
-export const getCollections = async (): Promise<Collection> => {
+export const getCollections = async (): Promise<Collection[]> => {
   try {
     const response = await axios.get(`${BASE_URL}`, {
       headers: {

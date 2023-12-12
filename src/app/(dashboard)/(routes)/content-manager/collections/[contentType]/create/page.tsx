@@ -104,6 +104,8 @@ const CreateEntryPage = ({ params }: Params) => {
     const payload = {
       attributes: attributesPayload,
     };
+    console.log(payload)
+    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
     if (!isFormValid) {
       toast({

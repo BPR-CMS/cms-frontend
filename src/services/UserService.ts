@@ -17,7 +17,7 @@ export const checkUserAuthenticated = (): boolean => {
   return !!token;
 };
 
-export const loginUser = async (data: User): Promise<User> => {
+export const loginUser = async (data: User): Promise<string> => {
   try {
     const response = await axios.post(`${BASE_URL}/login`, data);
     return response.data;
