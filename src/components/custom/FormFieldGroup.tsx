@@ -74,6 +74,8 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
           rows={rows}
           cols={cols}
           className="mt-2"
+          minLength={minLength}
+          maxLength={maxLength}
 
           // ... other props for Textarea
         />

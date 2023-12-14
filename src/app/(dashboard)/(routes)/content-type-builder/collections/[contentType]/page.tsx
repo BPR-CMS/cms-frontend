@@ -11,7 +11,7 @@ import { Attribute, AttributeType } from "@/models/Attribute";
 import { Button } from "@/components/ui/Button";
 import { fields } from "@/utils/constants";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
-import { addAttributesToCollection } from "@/services/ContentModelService";
+import { addAttributeToCollection } from "@/services/ContentModelService";
 import {
   Dialog,
   DialogContent,
@@ -73,48 +73,58 @@ export default function ContentTypePage({ params }: Params) {
     setSelectedFieldType(field.label.toUpperCase());
   }, []);
 
+  // Function to create a new field object
+  const createNewField = () => ({
+    name: values.name,
+    textType: textType,
+    dateType: dateType,
+    contentType: selectedFieldType,
+    formatType: numberFormat,
+    required: checkboxStates.required || false,
+    unique: checkboxStates.unique || false,
+    minimumLength: parseInt(values.minimumLength) || undefined,
+    maximumLength: parseInt(values.maximumLength) || undefined,
+    maximumRichTextLength: values.maximumRichTextLength,
+    minimumValue: parseFloat(values.minimumValue) || undefined,
+    maximumValue: parseFloat(values.maximumValue) || undefined,
+    defaultValue: values.defaultValue,
+  });
+
+  // Function to handle successful submission
+  const onSuccessfulSubmission = async (newField) => {
+    await addAttributeToCollection(selectedContentType.id, newField);
+    setFieldsData((prevFields) => [...prevFields, newField]);
+    updateCollection(selectedContentType.id, newField);
+
+    setIsDialogOpen(false);
+    toast({
+      title: "Success",
+      description: "Field added successfully.",
+      variant: "success",
+    });
+    resetDialog();
+  };
+
+  // Function to handle errors
+  const handleError = (error) => {
+    const axiosError = error as AxiosError;
+    const errorMessage = getErrors(axiosError);
+    console.error("Error adding new field:", error);
+    toast({
+      title: "Error",
+      description: errorMessage,
+      variant: "destructive",
+    });
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (selectedFieldType) {
-      const newField: Attribute = {
-        name: values.name,
-        textType: textType,
-        dateType: dateType,
-        contentType: selectedFieldType,
-        formatType: numberFormat,
-        required: checkboxStates.required || false,
-        unique: checkboxStates.unique || false,
-        minimumLength: parseInt(values.minimumLength) || undefined,
-        maximumLength: parseInt(values.maximumLength) || undefined,
-        maximumRichTextLength: values.maximumRichTextLength,
-        minimumValue: parseFloat(values.minimumValue) || undefined,
-        maximumValue: parseFloat(values.maximumValue) || undefined,
-        defaultValue: values.defaultValue,
-      };
-
+      const newField = createNewField();
       try {
-        await addAttributesToCollection(selectedContentType.id, newField);
-        setFieldsData((prevFields) => [...prevFields, newField]);
-        updateCollection(selectedContentType.id, newField);
-
-        setIsDialogOpen(false);
-
-        toast({
-          title: "Success",
-          description: "Field added successfully.",
-          variant: "success",
-        });
-        resetDialog();
+        await onSuccessfulSubmission(newField);
       } catch (error) {
-        const axiosError = error as AxiosError;
-        const errorMessage = getErrors(axiosError);
-        console.error("Error adding new field:", error);
-
-        toast({
-          title: "Error",
-          description: errorMessage,
-          variant: "destructive",
-        });
+        handleError(error);
       }
     } else {
       toast({
@@ -160,7 +170,6 @@ export default function ContentTypePage({ params }: Params) {
         <div className="flex-grow md:ml-72 mt-4">
           <h2>{selectedContentType.name}</h2>
           <p>{selectedContentType.description}</p>
-
           <div className="pl-56 pr-56">
             <div className="mt-6">
               <div className="container mx-auto py-10">
@@ -168,7 +177,6 @@ export default function ContentTypePage({ params }: Params) {
                   attributes={attributes}
                   onAddFieldClick={() => setIsDialogOpen(true)}
                 />
-
                 <Dialog
                   open={isDialogOpen}
                   onOpenChange={() => {

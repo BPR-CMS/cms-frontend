@@ -113,7 +113,7 @@ export const Sidebar = () => {
                 href={route.href}
                 className={cn(
                   "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-blue-400 hover:bg-white/10 rounded-lg transition",
-                  pathname === route.href ? "text-black" : "text-zinc-400"
+                  pathname.includes(route.href) ? "text-black" : "text-zinc-400"
                 )}
               >
                 <div className="flex items-center flex-1">

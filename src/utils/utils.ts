@@ -28,7 +28,7 @@ export const getErrors = (err: AxiosError): string => {
       case 404:
         return "The requested data was not found.";
       case 409:
-        return "An admin account with this email already exists.";
+        return "Your request could not be completed due to a conflict. It seems this item has already been added or updated by someone else.";
       case 429:
         return "Too many requests. Please try again later.";
       default:

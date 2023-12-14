@@ -12,10 +12,10 @@ if (typeof window !== "undefined") {
   }
 }
 
-export const addAttributesToCollection = async (
+export const addAttributeToCollection = async (
   collectionId: string,
   data: Attribute
-): Promise<any> => {
+): Promise<Attribute> => {
   try {
     const response = await axios.post(
       `${BASE_URL}/${collectionId}/attributes`,

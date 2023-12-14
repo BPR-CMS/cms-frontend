@@ -159,9 +159,13 @@ function ContentModelDialog() {
                 name="description"
                 id="description"
                 required
+                minLength={10}
+                maxLength={500}
                 value={values.description}
                 onChangeTextArea={handleChange}
                 error={errors.description}
+             
+
               />
             </div>
           </FormGrid>

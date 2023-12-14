@@ -1,6 +1,6 @@
 describe("Define content model", () => {
   beforeEach(() => {
-    // cy.request("POST", "http://localhost:8080/api/v1/utils/resetDatabase");
+    cy.request("POST", "http://localhost:8080/api/v1/utils/resetDatabase");
     cy.visit("http://localhost:3000/");
 
     // Fill out the form with valid data
@@ -16,7 +16,16 @@ describe("Define content model", () => {
       cy.get("input#email").type("newadmin@example.com");
       cy.get("input#password").type("m$TKO7EH&OYktDYc");
       cy.get("button#loginButton").click();
+      window.localStorage.setItem(
+        "token",
+        "eyJhbGciOiJIUzI1NiJ9.eyJfdXNlclJvbGUiOiJBRE1JTiIsIl9pZCI6InVnZmlieCIsImV4cCI6MTcwMjk5OTk2NiwiaWF0IjoxNzAyMzk1MTY2fQ.-5mFKPks1x7t3tdRddSqF-CxwtNaBqLZDAGYPjufr9g"
+      );
+      cy.setCookie(
+        "token",
+        "eyJhbGciOiJIUzI1NiJ9.eyJfdXNlclJvbGUiOiJBRE1JTiIsIl9pZCI6InVnZmlieCIsImV4cCI6MTcwMjk5OTk2NiwiaWF0IjoxNzAyMzk1MTY2fQ.-5mFKPks1x7t3tdRddSqF-CxwtNaBqLZDAGYPjufr9g"
+      );
     });
+
     cy.visit("http://localhost:3000/content-type-builder/collections");
     cy.get("#createNewCollectionButton").click();
     cy.get("#name").type("Articles");
@@ -28,6 +37,8 @@ describe("Define content model", () => {
   afterEach(() => {
     // Reset the database after each test
     cy.request("POST", "http://localhost:8080/api/v1/utils/resetDatabase");
+    window.localStorage.clear()
+    cy.clearCookie("token");
   });
 
   it("should add a new text field with both basic and advanced settings", () => {
@@ -35,6 +46,7 @@ describe("Define content model", () => {
     cy.get(".card").contains("Text").click();
     cy.get("#name").type("Title");
     cy.get("#long-text").click();
+    
     cy.get("#advanced").click();
     cy.get("#required").click();
     cy.get("#defaultValue").type("Title");
@@ -364,7 +376,6 @@ describe("Define content model", () => {
     cy.get(".destructive").should("contain.text", "Error");
   });
 
-
   it("should not add a new field with numeric values in the name", () => {
     cy.get("#addNewFieldButton").click();
     cy.get(".card").contains("Text").click();
@@ -390,5 +401,4 @@ describe("Define content model", () => {
     cy.get(".destructive").should("be.visible");
     cy.get(".destructive").should("contain.text", "Error");
   });
-
 });

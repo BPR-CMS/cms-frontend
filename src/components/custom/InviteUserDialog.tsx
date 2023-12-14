@@ -167,7 +167,7 @@ function InviteUserDialog() {
                 value={values.userType}
                 onValueChange={handleUserTypeChange}
               >
-                <SelectTrigger className="w-[380px]">
+                <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="Choose here" />
                 </SelectTrigger>
                 <SelectContent>

@@ -104,8 +104,8 @@ const CreateEntryPage = ({ params }: Params) => {
     const payload = {
       attributes: attributesPayload,
     };
-    console.log(payload)
-    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    console.log(payload);
+    console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
     if (!isFormValid) {
       toast({
@@ -243,7 +243,7 @@ const CreateEntryPage = ({ params }: Params) => {
             ) : (
               <form
                 onSubmit={handleSubmit}
-                id="entry-form"
+                id="create-entry-form"
                 className="bg-white p-6 sm:p-8 md:p-10 rounded-md shadow-lg"
                 noValidate
               >
