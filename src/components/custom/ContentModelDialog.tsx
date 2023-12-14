@@ -17,7 +17,7 @@ import { addCollection, getCollections } from "@/services/CollectionService";
 import { useToast } from "@/hooks/use-toast";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { AxiosError } from "axios";
-import { getErrors } from "@/lib/utils";
+import { getErrors } from "@/utils/utils";
 import { useRouter } from "next/navigation";
 import CollectionsContext from "@/contexts/CollectionsContext";
 function ContentModelDialog() {
@@ -159,9 +159,13 @@ function ContentModelDialog() {
                 name="description"
                 id="description"
                 required
+                minLength={10}
+                maxLength={500}
                 value={values.description}
                 onChangeTextArea={handleChange}
                 error={errors.description}
+             
+
               />
             </div>
           </FormGrid>

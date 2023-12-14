@@ -1,17 +1,19 @@
 export interface Attribute {
-  attributeId: string;
+  attributeId?: string;
   name: string;
   textType?: string;
-  mediaType?: string;
   dateType?: DateType;
   formatType?: string;
   contentType: AttributeType;
   minimumLength?: number;
   maximumLength?: number;
+  minimumValue?: number;
+  maximumValue?: number;
   maximumRichTextLength?: string;
-  required?: boolean;
-  unique?: boolean;
+  required?: boolean | string;
+  unique?: boolean | string;
   format?: string;
+  defaultValue?:string;
 }
 
 export enum AttributeType {
@@ -19,7 +21,6 @@ export enum AttributeType {
   RichText = "RICHTEXT",
   Date = "DATE",
   Number = "NUMBER",
-  Media = "MEDIA",
 }
 
 export type DateType = 'DATE' | 'DATETIME' | 'TIME'; 

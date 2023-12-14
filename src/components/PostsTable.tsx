@@ -34,20 +34,19 @@ export const PostsTable: React.FC<PostsTableProps> = ({
   const [posts, setPosts] = useState<Post[]>([]);
   const router = useRouter();
   // Function to format the date
-  const formatDate = (dateString) => {
-    const options = {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "long" as const, 
+      year: "numeric" as const,
+      month: "long" as const,
+      day: "numeric" as const,
+      hour: "numeric" as const,
+      minute: "numeric" as const,
       hour12: true,
     };
-    return new Intl.DateTimeFormat("en-US", options).format(
-      new Date(dateString)
-    );
+    return new Intl.DateTimeFormat("en-US", options).format(new Date(dateString));
   };
+  
 
   // Find the first TEXT and required attribute from attributes prop
   const firstTextRequiredAttribute = attributes.find(
@@ -61,7 +60,7 @@ export const PostsTable: React.FC<PostsTableProps> = ({
     dynamicColumns.push({
       accessorKey: `attributes.${firstTextRequiredAttribute.name}`,
       header:
-        firstTextRequiredAttribute.label ||
+        firstTextRequiredAttribute.name ||
         firstTextRequiredAttribute.name.charAt(0).toUpperCase() +
           firstTextRequiredAttribute.name.slice(1),
     });

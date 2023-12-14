@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import FormFieldGroup from "./custom/FormFieldGroup";
+import { getStepValue } from "@/utils/utils";
 type CheckboxStateValues = boolean | string;
 export type SettingsTabsProps = {
   selectedField: any;
@@ -22,8 +23,6 @@ export type SettingsTabsProps = {
   setTextType: React.Dispatch<React.SetStateAction<string>>;
   dateType: string | undefined;
   setDateType: React.Dispatch<React.SetStateAction<string>>;
-  mediaType: string;
-  setMediaType: React.Dispatch<React.SetStateAction<string>>;
   checkboxStates: Record<string, CheckboxStateValues>;
   handleCheckboxChange: (name: string, checked: CheckboxStateValues) => void;
 };
@@ -39,8 +38,6 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
   setTextType,
   dateType,
   setDateType,
-  mediaType,
-  setMediaType,
   checkboxStates,
   handleCheckboxChange,
 }) => {
@@ -48,7 +45,9 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
     <Tabs defaultValue="basic">
       <TabsList className="flex justify-end">
         <TabsTrigger value="basic">Basic settings</TabsTrigger>
-        <TabsTrigger id="advanced" value="advanced">Advanced settings</TabsTrigger>
+        <TabsTrigger id="advanced" value="advanced">
+          Advanced settings
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="basic">
         <div className=" mb-6 w-[400px]">
@@ -101,12 +100,18 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 <SelectValue placeholder="Choose here" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem id="integer" value="INTEGER">integer (ex: 10)</SelectItem>
+                <SelectItem id="integer" value="INTEGER">
+                  integer (ex: 10)
+                </SelectItem>
                 <SelectItem id="bigInteger" value="BIGINTEGER">
                   big integer (ex: 123456789)
                 </SelectItem>
-                <SelectItem  id="decimal" value="DECIMAL">decimal (ex: 2.22)</SelectItem>
-                <SelectItem id="float" value="FLOAT">float (ex: 3.33333333)</SelectItem>
+                <SelectItem id="decimal" value="DECIMAL">
+                  decimal (ex: 2.22)
+                </SelectItem>
+                <SelectItem id="float" value="FLOAT">
+                  float (ex: 3.33333333)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -124,34 +129,17 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 <SelectValue placeholder="Choose here" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem id="date" value="DATE">date (ex: 01/01/2023)</SelectItem>
+                <SelectItem id="date" value="DATE">
+                  date (ex: 01/01/2023)
+                </SelectItem>
                 <SelectItem id="dateTime" value="DATETIME">
                   datetime (ex: 01/01/2023 00:00 AM)
                 </SelectItem>
-                <SelectItem id="time" value="TIME">time (ex: 00:00 AM)</SelectItem>
+                <SelectItem id="time" value="TIME">
+                  time (ex: 00:00 AM)
+                </SelectItem>
               </SelectContent>
             </Select>
-          </div>
-        )}
-
-        {selectedField && selectedField.label === "Media" && (
-          <div>
-            <Label className="flex mb-4">Type</Label>
-            <RadioGroup
-              defaultValue="SINGLE"
-              value={mediaType}
-              className="flex justify-between w-[400px]"
-              onValueChange={(value: string) => setMediaType(value)}
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="MULTIPLE" id="multiple-media" />
-                <Label htmlFor="multiple-media">Multiple Media</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="SINGLE" id="single-media" />
-                <Label htmlFor="single-media">Single Media</Label>
-              </div>
-            </RadioGroup>
           </div>
         )}
       </TabsContent>
@@ -212,7 +200,15 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 value={values.maximumLength}
                 onChangeInput={handleChange}
                 error={errors.maximumLength}
+                placeholder={
+                  textType === "SHORT" ? "Max 50 characters allowed" : ""
+                }
               />
+              {textType === "SHORT" && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Maximum length allowed for short text is 50 characters.
+                </p>
+              )}
             </div>
             <div className="col-span-full">
               <FormFieldGroup
@@ -277,6 +273,7 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 value={values.defaultValue}
                 onChangeInput={handleChange}
                 error={errors.defaultValue}
+                step={getStepValue(numberFormat || "INTEGER")}
               />
             </div>
             <div className="flex items-center space-x-2 mb-4">
@@ -326,7 +323,13 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({
                 label="Default value"
                 name="defaultValue"
                 id="defaultValue"
-                type="date"
+                type={
+                  dateType === "DATE"
+                    ? "date"
+                    : dateType === "DATETIME"
+                    ? "datetime-local"
+                    : "time"
+                }
                 value={values.defaultValue}
                 onChangeInput={handleChange}
                 error={errors.defaultValue}

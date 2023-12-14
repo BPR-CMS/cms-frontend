@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/Select";
 import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
-import { getErrors } from "@/lib/utils";
+import { getErrors } from "@/utils/utils";
 import DeleteUserDialog from "@/components/custom/DeleteUserDialog";
 interface UserFormValues {
   firstName: string;

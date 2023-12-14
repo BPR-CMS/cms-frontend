@@ -5,12 +5,12 @@ import FormGrid from "@/components/custom/FormGrid";
 import { Button } from "@/components/ui/Button";
 import { getCollectionByApiId } from "@/services/CollectionService";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
-import { getInputType } from "@/lib/utils";
+import { getInputType } from "@/utils/utils";
 import ReactQuill from "react-quill";
 import { FaExclamationCircle } from "react-icons/fa";
 import "react-quill/dist/quill.snow.css";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
-import { getStepValue } from "@/lib/utils";
+import { getStepValue } from "@/utils/utils";
 import { deletePost, getPostById, updatePost } from "@/services/PostService";
 import { Post } from "@/models/Post";
 import { getUserById } from "@/services/UserService";
@@ -19,12 +19,12 @@ import { Attribute } from "@/models/Attribute";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
-import { getErrors } from "@/lib/utils";
+import { getErrors } from "@/utils/utils";
 import { Collection } from "@/models/Collection";
 import DeletePostDialog from "@/components/custom/DeletePostDialog";
 
 type FormValues = {
-  [key: string]: string;
+  [key: string ]: string;
 };
 
 const PostDetailsPage = ({ params }: Params) => {
@@ -120,8 +120,12 @@ const PostDetailsPage = ({ params }: Params) => {
               };
             }
           );
-
-          setPost({ ...data, attributes: mergedAttributes });
+          const attributesRecord: Record<string, Attribute> = {};
+          mergedAttributes.forEach(attr => {
+            attributesRecord[attr.name] = { ...attr };
+          });
+          
+          setPost({ ...data, attributes: attributesRecord });
           const initialValues: FormValues = {};
 
           mergedAttributes.forEach((attr) => {
@@ -133,8 +137,13 @@ const PostDetailsPage = ({ params }: Params) => {
           const richTextValues: FormValues = {};
           mergedAttributes.forEach((attr) => {
             if (attr.contentType === "RICHTEXT") {
-              richTextValues[attr.name] = attr.value || "";
+              if (typeof attr.value === 'string') {
+                richTextValues[attr.name] = attr.value;
+              } else {
+                // Handle the case where attr.value is not a string
+              }
             }
+            
           });
 
           setRichTextFieldValues(richTextValues);
@@ -156,7 +165,7 @@ const PostDetailsPage = ({ params }: Params) => {
   const validateRichTextField = (
     attributeId: string,
     content: string,
-    isRequired: boolean,
+    isRequired: boolean | string,
     minLength: number,
     maxLength: number
   ) => {
@@ -204,7 +213,7 @@ const PostDetailsPage = ({ params }: Params) => {
     if (attribute) {
       setRichTextFieldValues((prev) => ({ ...prev, [attributeName]: content }));
       validateRichTextField(
-        attribute.attributeId,
+        attribute.attributeId!,
         content,
         attribute.required ?? false,
         attribute.minimumLength ?? 0,
@@ -250,7 +259,7 @@ const PostDetailsPage = ({ params }: Params) => {
                   type={getInputType(attribute.contentType)}
                   value={values[attribute.name] || ""}
                   onChangeTextArea={handleChange}
-                  required={collectionAttribute.required}
+                  required={collectionAttribute.required? true : false}
                   minLength={collectionAttribute.minimumLength}
                   maxLength={collectionAttribute.maximumLength}
                   error={errors[attribute.name] || ""}
@@ -270,7 +279,7 @@ const PostDetailsPage = ({ params }: Params) => {
                 type={getInputType(attribute.contentType)}
                 value={values[attribute.name] || ""}
                 onChangeInput={handleChange}
-                required={collectionAttribute.required}
+                required={collectionAttribute.required? true : false}
                 minValue={collectionAttribute.minimumLength}
                 maxValue={collectionAttribute.maximumLength}
                 error={errors[attribute.name] || ""}
@@ -290,7 +299,7 @@ const PostDetailsPage = ({ params }: Params) => {
                 type={dateInputType}
                 value={values[attribute.name] || ""}
                 onChangeInput={handleChange}
-                required={collectionAttribute.required}
+                required={collectionAttribute.required? true : false}
               />
             </div>
           </FormGrid>
@@ -313,7 +322,7 @@ const PostDetailsPage = ({ params }: Params) => {
                 />
               </div>
             </div>
-            {richTextErrors[collectionAttribute.attributeId] && (
+            {richTextErrors[collectionAttribute.attributeId!] && (
               <button
                 className="mt-2 text-red-500 cursor-pointer relative p-1 border border-red-500 rounded hover:bg-red-100 focus:outline-none"
                 onClick={toggleRichTextErrorTooltip}
@@ -321,7 +330,7 @@ const PostDetailsPage = ({ params }: Params) => {
                 <FaExclamationCircle />
                 {showRichTextErrorTooltip && (
                   <div className="absolute left-full top-0 mt-0 ml-2 w-48 p-2 bg-white text-sm text-red-500 border border-red-500 rounded-md shadow-md z-10">
-                    {richTextErrors[collectionAttribute.attributeId]}
+                    {richTextErrors[collectionAttribute.attributeId!]}
                   </div>
                 )}
               </button>
@@ -464,7 +473,10 @@ const PostDetailsPage = ({ params }: Params) => {
                 </Button>
               </div>
               {post ? (
-                post.attributes.map((attribute) => renderFormField(attribute))
+              post.attributes && Object.entries(post.attributes).map(([key, attribute]) => {
+                return renderFormField(attribute);
+              })
+              
               ) : (
                 <p>Loading or no post data...</p> // Fallback content
               )}

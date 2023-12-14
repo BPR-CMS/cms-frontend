@@ -1,6 +1,6 @@
 describe("Define content model", () => {
   beforeEach(() => {
-    // cy.request("POST", "http://localhost:8080/api/v1/utils/resetDatabase");
+    cy.request("POST", "http://localhost:8080/api/v1/utils/resetDatabase");
     cy.visit("http://localhost:3000/");
 
     // Fill out the form with valid data
@@ -16,7 +16,16 @@ describe("Define content model", () => {
       cy.get("input#email").type("newadmin@example.com");
       cy.get("input#password").type("m$TKO7EH&OYktDYc");
       cy.get("button#loginButton").click();
+      window.localStorage.setItem(
+        "token",
+        "eyJhbGciOiJIUzI1NiJ9.eyJfdXNlclJvbGUiOiJBRE1JTiIsIl9pZCI6InVnZmlieCIsImV4cCI6MTcwMjk5OTk2NiwiaWF0IjoxNzAyMzk1MTY2fQ.-5mFKPks1x7t3tdRddSqF-CxwtNaBqLZDAGYPjufr9g"
+      );
+      cy.setCookie(
+        "token",
+        "eyJhbGciOiJIUzI1NiJ9.eyJfdXNlclJvbGUiOiJBRE1JTiIsIl9pZCI6InVnZmlieCIsImV4cCI6MTcwMjk5OTk2NiwiaWF0IjoxNzAyMzk1MTY2fQ.-5mFKPks1x7t3tdRddSqF-CxwtNaBqLZDAGYPjufr9g"
+      );
     });
+
     cy.visit("http://localhost:3000/content-type-builder/collections");
     cy.get("#createNewCollectionButton").click();
     cy.get("#name").type("Articles");
@@ -28,6 +37,8 @@ describe("Define content model", () => {
   afterEach(() => {
     // Reset the database after each test
     cy.request("POST", "http://localhost:8080/api/v1/utils/resetDatabase");
+    window.localStorage.clear()
+    cy.clearCookie("token");
   });
 
   it("should add a new text field with both basic and advanced settings", () => {
@@ -35,6 +46,7 @@ describe("Define content model", () => {
     cy.get(".card").contains("Text").click();
     cy.get("#name").type("Title");
     cy.get("#long-text").click();
+    
     cy.get("#advanced").click();
     cy.get("#required").click();
     cy.get("#defaultValue").type("Title");
@@ -364,69 +376,12 @@ describe("Define content model", () => {
     cy.get(".destructive").should("contain.text", "Error");
   });
 
-  it("should add a new media field with both basic and advanced settings", () => {
-    cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
-    cy.get("#name").type("Collage");
-    cy.get("#multiple-media").click();
-    cy.get("#advanced").click();
-    cy.get("#required").click();
-
-    cy.get("#finishButton").should("be.enabled");
-    cy.get("#finishButton").click();
-
-    cy.get(".success")
-      .should("be.visible")
-      .contains("Field added successfully.");
-    cy.get("#fieldsTable").should("exist");
-    cy.get("#fieldsTable").contains("Collage");
-  });
-
-  it("should add a new media field with only basic settings", () => {
-    cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
-    cy.get("#name").type("Collage");
-    cy.get("#multiple-media").click();
-
-    cy.get("#finishButton").should("be.enabled");
-    cy.get("#finishButton").click();
-
-    cy.get(".success")
-      .should("be.visible")
-      .contains("Field added successfully.");
-    cy.get("#fieldsTable").should("exist");
-    cy.get("#fieldsTable").contains("Collage");
-  });
-
-  it("should not add a new media field with missing name", () => {
-    cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
-
-    cy.get("#multiple-media").click();
-
-    cy.get("#finishButton").should("be.disabled");
-  });
-
-  it("should not add a new media field with special characters in the name", () => {
-    cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
-    cy.get("#name").type("%Avatar&***&");
-
-    cy.get("#multiple-media").click();
-
-    cy.get("#finishButton").should("be.disabled");
-    cy.get("#error-button").should("be.visible").click();
-    cy.get("#error-tooltip")
-      .contains("Please match the format requested.")
-      .should("be.visible");
-  });
-
   it("should not add a new field with numeric values in the name", () => {
     cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
+    cy.get(".card").contains("Text").click();
     cy.get("#name").type("123");
 
-    cy.get("#multiple-media").click();
+    cy.get("#long-text").click();
 
     cy.get("#finishButton").should("be.disabled");
     cy.get("#error-button").should("be.visible").click();
@@ -441,27 +396,6 @@ describe("Define content model", () => {
     cy.get("#name").type("  ");
     cy.get("#long-text").click();
 
-    cy.get("#finishButton").click();
-
-    cy.get(".destructive").should("be.visible");
-    cy.get(".destructive").should("contain.text", "Error");
-  });
-
-  it("should not add a new media field with duplicate name", () => {
-    cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
-    cy.get("#name").type("Collage");
-    cy.get("#multiple-media").click();
-
-    cy.get("#finishButton").should("be.enabled");
-    cy.get("#finishButton").click();
-
-    cy.get("#addNewFieldButton").click();
-    cy.get(".card").contains("Media").click();
-    cy.get("#name").type("Collage");
-    cy.get("#multiple-media").click();
-
-    cy.get("#finishButton").should("be.enabled");
     cy.get("#finishButton").click();
 
     cy.get(".destructive").should("be.visible");

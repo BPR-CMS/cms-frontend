@@ -1,23 +1,17 @@
 "use client";
 import { Collection } from "@/models/Collection";
 import { getCollections } from "@/services/CollectionService";
-import React, {
-  createContext,
-  useState,
-  useEffect,
-  useCallback,
-  useContext,
-} from "react";
+import React, { createContext, useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { checkUserAuthenticated } from "@/services/UserService";
 const CollectionsContext = createContext(null);
 
 export const CollectionsProvider = ({ children }) => {
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
   const [collections, setCollections] = useState<Collection[]>([]);
 
   const fetchCollections = useCallback(async () => {
+    const isAuthenticated = await checkUserAuthenticated();
     if (!isAuthenticated) {
       setCollections([]);
       return;
@@ -69,7 +63,7 @@ export const CollectionsProvider = ({ children }) => {
 
   return (
     <CollectionsContext.Provider
-      value={{ collections, updateCollection, fetchCollections, isAuthenticated }}
+      value={{ collections, updateCollection, fetchCollections }}
     >
       {children}
     </CollectionsContext.Provider>

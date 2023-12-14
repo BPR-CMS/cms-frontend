@@ -11,7 +11,7 @@ import { Attribute, AttributeType } from "@/models/Attribute";
 import { Button } from "@/components/ui/Button";
 import { fields } from "@/utils/constants";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
-import { addAttributesToCollection } from "@/services/ContentModelService";
+import { addAttributeToCollection } from "@/services/ContentModelService";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +25,8 @@ import DetailedView from "@/components/DetailedView";
 import GridView from "@/components/GridView";
 import { CollectionFieldsTable } from "@/components/CollectionFieldsTable";
 import CollectionsContext from "@/contexts/CollectionsContext";
+import { AxiosError } from "axios";
+import { DateType, getErrors } from "@/utils/utils";
 export default function ContentTypePage({ params }: Params) {
   const { contentType } = params;
 
@@ -56,7 +58,7 @@ export default function ContentTypePage({ params }: Params) {
   const [selectedFieldType, setSelectedFieldType] =
     useState<AttributeType | null>(null);
   const [numberFormat, setNumberFormat] = useState<string>("INTEGER");
-  const [dateType, setDateType] = useState<string>("DATE");
+  const [dateType, setDateType] = useState<DateType>("DATE");
 
   const [fieldsData, setFieldsData] = useState<Attribute[]>([]);
   const { toast } = useToast();
@@ -65,58 +67,66 @@ export default function ContentTypePage({ params }: Params) {
   const [currentView, setCurrentView] = useState("grid"); // 'grid' or 'detail'
   const [selectedField, setSelectedField] = useState(null);
   const [textType, setTextType] = useState<string>("SHORT");
-  const [mediaType, setMediaType] = useState<string>("SINGLE");
   const handleCardClick = useCallback((field: any) => {
     setSelectedField(field);
     setCurrentView("detail");
     setSelectedFieldType(field.label.toUpperCase());
   }, []);
 
+  // Function to create a new field object
+  const createNewField = () => ({
+    name: values.name,
+    textType: textType,
+    dateType: dateType,
+    contentType: selectedFieldType,
+    formatType: numberFormat,
+    required: checkboxStates.required || false,
+    unique: checkboxStates.unique || false,
+    minimumLength: parseInt(values.minimumLength) || undefined,
+    maximumLength: parseInt(values.maximumLength) || undefined,
+    maximumRichTextLength: values.maximumRichTextLength,
+    minimumValue: parseFloat(values.minimumValue) || undefined,
+    maximumValue: parseFloat(values.maximumValue) || undefined,
+    defaultValue: values.defaultValue,
+  });
+
+  // Function to handle successful submission
+  const onSuccessfulSubmission = async (newField) => {
+    await addAttributeToCollection(selectedContentType.id, newField);
+    setFieldsData((prevFields) => [...prevFields, newField]);
+    updateCollection(selectedContentType.id, newField);
+
+    setIsDialogOpen(false);
+    toast({
+      title: "Success",
+      description: "Field added successfully.",
+      variant: "success",
+    });
+    resetDialog();
+  };
+
+  // Function to handle errors
+  const handleError = (error) => {
+    const axiosError = error as AxiosError;
+    const errorMessage = getErrors(axiosError);
+    console.error("Error adding new field:", error);
+    toast({
+      title: "Error",
+      description: errorMessage,
+      variant: "destructive",
+    });
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (selectedFieldType) {
-      const newField: Attribute = {
-        name: values.name,
-        textType: textType,
-        mediaType: mediaType,
-        dateType: dateType,
-        contentType: selectedFieldType,
-        formatType: numberFormat,
-        required: checkboxStates.required || false,
-        unique: checkboxStates.unique || false,
-        minimumLength: values.minimumLength,
-        maximumLength: values.maximumLength,
-        maximumRichTextLength: values.maximumRichTextLength,
-        minimumValue: values.minimumValue,
-        maximumValue: values.maximumValue,
-        defaultValue: values.defaultValue,
-      };
-
+      const newField = createNewField();
       try {
-        await addAttributesToCollection(selectedContentType.id, newField);
-        console.log(newField);
-        setFieldsData((prevFields) => [...prevFields, newField]);
-        updateCollection(selectedContentType.id, newField);
-
-        setIsDialogOpen(false);
-
-        toast({
-          title: "Success",
-          description: "Field added successfully.",
-          variant: "success",
-        });
-        resetDialog();
+        await onSuccessfulSubmission(newField);
       } catch (error) {
-        console.error("Error adding new field:", error);
-
-        toast({
-          title: "Error",
-          description: "Failed to add new field.",
-          variant: "destructive",
-        });
+        handleError(error);
       }
     } else {
-      console.log("error");
       toast({
         title: "Error",
         description: "Please select a field type.",
@@ -144,6 +154,7 @@ export default function ContentTypePage({ params }: Params) {
       name: "",
       minimumLength: "",
       maximumLength: "",
+      maximumRichTextLength: "",
       minimumValue: "",
       maximumValue: "",
       defaultValue: "",
@@ -159,7 +170,6 @@ export default function ContentTypePage({ params }: Params) {
         <div className="flex-grow md:ml-72 mt-4">
           <h2>{selectedContentType.name}</h2>
           <p>{selectedContentType.description}</p>
-
           <div className="pl-56 pr-56">
             <div className="mt-6">
               <div className="container mx-auto py-10">
@@ -167,7 +177,6 @@ export default function ContentTypePage({ params }: Params) {
                   attributes={attributes}
                   onAddFieldClick={() => setIsDialogOpen(true)}
                 />
-
                 <Dialog
                   open={isDialogOpen}
                   onOpenChange={() => {
@@ -226,8 +235,6 @@ export default function ContentTypePage({ params }: Params) {
                             setNumberFormat={setNumberFormat}
                             dateType={dateType}
                             setDateType={setDateType}
-                            mediaType={mediaType}
-                            setMediaType={setMediaType}
                             checkboxStates={checkboxStates}
                             handleCheckboxChange={handleCheckboxChange}
                           />

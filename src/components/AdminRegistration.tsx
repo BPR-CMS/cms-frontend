@@ -9,7 +9,7 @@ import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { useToast } from "@/hooks/use-toast";
 import { checkAdminExists, registerAdmin } from "@/services/AdminService";
 import { User } from "@/models/User";
-import { getErrors } from "@/lib/utils";
+import { getErrors } from "@/utils/utils";
 import { AxiosError } from "axios";
 import {
   Tooltip,

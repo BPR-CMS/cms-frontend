@@ -4,7 +4,7 @@ import { ArrowRight, LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Card } from "@/components/ui/Card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 
 import { tools } from "@/utils/constants";
 import Cookies from "js-cookie";

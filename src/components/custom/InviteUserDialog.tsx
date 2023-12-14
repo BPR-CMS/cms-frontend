@@ -1,3 +1,4 @@
+
 "use client";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { Button } from "../ui/Button";
@@ -19,7 +20,7 @@ import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { User } from "@/models/User";
 import { useToast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
-import { getErrors } from "@/lib/utils";
+import { getErrors } from "@/utils/utils";
 import { Label } from "../ui/Label";
 import {
   Select,
@@ -166,7 +167,7 @@ function InviteUserDialog() {
                 value={values.userType}
                 onValueChange={handleUserTypeChange}
               >
-                <SelectTrigger className="w-[380px]">
+                <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="Choose here" />
                 </SelectTrigger>
                 <SelectContent>

@@ -28,7 +28,7 @@ export const getErrors = (err: AxiosError): string => {
       case 404:
         return "The requested data was not found.";
       case 409:
-        return "An admin account with this email already exists.";
+        return "Your request could not be completed due to a conflict. It seems this item has already been added or updated by someone else.";
       case 429:
         return "Too many requests. Please try again later.";
       default:
@@ -39,11 +39,14 @@ export const getErrors = (err: AxiosError): string => {
   }
 };
 
-export type ContentType = 'TEXT' | 'RICHTEXT' | 'NUMBER' | 'DATE' | 'MEDIA';
-export type DateType = 'DATE' | 'DATETIME' | 'TIME'; 
+export type ContentType = "TEXT" | "RICHTEXT" | "NUMBER" | "DATE";
+export type DateType = "DATE" | "DATETIME" | "TIME";
 
-export function getInputType(contentType: ContentType, dateType?: DateType): string {
-  if (contentType === 'DATE' && dateType) {
+export function getInputType(
+  contentType: ContentType,
+  dateType?: DateType
+): string {
+  if (contentType === "DATE" && dateType) {
     const dateTypeMapping: { [K in DateType]: string } = {
       DATE: "date",
       DATETIME: "datetime-local",
@@ -57,12 +60,10 @@ export function getInputType(contentType: ContentType, dateType?: DateType): str
     RICHTEXT: "text",
     NUMBER: "number",
     DATE: "date", // Default to date if no dateType is provided
-    MEDIA: "file",
   };
 
   return typeMapping[contentType];
 }
-
 
 export const getStepValue = (numberType: string) => {
   switch (numberType) {

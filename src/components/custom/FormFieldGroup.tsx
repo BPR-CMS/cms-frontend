@@ -23,10 +23,11 @@ interface FormFieldGroupProps {
   useTextarea?: boolean;
   rows?: number;
   cols?: number;
-  ref? : Ref<HTMLInputElement> | undefined;
+  ref?: Ref<HTMLInputElement> | undefined;
   step?: string | number;
   minValue?: number;
-  maxValue?: number; 
+  maxValue?: number;
+  placeholder?: string;
 }
 
 const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
@@ -50,7 +51,8 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
   ref,
   step,
   minValue,
-  maxValue
+  maxValue,
+  placeholder,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -72,6 +74,8 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
           rows={rows}
           cols={cols}
           className="mt-2"
+          minLength={minLength}
+          maxLength={maxLength}
 
           // ... other props for Textarea
         />
@@ -92,6 +96,7 @@ const FormFieldGroup: React.FC<FormFieldGroupProps> = ({
           step={step}
           min={minValue}
           max={maxValue}
+          placeholder={placeholder}
         />
       )}
 
