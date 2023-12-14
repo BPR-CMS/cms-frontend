@@ -2,7 +2,7 @@ import axios from "axios";
 import { User } from "@/models/User";
 import Cookies from "js-cookie";
 
-const BASE_URL = "http://localhost:8080/api/v1/users";
+const BASE_URL = "https://webease-cms-production.up.railway.app/api/v1/users";
 let TOKEN = "";
 
 const getToken = () => {

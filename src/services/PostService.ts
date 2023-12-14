@@ -1,7 +1,7 @@
 import { Post } from "@/models/Post";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080/api/v1";
+const BASE_URL = "https://webease-cms-production.up.railway.app/api/v1";
 let TOKEN = "";
 
 if (typeof window !== "undefined") {

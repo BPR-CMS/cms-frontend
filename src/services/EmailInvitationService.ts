@@ -1,7 +1,7 @@
 import axios from "axios";
 import { User } from "@/models/User";
 
-const BASE_URL = "http://localhost:8080/api/v1/invitations";
+const BASE_URL = "https://webease-cms-production.up.railway.app/api/v1/invitations";
 let TOKEN = "";
 
 if (typeof window !== "undefined") {

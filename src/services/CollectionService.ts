@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Collection } from "@/models/Collection";
 
-const BASE_URL = "http://localhost:8080/api/v1/collections";
+const BASE_URL = "https://webease-cms-production.up.railway.app/api/v1/collections";
 
 let TOKEN = "";
 
